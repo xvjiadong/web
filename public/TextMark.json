@@ -1,0 +1,19 @@
+[
+    { 
+        "page": 1,
+        "mark": [
+            {
+                "id":1,
+                "markcontent":"878",
+                "shape":[
+                    {
+                        "left":1,
+                        "top":1,
+                        "width":1,
+                        "height":1
+                    }
+                ]
+            }
+        ]
+    }
+]
