@@ -2,8 +2,8 @@
     <div class="main">
         <div class="block">
             <el-form status-icon ref="userform" :model="user" :rules="userrules" class="userform">
-                <el-form-item prop="worknumber">
-                    <el-input v-model="user.worknumber" size="small" placeholder="请输入工号">
+                <el-form-item prop="username">
+                    <el-input v-model="user.username" size="small" placeholder="请输入工号">
                         <template slot="prepend">工号<i class="el-icon-user"></i></template>
                     </el-input>
                 </el-form-item>
@@ -22,6 +22,7 @@
 </template>
 <script>
 import axios from 'axios'
+axios.defaults.timeout=50000
 export default {
     mounted() {
         if (this.$route.query.msg) {
@@ -45,11 +46,11 @@ export default {
         };
         return {
             user: {
-                worknumber: "",
+                username: "",
                 password: ""
             },
             userrules: {
-                worknumber: [
+                username: [
                     { validator: validateworknumber, trigger: 'blur' }
                 ],
                 password: [
@@ -62,9 +63,11 @@ export default {
         SubForm(item) {
             this.$refs[item].validate((result) => {
                 if (result) {
-                    axios.post("http://localhost:3000/login", this.user).then((res) => {
+                    //console.log(JSON.stringify(this.user));
+                    axios.post("http://192.168.224.150:10010/users/login", this.user).then((res) => {
+                        console.log(res.data);
                         if (res.data.code === 200) {
-                            this.$store.commit("setuser", res.data.user[0])
+                            this.$store.commit("setuser", res.data.user)
                             this.$store.commit("changeisadd", false)
                             //console.log(this.$store.state.user);
                             this.$message({ message: "登录成功", type: "success" })

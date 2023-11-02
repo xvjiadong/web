@@ -30,10 +30,10 @@
         </div>
         <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
             <el-checkbox-group v-model="list">
-                <el-checkbox label="原批"></el-checkbox>
-                <el-checkbox label="铁皮"></el-checkbox>
-                <el-checkbox label="撸狗"></el-checkbox>
-                <el-checkbox label="魂w"></el-checkbox>
+                <el-checkbox label="人脸"></el-checkbox>
+                <el-checkbox label="文本"></el-checkbox>
+                <el-checkbox label="物体"></el-checkbox>
+                <el-checkbox label="场景"></el-checkbox>
             </el-checkbox-group>
             <el-button @click="ok">
                 确定

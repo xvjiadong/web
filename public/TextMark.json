@@ -1,19 +1,100 @@
 [
-    { 
-        "page": 1,
-        "mark": [
-            {
-                "id":1,
-                "markcontent":"878",
-                "shape":[
-                    {
-                        "left":1,
-                        "top":1,
-                        "width":1,
-                        "height":1
-                    }
-                ]
-            }
+  {
+    "page": "1",
+    "mark": [
+      {
+        "mode": 1,
+        "id": "1-1698770514490",
+        "markcontent": "11",
+        "shape": [
+          {
+            "id": "1-1698770514490-0",
+            "left": "220px",
+            "top": "calc(var(--scale-factor)*169.63px)",
+            "width": "calc(var(--scale-factor)*259.20000000000005px)",
+            "height": " calc(var(--scale-factor)*26.92px)"
+          },
+          {
+            "id": "1-1698770514490-1",
+            "left": "calc(var(--scale-factor)*140.93px)",
+            "top": "calc(var(--scale-factor)*256.15px)",
+            "width": "calc(var(--scale-factor)*312px)",
+            "height": "calc(var(--scale-factor)*25px)"
+          },
+          {
+            "id": "1-1698770514490-2",
+            "left": "calc(var(--scale-factor)*249.46px)",
+            "top": "calc(var(--scale-factor)*287.38px)",
+            "width": "calc(var(--scale-factor)*96px)",
+            "height": "calc(var(--scale-factor)*25px)"
+          }
         ]
-    }
+      }
+    ]
+  },
+  {
+    "page": "3",
+    "mark": [
+      {
+        "id": "3-1698924279376",
+        "istag": true,
+        "markcontent": [{ "tag": "黄金糕 ", "evidence": ["3-1698924294511"] }, {"tag":"双皮奶","evidence":[]}, {"tag":"花花花","evidence":[]}],
+        "mode": 2,
+        "evidencelist": [{ "tag": "黄金糕 ", "evidence": ["3-1698924294511"] }],
+        "shape": [
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924279376-0",
+            "left": "179px",
+            "top": "calc(var(--scale-factor)*359.40px)",
+            "width": "calc(var(--scale-factor)*372px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924279376-1",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*382.68px)",
+            "width": "calc(var(--scale-factor)*420px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924279376-2",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*406.20px)",
+            "width": "calc(var(--scale-factor)*204px)"
+          }
+        ]
+      },
+      {
+        "belong": { "id": "3-1698924279376", "tag": "花花花" },
+        "id": "3-1698924294511",
+        "istag": false,
+        "markcontent": null,
+        "mode": 2,
+        "shape": [
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924294511-0",
+            "left": "192px",
+            "top": "calc(var(--scale-factor)*453.02px)",
+            "width": "calc(var(--scale-factor)*372px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924294511-1",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*476.30px)",
+            "width": "calc(var(--scale-factor)*420px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1698924294511-2",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*499.82px)",
+            "width": "calc(var(--scale-factor)*360px)"
+          }
+        ]
+      }
+    ]
+  }
 ]

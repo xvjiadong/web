@@ -116,7 +116,7 @@ export default {
                 console.log(result);
                 if (result) {
                     /*注册请求发送*/
-                    axios.post("http://localhost:3000/logon", this.user).then((res) => {
+                    axios.post("http://192.168.224.150:10010/users/logon", this.user).then((res) => {
                         if (res.data.code === 200) {
                             this.$message({message:"注册成功",type:"success"})
                             setTimeout(() => {
