@@ -22,7 +22,7 @@ const routes = [
     path: "/",
     name: "login",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../components/PdfView.vue"),
+      import(/* webpackChunkName: "about" */ "../views/LoginIn.vue"),
   },
   {
     path: "/logon",
@@ -83,14 +83,41 @@ router.beforeEach((to, from, next) => {
             mode: "history",
             routes: routes,
           });
-        router.matcher=createRouter().matcher
+        router.matcher = createRouter().matcher;
         add();
         store.commit("changeisadd", true);
         next({
           path: to.fullPath,
         });
       } else {
-        next();
+        if (
+          to.name === "PicView" ||
+          to.name === "PdfView" ||
+          to.name === "ImageClassification" ||
+          to.name === "TextClassification" ||
+          to.name === "PicReview" ||
+          to.name === "PdfReview" ||
+          to.name === "TextPartReview" ||
+          to.name === "PicPartReview"
+        ) {
+          if (
+            Object.prototype.hasOwnProperty.call(to.query, "marktype") &&
+            Object.prototype.hasOwnProperty.call(to.query, "projectid") &&
+            Object.prototype.hasOwnProperty.call(to.query, "projectname") &&
+            Object.prototype.hasOwnProperty.call(to.query, "version")
+          ) {
+            if (to.name !== "PdfReview") {
+              store.commit("clearisaddpdf")
+            }
+            next();
+          } else {
+            next({
+              path: "/",
+            });
+          }
+        } else {
+          next();
+        }
       }
     } else {
       next({

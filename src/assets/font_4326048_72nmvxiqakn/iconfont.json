@@ -1,0 +1,205 @@
+{
+  "id": "4326048",
+  "name": "56",
+  "font_family": "element-icons",
+  "css_prefix_text": "el-icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "8776843",
+      "name": "edit",
+      "font_class": "icon-test",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
+    },
+    {
+      "icon_id": "8777370",
+      "name": "list",
+      "font_class": "icon-test1",
+      "unicode": "e64f",
+      "unicode_decimal": 58959
+    },
+    {
+      "icon_id": "34452758",
+      "name": "business-icon-Big promotion",
+      "font_class": "a-business-icon-Bigpromotion",
+      "unicode": "e822",
+      "unicode_decimal": 59426
+    },
+    {
+      "icon_id": "34452981",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e843",
+      "unicode_decimal": 59459
+    },
+    {
+      "icon_id": "34453198",
+      "name": "discount-fill",
+      "font_class": "discount-fill",
+      "unicode": "e853",
+      "unicode_decimal": 59475
+    },
+    {
+      "icon_id": "34453199",
+      "name": "discount",
+      "font_class": "discount",
+      "unicode": "e854",
+      "unicode_decimal": 59476
+    },
+    {
+      "icon_id": "34453206",
+      "name": "folder",
+      "font_class": "folder",
+      "unicode": "e856",
+      "unicode_decimal": 59478
+    },
+    {
+      "icon_id": "34452836",
+      "name": "editor-four-column",
+      "font_class": "editor-four-column",
+      "unicode": "e82a",
+      "unicode_decimal": 59434
+    },
+    {
+      "icon_id": "34452840",
+      "name": "editor-left-alignment",
+      "font_class": "editor-left-alignment",
+      "unicode": "e82b",
+      "unicode_decimal": 59435
+    },
+    {
+      "icon_id": "34452911",
+      "name": "money-funds",
+      "font_class": "money-funds",
+      "unicode": "e831",
+      "unicode_decimal": 59441
+    },
+    {
+      "icon_id": "34452923",
+      "name": "product-filter",
+      "font_class": "product-filter",
+      "unicode": "e833",
+      "unicode_decimal": 59443
+    },
+    {
+      "icon_id": "34452924",
+      "name": "order-success",
+      "font_class": "order-success",
+      "unicode": "e834",
+      "unicode_decimal": 59444
+    },
+    {
+      "icon_id": "34452925",
+      "name": "order",
+      "font_class": "order",
+      "unicode": "e835",
+      "unicode_decimal": 59445
+    },
+    {
+      "icon_id": "34452927",
+      "name": "product-checked",
+      "font_class": "product-checked",
+      "unicode": "e836",
+      "unicode_decimal": 59446
+    },
+    {
+      "icon_id": "34452928",
+      "name": "order-manage",
+      "font_class": "order-manage",
+      "unicode": "e837",
+      "unicode_decimal": 59447
+    },
+    {
+      "icon_id": "34452929",
+      "name": "order-success-fill",
+      "font_class": "order-success-fill",
+      "unicode": "e838",
+      "unicode_decimal": 59448
+    },
+    {
+      "icon_id": "34452933",
+      "name": "product-checked-fill",
+      "font_class": "product-checked-fill",
+      "unicode": "e839",
+      "unicode_decimal": 59449
+    },
+    {
+      "icon_id": "34452936",
+      "name": "product-fill",
+      "font_class": "product-fill",
+      "unicode": "e83a",
+      "unicode_decimal": 59450
+    },
+    {
+      "icon_id": "34452937",
+      "name": "product-list-fill",
+      "font_class": "product-list-fill",
+      "unicode": "e83b",
+      "unicode_decimal": 59451
+    },
+    {
+      "icon_id": "34452939",
+      "name": "product-filter-fill",
+      "font_class": "product-filter-fill",
+      "unicode": "e83c",
+      "unicode_decimal": 59452
+    },
+    {
+      "icon_id": "34452945",
+      "name": "product-loaction-fill",
+      "font_class": "product-loaction-fill",
+      "unicode": "e83d",
+      "unicode_decimal": 59453
+    },
+    {
+      "icon_id": "34452946",
+      "name": "product-loaction",
+      "font_class": "product-loaction",
+      "unicode": "e83e",
+      "unicode_decimal": 59454
+    },
+    {
+      "icon_id": "34452947",
+      "name": "product",
+      "font_class": "product",
+      "unicode": "e83f",
+      "unicode_decimal": 59455
+    },
+    {
+      "icon_id": "34452948",
+      "name": "product-list",
+      "font_class": "product-list",
+      "unicode": "e840",
+      "unicode_decimal": 59456
+    },
+    {
+      "icon_id": "34452951",
+      "name": "product-get-catalog",
+      "font_class": "product-get-catalog",
+      "unicode": "e841",
+      "unicode_decimal": 59457
+    },
+    {
+      "icon_id": "34453006",
+      "name": "list",
+      "font_class": "list",
+      "unicode": "e842",
+      "unicode_decimal": 59458
+    },
+    {
+      "icon_id": "34453253",
+      "name": "professional",
+      "font_class": "professional",
+      "unicode": "e863",
+      "unicode_decimal": 59491
+    },
+    {
+      "icon_id": "34453294",
+      "name": "training-fill",
+      "font_class": "training-fill",
+      "unicode": "e86f",
+      "unicode_decimal": 59503
+    }
+  ]
+}

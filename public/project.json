@@ -1,0 +1,295 @@
+{
+    "msg": "成功",
+    "code": 200,
+    "data": [
+        {
+            "id": 1,
+            "name": "鸡冠花",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": []
+        },
+        {
+            "id": 2,
+            "name": "狗尾巴草",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": []
+        },
+        {
+            "id": 3,
+            "name": "猪",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "线标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "狗",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "线标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "羊",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "name": "羊",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": []
+        },
+        {
+            "id": 21,
+            "name": "羊",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": []
+        },
+        {
+            "id": 22,
+            "name": "牛尾花",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "点标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 23,
+            "name": "牛尾花",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "点标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "name": "牛尾花",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": "15%",
+                    "callType": "点标注",
+                    "dataNumber": 14,
+                    "userVOList": [
+                        {
+                            "userId": 1,
+                            "personalProgress": "15%",
+                            "dataNumber": 788,
+                            "startTime":"2023-11-05 10:47",
+                            "endTime":"2023-11-15 10:47"
+                        },
+                        {
+                            "userId": 4,
+                            "personalProgress": null,
+                            "dataNumber": 56,
+                            "startTime":"2023-11-05 10:47",
+                            "endTime":"2023-11-15 10:47"
+                        },
+                        {
+                            "userId": 1,
+                            "personalProgress": null,
+                            "dataNumber": 7,
+                            "startTime":"2023-11-05 10:47",
+                            "endTime":"2023-11-15 10:47"
+                        },
+                        {
+                            "userId": 4,
+                            "personalProgress": null,
+                            "dataNumber": 6,
+                            "startTime":"2023-11-05 10:47",
+                            "endTime":"2023-11-15 10:47"
+                        }
+                    ]
+                },
+                {
+                    "verName": "V2",
+                    "progress": null,
+                    "callType": null,
+                    "dataNumber": 1,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "name": "牛尾花",
+            "dataNumber": null,
+            "dataType": "图像",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "点标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "name": "牛尾花",
+            "dataNumber": null,
+            "dataType": "图像",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "点标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "name": "767",
+            "dataNumber": null,
+            "dataType": "图像",
+            "versions": [
+                {
+                    "verName": "v1",
+                    "progress": null,
+                    "callType": "混合标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "name": "鬼地方个",
+            "dataNumber": null,
+            "dataType": "图像",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "混合标注",
+                    "dataNumber": null,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "name": "的身份",
+            "dataNumber": null,
+            "dataType": "图像",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "混合标注",
+                    "dataNumber": 2,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "name": "而法国",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "v1",
+                    "progress": null,
+                    "callType": "实体抽取",
+                    "dataNumber": 0,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "name": "而法国",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "v1",
+                    "progress": null,
+                    "callType": "实体抽取",
+                    "dataNumber": 0,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "name": "而法国",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "v1",
+                    "progress": null,
+                    "callType": "实体抽取",
+                    "dataNumber": 0,
+                    "userVOList": []
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "name": "765",
+            "dataNumber": null,
+            "dataType": "文本",
+            "versions": [
+                {
+                    "verName": "V1",
+                    "progress": null,
+                    "callType": "实体抽取",
+                    "dataNumber": 2,
+                    "userVOList": []
+                }
+            ]
+        }
+    ]
+}

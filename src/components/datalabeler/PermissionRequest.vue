@@ -1,6 +1,6 @@
 <template>
     <div>
-        PermissionRequest
+        
     </div>
 </template>
 <script>

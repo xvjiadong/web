@@ -12,6 +12,7 @@
     "@vue-office/pdf": "^1.5.4",
     "@vue/composition-api": "^1.7.2",
     "ailabel": "^5.1.15",
+    "animate.css": "^4.1.1",
     "axios": "^1.6.0",
     "core-js": "^3.8.3",
     "crypto-browserify": "^3.12.0",

@@ -2,8 +2,8 @@
     <div class="main">
         <div class="block">
             <el-form status-icon ref="userform" :model="user" :rules="userrules" class="userform">
-                <el-form-item prop="username">
-                    <el-input v-model="user.username" size="small" placeholder="请输入工号">
+                <el-form-item prop="phoneNumber">
+                    <el-input v-model="user.phoneNumber" size="small" placeholder="请输入工号">
                         <template slot="prepend">工号<i class="el-icon-user"></i></template>
                     </el-input>
                 </el-form-item>
@@ -46,11 +46,11 @@ export default {
         };
         return {
             user: {
-                username: "",
+                phoneNumber: "",
                 password: ""
             },
             userrules: {
-                username: [
+                phoneNumber: [
                     { validator: validateworknumber, trigger: 'blur' }
                 ],
                 password: [
@@ -64,14 +64,13 @@ export default {
             this.$refs[item].validate((result) => {
                 if (result) {
                     //console.log(JSON.stringify(this.user));
-                    axios.post("http://192.168.224.150:10010/users/login", this.user).then((res) => {
-                        console.log(res.data);
+                    axios.post("http://10.99.254.235:10010/users/login", this.user).then((res) => {
                         if (res.data.code === 200) {
-                            this.$store.commit("setuser", res.data.user)
+                            this.$store.commit("setuser", res.data.data)
                             this.$store.commit("changeisadd", false)
                             //console.log(this.$store.state.user);
                             this.$message({ message: "登录成功", type: "success" })
-                            this.$router.push({ path: '/MainBox' })
+                            this.$router.push('/MainBox' )
                         } else {
                             this.$message({ message: "请重新输入工号密码", type: "error" })
                         }

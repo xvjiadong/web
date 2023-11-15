@@ -6,6 +6,7 @@
         "mode": 1,
         "id": "1-1698770514490",
         "markcontent": "11",
+        "choosecontent": "博时基金管理有限公司博时安盈债券型证券投资基金基金合同",
         "shape": [
           {
             "id": "1-1698770514490-0",
@@ -38,7 +39,12 @@
       {
         "id": "3-1698924279376",
         "istag": true,
-        "markcontent": [{ "tag": "黄金糕 ", "evidence": ["3-1698924294511"] }, {"tag":"双皮奶","evidence":[]}, {"tag":"花花花","evidence":[]}],
+        "choosecontent": "基金合同是规定基金合同当事人之间权利义务关系的基本法律文件，其他与基金相关的涉及基金合同当事人之间权利义务关系的任何文件或表述，如与基金合同有冲突，均以基金合同为准。",
+        "markcontent": [
+          { "tag": "黄金糕 ", "evidence": ["3-1698924294511"] },
+          { "tag": "双皮奶", "evidence": [] },
+          { "tag": "花花花", "evidence": [] }
+        ],
         "mode": 2,
         "evidencelist": [{ "tag": "黄金糕 ", "evidence": ["3-1698924294511"] }],
         "shape": [
@@ -71,6 +77,7 @@
         "istag": false,
         "markcontent": null,
         "mode": 2,
+        "choosecontent": "合同的当事人包括基金管理人、基金托管人和基金份额持有人。基金投资人自依本基金合同取得基金份额，即成为基金份额持有人和本基金合同的当事人，其持有基金份额的行为本身即表明其对基金合同的承认和接受。",
         "shape": [
           {
             "height": "calc(var(--scale-factor)*13px)",
@@ -94,6 +101,67 @@
             "width": "calc(var(--scale-factor)*360px)"
           }
         ]
+      },
+      {
+        "choosecontent": "中国证监会对本基金募集的核准，并不表明其对本基金的价值和收益做出实质性判断或保证，也不表明投资于本基金没有风险。",
+        "id": "3-1699548556894",
+        "link": [
+          {
+            "id": "3-1699548570341",
+            "linkname": "比例",
+            "tag": "龙须面"
+          }
+        ],
+        "mode": 3,
+        "shape": [
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1699548556894-0",
+            "left": "153px",
+            "top": "calc(var(--scale-factor)*593.45px)",
+            "width": "calc(var(--scale-factor)*396px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1699548556894-1",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*616.75px)",
+            "width": "calc(var(--scale-factor)*276px)"
+          }
+        ],
+        "tag": "黄金糕"
+      },
+      {
+        "choosecontent": "基金管理人、基金托管人在本基金合同之外披露涉及本基金的信息，其内容涉及界定基金合同当事人之间权利义务关系的，如与基金合同有冲突，以基金合同为准。",
+        "id": "3-1699548570341",
+        "link": [
+          { "id": "3-1699548556894", "linkname": "比例", "tag": "黄金糕" }
+        ],
+        "mode": 3,
+        "shape": [
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1699548570341-0",
+            "left": "186px",
+            "top": "calc(var(--scale-factor)*687.10px)",
+            "width": "calc(var(--scale-factor)*372px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1699548570341-1",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*710.38px)",
+            "width": "calc(var(--scale-factor)*420px)"
+          },
+          {
+            "height": "calc(var(--scale-factor)*13px)",
+            "id": "3-1699548570341-2",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*733.90px)",
+            "width": "calc(var(--scale-factor)*72px)"
+          }
+        ],
+        "tag": "龙须面"
       }
     ]
   }

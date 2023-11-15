@@ -1,30 +1,30 @@
 <template>
-    <el-header>
+    <el-header :class="{elHeader:$store.state.islight,elHeader2:!$store.state.islight}">
         <div class="left">
             <div :class='{menuiconnotcollapse:!$store.state.iscollapse,menuiconcollapse:$store.state.iscollapse}' @click="changemenu">
-                <i class="el-icon-d-arrow-left" v-if="!$store.state.iscollapse" style="font-size: 4vh;"></i>
-                <i class="el-icon-d-arrow-right" v-if="$store.state.iscollapse" style="font-size: 4vh;"></i>
-                <span style="font-size: 120%;">{{ $store.state.iscollapse ? "" : "数据标注平台" }} </span>
+                <i class="el-icon-d-arrow-left" v-if="!$store.state.iscollapse" style="font-size: 3.5vh;"></i>
+                <i class="el-icon-category" v-if="$store.state.iscollapse" style="font-size: 3.5vh;"></i>
+                <span style="font-size: 100%;">{{ $store.state.iscollapse ? "" : "数据标注平台" }} </span>
             </div>
             <div class="model">
                 <div style="height: 50%;display: flex;justify-content: center;align-items: center;">
                     {{ islight ? "高亮模式" : "护眼模式" }}
                 </div>
                 <el-switch v-model="islight" active-icon-class="el-icon-sunrise"
-                    inactive-icon-class="el-icon-s-opportunity"></el-switch>
+                    inactive-icon-class="el-icon-s-opportunity" @change="light"></el-switch>
             </div>
         </div>
         <div class="right">
             <ul class="rightmenu">
                 <li>
-                    <el-avatar :size="50" :src="avatar"></el-avatar>
+                    <el-avatar :size="30" :src="avatar"></el-avatar>
                 </li>
                 <li>
-                    <span>{{ $store.state.user.name }}</span>
+                    <span>{{ $store.state.user.username }}</span>
                 </li>
                 <li>
                     <el-dropdown>
-                        <span class="el-dropdown-link" style="font-size: 20px;">
+                        <span class="el-dropdown-link" :class="{text1:$store.state.islight,text2:!$store.state.islight}">
                             文档<i class="el-icon-arrow-down el-icon--right"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
@@ -43,13 +43,13 @@
             </ul>
         </div>
     </el-header>
-</template>3
+</template>
 <script>
 export default {
     name: "TopMenu",
     data() {
         return {
-            islight: true,
+            islight: this.$store.state.islight,
         }
     },
     computed: {
@@ -65,6 +65,10 @@ export default {
             localStorage.removeItem("token")
             this.$store.commit("clearuser")
             this.$router.push("/")
+        },
+        light(value) {
+            console.log(value);
+            this.$store.commit("changeislight",value)
         }
     },
     mounted() {
@@ -84,7 +88,17 @@ export default {
     justify-content: space-between;
     align-items: center;
 }
-
+.elHeader2 {
+    background-color: rgb(39,46,62);
+    color: white;
+    width: 100%;
+    line-height: 60px;
+    padding: 0;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .menuiconnotcollapse {
     height: 100%;
     width: 20%;
@@ -139,7 +153,7 @@ export default {
 .rightmenu li {
     width: 10%;
     height: 100%;
-    font-size: 20px;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,5 +163,12 @@ export default {
     text-decoration: underline;
     color: rgb(36, 104, 242);
     cursor: pointer;
+}
+.text1{
+    font-size: 12px;
+}
+.text2{
+    font-size: 12px;
+    color: white;
 }
 </style>

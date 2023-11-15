@@ -47,7 +47,33 @@
   cursor: text;
   transform-origin: 0% 0%;
 }
-
+#mode1{
+  cursor: pointer;
+}
+#mode2{
+  cursor: pointer;
+}
+#mode3{
+  cursor: pointer;
+}
+#mode1:hover{
+  background-color: rgb(221,222,223);
+}
+#mode2:hover{
+  background-color: rgb(221,222,223);
+}
+#mode3:hover{
+  background-color: rgb(221,222,223);
+}
+#nextpdf:hover{
+  background-color: rgb(221,222,223);
+}
+#prepdf:hover{
+  background-color: rgb(221,222,223);
+}
+#access:hover{
+  background-color: rgb(221,222,223);
+}
 /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
  * the problem doesn't show up in "text" reference tests. */
 .textLayer span.markedContent {
@@ -1940,7 +1966,7 @@
 }
 
 .pdfViewer .page canvas[hidden] {
-  display: none;
+  display: block;
 }
 
 .pdfViewer .page canvas[zooming] {

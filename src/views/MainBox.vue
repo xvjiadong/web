@@ -1,18 +1,18 @@
 <template>
     <el-container>
-        <el-header>
+        <el-header :class="{elHeader:$store.state.islight,elHeader2:!$store.state.islight}">
             <TopMenu></TopMenu>
         </el-header>
         <el-container>
             <el-aside :width="!$store.state.iscollapse?'10%':'4.2%'"><SideMenu/></el-aside>
-            <el-main><router-view></router-view></el-main>
+            <el-main :key="$store.state.index" :class="{elMain1:$store.state.islight,elMain2:!$store.state.islight}"><router-view></router-view></el-main>
         </el-container>
     </el-container>
 </template>
 <script>
 import TopMenu from '@/components/TopMenu.vue'
 import SideMenu from '@/components/SideMenu.vue'
-//import axios from 'axios'
+import axios from 'axios'
 export default {
     name:"MainBox",
     components: {
@@ -28,9 +28,9 @@ export default {
 
     },
     mounted() {
-        /*axios.post("http://localhost:3000/try", { yet: 1 }).then((res) => {
+        axios.get("https://items-storage.oss-cn-beijing.aliyuncs.com/UserAvatar/project.json",).then((res) => {
             console.log(res.data);
-        })*/
+        })
     }
 }
 </script>
@@ -39,7 +39,7 @@ export default {
     width: 100%;
     height: 100%;
 }
-.el-header {
+.elHeader {
     background-color: white;
     color: #333;
     text-align: center;
@@ -53,14 +53,23 @@ export default {
     line-height: 200px;
     padding: 0;
 }
-
-.el-main {
-    background-color: #E9EEF3;
+.elAside {
+    background-color: #D3DCE6;
     color: #333;
     text-align: center;
-    line-height: 160px;
+    line-height: 200px;
+    padding: 0;
 }
-
+.elMain1 {
+    background-color: #E9EEF3;
+    color: #333;
+    padding:0px;
+}
+.elMain2 {
+    background-color: rgb(70,78,97);
+    color: #333;
+    padding:0px;
+}
 body>.el-container {
     margin-bottom: 40px;
 }

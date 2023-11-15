@@ -98,8 +98,57 @@ const projectmanagerrouter = [
   {
     path: "/PicView",
     name: "PicView",
-    component: () =>
-      import("../components/PicView.vue"),
+    component: () => import("../components/PicView.vue"),
+  },
+  {
+    path: "/ProjectDetail",
+    name: "ProjectDetail",
+    component: () => import("../components/projectmanager/ProjectDetail.vue"),
+  },
+  {
+    path: "/InputFile",
+    name: "InputFile",
+    component: () => import("../components/projectmanager/InputFile.vue"),
+  },
+  {
+    path: "/PdfView",
+    name: "PdfView",
+    component: () => import("../components/PdfView.vue"),
+  },
+  {
+    path: "/TextClassification",
+    name: "TextClassification",
+    component: () => import("../components/TextClassification.vue"),
+  },
+  {
+    path: "/ImageClassification",
+    name: "ImageClassification",
+    component: () => import("../components/ImageClassification.vue"),
+  },
+  {
+    path: "/LabelDetail",
+    name: "LabelDetail",
+    component: () => import("../components/projectmanager/LabelDetail.vue"),
+  },
+  {
+    path: "/PicPartReview",
+    name: "PicPartReview",
+    component: () => import("../components/PicPartReview.vue"),
+  },
+  {
+    path: "/PicReview",
+    name: "PicReview",
+    component: () => import("../components/PicReview.vue"),
+  },
+  {
+    path: "/PdfReview",
+    name: "PdfReview",
+    component: () => import("../components/PdfReview.vue"),
+  },
+  {
+    path: "/TextPartReview",
+    name: "TextPartReview",
+    component: () => import("../components/TextPartReview.vue"),
   },
 ];
 const datalabelerrouter = [
@@ -109,11 +158,6 @@ const datalabelerrouter = [
     component: () => import("../components/datalabeler/MakeMark.vue"),
   },
   {
-    name: "MarkList",
-    path: "/MarkList",
-    component: () => import("../components/datalabeler/MarkList.vue"),
-  },
-  {
     name: "PermissionRequest",
     path: "/PermissionReuest",
     component: () => import("../components/datalabeler/PermissionRequest.vue"),
@@ -121,8 +165,22 @@ const datalabelerrouter = [
   {
     path: "/PicView",
     name: "PicView",
-    component: () =>
-      import("../components/PicView.vue"),
+    component: () => import("../components/PicView.vue"),
+  },
+  {
+    path: "/PdfView",
+    name: "PdfView",
+    component: () => import("../components/PdfView.vue"),
+  },
+  {
+    path: "/TextClassification",
+    name: "TextClassification",
+    component: () => import("../components/TextClassification.vue"),
+  },
+  {
+    path: "/ImageClassification",
+    name: "ImageClassification",
+    component: () => import("../components/ImageClassification.vue"),
   },
 ];
 export default {

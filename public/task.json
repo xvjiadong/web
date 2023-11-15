@@ -1,0 +1,203 @@
+{
+    "msg": "成功",
+    "code": 200,
+    "data": [
+        {
+            "projectId": 2,
+            "projectName": "猪",
+            "version": "V1",
+            "taskName": "1486",
+            "callType": "线标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "狗",
+            "version": "V1",
+            "taskName": "165444",
+            "callType": "线标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "羊",
+            "version": "V1",
+            "taskName": "ihk",
+            "callType": "标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V1",
+            "taskName": "1oojl",
+            "callType": "点标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V1",
+            "taskName": "165ui",
+            "callType": "点标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V1",
+            "taskName": "一个小巧的任务名",
+            "callType": "点标注",
+            "progress": null,
+            "startTime": "2023-11-09 16:49",
+            "endTime": "2023-12-09 15:43",
+            "taskUser": [
+                {
+                    "userId": 1,
+                    "personalProgress": null,
+                    "dataNumber": null
+                },
+                {
+                    "userId": 4,
+                    "personalProgress": null,
+                    "dataNumber": null
+                },
+                {
+                    "userId": 1,
+                    "personalProgress": null,
+                    "dataNumber": 7
+                },
+                {
+                    "userId": 4,
+                    "personalProgress": null,
+                    "dataNumber": 6
+                }
+            ]
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V2",
+            "taskName": "huk",
+            "callType": null,
+            "progress": null,
+            "startTime": "",
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V1",
+            "taskName": "ijk",
+            "callType": "点标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "牛尾花",
+            "version": "V1",
+            "taskName": "gjyt",
+            "callType": "点标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "767",
+            "version": "v1",
+            "taskName": "drt",
+            "callType": "混合标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "鬼地方个",
+            "version": "V1",
+            "taskName": null,
+            "callType": "混合标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "的身份",
+            "version": "V1",
+            "taskName": null,
+            "callType": "混合标注",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "而法国",
+            "version": "v1",
+            "taskName": "1ujhng",
+            "callType": "实体抽取",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "而法国",
+            "version": "v1",
+            "taskName": "yt",
+            "callType": "实体抽取",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "而法国",
+            "version": "v1",
+            "taskName": null,
+            "callType": "实体抽取",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        },
+        {
+            "projectId": 2,
+            "projectName": "765",
+            "version": "V1",
+            "taskName": null,
+            "callType": "实体抽取",
+            "progress": null,
+            "startTime": null,
+            "endTime": null,
+            "taskUser": []
+        }
+    ]
+}

@@ -1,0 +1,107 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 4326048 */
+  src: url('iconfont.woff2?t=1699684546419') format('woff2'),
+       url('iconfont.woff?t=1699684546419') format('woff'),
+       url('iconfont.ttf?t=1699684546419') format('truetype'),
+       url('iconfont.svg?t=1699684546419#iconfont') format('svg');
+}
+[class^="el-icon-"], [class*=" el-icon-"]{
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.el-icon-editor-four-column:before {
+  content: "\e82a";
+}
+
+.el-icon-editor-left-alignment:before {
+  content: "\e82b";
+}
+
+.el-icon-money-funds:before {
+  content: "\e831";
+}
+
+.el-icon-product-filter:before {
+  content: "\e833";
+}
+
+.el-icon-order-success:before {
+  content: "\e834";
+}
+
+.el-icon-order:before {
+  content: "\e835";
+}
+
+.el-icon-product-checked:before {
+  content: "\e836";
+}
+
+.el-icon-order-manage:before {
+  content: "\e837";
+}
+
+.el-icon-order-success-fill:before {
+  content: "\e838";
+}
+
+.el-icon-product-checked-fill:before {
+  content: "\e839";
+}
+
+.el-icon-product-fill:before {
+  content: "\e83a";
+}
+
+.el-icon-product-list-fill:before {
+  content: "\e83b";
+}
+
+.el-icon-product-filter-fill:before {
+  content: "\e83c";
+}
+
+.el-icon-product-loaction-fill:before {
+  content: "\e83d";
+}
+
+.el-icon-product-loaction:before {
+  content: "\e83e";
+}
+
+.el-icon-product:before {
+  content: "\e83f";
+}
+
+.el-icon-product-list:before {
+  content: "\e840";
+}
+
+.el-icon-product-get-catalog:before {
+  content: "\e841";
+}
+
+.el-icon-list:before {
+  content: "\e842";
+}
+
+.el-icon-professional:before {
+  content: "\e863";
+}
+
+.el-icon-training-fill:before {
+  content: "\e86f";
+}
+
