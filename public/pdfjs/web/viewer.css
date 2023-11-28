@@ -65,6 +65,12 @@
 #mode3:hover{
   background-color: rgb(221,222,223);
 }
+#mode4{
+  cursor: pointer;
+}
+#mode4:hover{
+  background-color: rgb(221,222,223);
+}
 #nextpdf:hover{
   background-color: rgb(221,222,223);
 }

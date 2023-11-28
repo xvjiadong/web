@@ -108,23 +108,26 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column width="80" prop="taskName" label="任务名"></el-table-column>
+                    <el-table-column width="200" prop="taskName" label="任务名"></el-table-column>
                     <el-table-column width="80" prop="projectName" label="所属项目"></el-table-column>
                     <el-table-column width="80" prop="version" label="所属版本"></el-table-column>
-                    <el-table-column width="120" prop="callType" label="任务类型"></el-table-column>
-                    <el-table-column width="120" prop="progress" label="任务进度"></el-table-column>
+                    <el-table-column width="150" prop="callType" label="任务类型"></el-table-column>
+                    <el-table-column width="150" prop="progress" label="任务进度"></el-table-column>
                     <el-table-column width="150" prop="startTime" label="创建时间"></el-table-column>
                     <el-table-column width="150" prop="endTime" label="截止时间"></el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务详情</span>
-                            <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">查看进度</span>
-                            <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务转让</span>
-                            <span size="mini" class="tableplay" @click="handletask(scope.row)">删除</span>
+                            <div v-if="scope.row.taskUser.length > 0">
+                                <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务详情</span>
+                                <span size="mini" class="tableplay" @click="handleTasklabel(scope.row)">查看标签</span>
+                                <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务转让</span>
+                            </div>
+                            <div v-else>
+                                <span size="mini" class="tableplay" @click="handleSchedule(scope.row)">任务调度</span>
+                            </div>
                         </template>
                     </el-table-column>
                 </el-table>
-
             </div>
             <div v-if="mode === 1">
                 <el-table ref="accept" :data="accepttask">
@@ -149,10 +152,49 @@
                 </el-table>
             </div>
         </el-card>
+        <el-dialog title="更新标签组" :visible.sync="labelvisible" width="24%" top="15%" :destroy-on-close="true"
+            :show-close="false" :close-on-click-modal="false">
+            <div style="height: 160px;overflow-y: auto;">
+                <div style="display: flex;justify-content: left;">
+                    <span>序号</span>
+                    <span style="margin-left: 15px;">标签名</span>
+                </div>
+                <div v-for="(item, index) in show.labels" :key="index"
+                    style="display: flex;justify-content: left;align-items: center;margin-top: 12px;">
+                    <div style="font-size: 15px;margin-left: 8px;">
+                        {{ index + 1 }}
+                    </div>
+                    <div class="labelblock">{{ item }}</div>
+                    <i class="el-icon-close labelicon" @click="deletelabel(item)"></i>
+                </div>
+            </div>
+            <i v-if="!addnewlabel" class="el-icon-circle-plus-outline labelicon" @click="addnewlabel = true"></i>
+            <div v-else style="display: flex;flex-direction: column;justify-content: left;">
+                <div style="display: flex;justify-content: left;align-items: center;">
+                    <input placeholder="请输入新标签;不允许重复和空标签" v-model="newlabel" class="inputlabel">
+                    <el-tooltip content="保存编辑" placement="top-start">
+                        <i class="el-icon-check labelicon" @click="addsure"></i>
+                    </el-tooltip>
+                    <el-tooltip content="取消编辑" placement="top-end">
+                        <i class="el-icon-close labelicon" @click="addcancel"></i>
+                    </el-tooltip>
+                </div>
+                <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
+                    {{ labelerror }}
+                </span>
+                <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
+                    {{ labelsure }}
+                </span>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="isupdate" size="mini" type="primary" @click="labelupdate">更新</el-button>
+                <el-button size="mini" @click="labelcancel">关闭</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
-import Task from "../../../public/task.json"
+import axios from 'axios'
 export default {
     name: "TaskList",
     components: {
@@ -160,117 +202,9 @@ export default {
     },
     data() {
         return {
+            newlabel: "",
             hideintroduction: false,
-            createtask: [
-                {
-                    taskname: "45845",
-                    tasktype: "图像文本标注",
-                    taskbelongversion: "v1",
-                    taskbelongprojectid: "4965",
-                    taskbelongprojectname: "4445",
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    childrentask: [
-                        {
-                            taskperson: "小五",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小六",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小七",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                    ]
-                },
-                {
-                    taskname: "4596",
-                    tasktype: "信息抽取标注",
-                    taskbelongversion: "v1",
-                    taskbelongprojectid: "49654845",
-                    taskbelongprojectname: "4445",
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    childrentask: [
-                        {
-                            taskperson: "小五",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小六",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小七",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                    ]
-                },
-                {
-                    taskname: "45",
-                    tasktype: "文本分类标注",
-                    taskbelongversion: "v1",
-                    taskbelongprojectid: "496uiu5",
-                    taskbelongprojectname: "4445",
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    childrentask: [
-                        {
-                            taskperson: "小五",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小六",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小七",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                    ]
-                },
-                {
-                    taskname: "484535",
-                    tasktype: "图片分类标注",
-                    taskbelongversion: "v1",
-                    taskbelongprojectid: "496iuiu7t5",
-                    taskbelongprojectname: "4445",
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    childrentask: [
-                        {
-                            taskperson: "小五",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小六",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                        {
-                            taskperson: "小七",
-                            tasknumber: "159",
-                            taskprocess: "15%"
-                        },
-                    ]
-                },
-            ],
+            createtask: [],
             accepttask: [
                 {
                     projectid: "4855657",
@@ -314,18 +248,76 @@ export default {
                 },
             ],
             mode: 0,
-            update:false
+            update: false,
+            show: {
+                versionId: 0,
+                labels: []
+            },
+            labelvisible: false,
+            addnewlabel: false,
+            emptylabel: false,
+            labelerror: "",
+            labelsure: "待添加",
+            isupdate: false
         }
     },
     computed: {
 
     },
     methods: {
+        addsure() {
+            if (this.newlabel === "") {
+                this.labelerror = "标签不能为空"
+                this.emptylabel = true
+            } else if (this.show.labels.includes(this.newlabel)) {
+                this.labelerror = "标签重复"
+                this.emptylabel = true
+            } else {
+                this.show.labels.push(this.newlabel)
+                this.labelsure = "添加成功"
+                this.newlabel = ""
+                this.emptylabel = false
+                this.isupdate = true
+            }
+        },
+        deletelabel(item) {
+            this.show.labels = this.show.labels.filter(element => {
+                return item !== element
+            })
+            this.isupdate = true
+        },
+        addcancel() {
+            this.newlabel = ""
+            this.addnewlabel = false
+            this.addnewlabel = false
+            this.emptylabel = false
+            this.labelerror = ""
+            this.labelsure = "待添加"
+
+        },
+        labelupdate() {
+            console.log(this.show);
+            axios.post("http://192.168.224.150:10010/task/label", this.show).then(res => {
+                console.log(res.data);
+                this.$message.success("更新成功")
+                this.handleTasklabel(this.show)
+            })
+        },
+        labelcancel() {
+            this.labelvisible = false
+            this.addnewlabel = false
+            this.emptylabel = false
+            this.labelerror = ""
+            this.labelsure = "待添加"
+            this.show.labels = []
+            this.show.versionId = 0
+            this.isupdate = false
+        },
         hide() {
             this.hideintroduction = !this.hideintroduction
         },
         getrowkey(row) {
-            return row.userId ||row.taskName
+            return row.userId || row.taskName
         },
         a(scope) {
             console.log(scope);
@@ -344,15 +336,35 @@ export default {
         },
         handletaskturn(item) {
             console.log(item);
+        },
+        handleTasklabel(item) {
+            axios.get("http://192.168.224.150:10010/task/label/" + item.versionId).then(res => {
+                res.data.data.map(item => {
+                    this.show.labels.push(item.label)
+                })
+                this.show.versionId = item.versionId
+                this.labelvisible = true
+            })
+        },
+        handleSchedule(item) {
+            this.$router.push({ path: "/TaskSchedule/", query: { id: item.projectId, version: item.versionId } })
+        },
+        getcreatetask() {
+            axios.get("http://192.168.224.150:10010/items/version").then(res => {
+                console.log(res.data.data);
+                this.createtask = res.data.data
+            })
         }
     },
     mounted() {
-        this.createtask = Task.data
-        this.update=!this.update
+        this.getcreatetask()
+        this.update = !this.update
     },
 }
 </script>
 <style scoped>
+@import url('../../../node_modules/animate.css/animate.min.css');
+
 .container {
     width: 100%;
     height: 643px;
@@ -488,5 +500,110 @@ export default {
 
 .tableplay:hover {
     color: rgb(82, 142, 255);
+}
+.labelblock {
+    border: 1px solid rgb(221, 221, 221);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 30px;
+    width: 240px;
+    padding-left: 5px;
+    cursor: pointer;
+    margin-left: 22px;
+}
+
+.labelblock:hover {
+    border: 1px solid rgb(36, 104, 242);
+}
+
+.labelicon {
+    margin-left: 12px;
+    cursor: pointer;
+    font-size: 25px;
+}
+
+.labelicon:hover {
+    color: rgb(36, 104, 242);
+}
+
+.inputlabel {
+    width: 358px;
+    height: 28px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding-left: 5px;
+    border-radius: 0px;
+    border: 1px solid rgb(221, 221, 221);
+    outline-style: none;
+    font-size: 14px;
+}
+
+.inputlabel:focus {
+    border: 1px solid rgb(36, 104, 242);
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5px, -5px);
+    }
+
+    20% {
+        transform: translate(5px, 5px);
+    }
+
+    30% {
+        transform: translate(-5px, -5px);
+    }
+
+    40% {
+        transform: translate(5px, 5px);
+    }
+
+    50% {
+        transform: translate(-5px, -5px);
+    }
+
+    60% {
+        transform: translate(5px, 5px);
+    }
+
+    70% {
+        transform: translate(-5px, -5px);
+    }
+
+    80% {
+        transform: translate(5px, 5px);
+    }
+
+    90% {
+        transform: translate(-5px, -5px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+#repeattext {
+    animation: shake 0.8s 1 forwards;
+    color: red;
+    font-size: 18px;
+    text-align: left;
+}
+
+.suretext {
+    color: rgb(192, 196, 204);
+    font-size: 18px;
+    text-align: left;
+}
+
+.addok {
+    color: green;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        TaskAnaysis
+        <iframe src="/index/index/index.html" width="1460" height="650"></iframe>
     </div>
 </template>
 <script>

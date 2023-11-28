@@ -1,0 +1,430 @@
+[
+  {
+    "page": "3",
+    "mark": [
+      {
+        "mode": 1,
+        "id": "3-1700810566152",
+        "shape": [
+          {
+            "width": "284px",
+            "height": "calc(var(--scale-factor)*12.00px)",
+            "left": "154px",
+            "top": "calc(var(--scale-factor)*125.33px)"
+          }
+        ],
+        "choosecontent": "一、订立本基金合同的目的、依据和原则"
+      },
+      {
+        "mode": 2,
+        "id": "3-1700810594928",
+        "markcontent": [{ "tag": "依据", "evidence": ["3-1700810614368"] }],
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*120px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "175px",
+            "top": "calc(var(--scale-factor)*195.43px)",
+            "id": "3-1700810594928-0"
+          }
+        ],
+        "istag": true,
+        "choosecontent": "订立本基金合同的依据"
+      },
+      {
+        "mode": 2,
+        "id": "3-1700810614368",
+        "markcontent": null,
+        "shape": [
+          {
+            "width": "188px",
+            "height": "calc(var(--scale-factor)*12.00px)",
+            "left": "357px",
+            "top": "calc(var(--scale-factor)*195.43px)",
+            "id": "3-1700810614368-0"
+          }
+        ],
+        "istag": false,
+        "belong": { "id": "3-1700810594928", "tag": "依据" },
+        "choosecontent": "《中华人民共和国合同法》"
+      },
+      {
+        "mode": 3,
+        "id": "3-1700810646792",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*120px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "176px",
+            "top": "calc(var(--scale-factor)*312.58px)"
+          }
+        ],
+        "tag": "条款",
+        "link": [
+          { "tag": "法规", "id": "3-1700810658264", "linkname": "解释" }
+        ],
+        "choosecontent": "订立本基金合同的原则"
+      },
+      {
+        "mode": 3,
+        "id": "3-1700810658264",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*240px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "356px",
+            "top": "calc(var(--scale-factor)*312.58px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*24px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*335.86px)"
+          }
+        ],
+        "tag": "法规",
+        "link": [
+          { "linkname": "解释", "id": "3-1700810646792", "tag": "条款" }
+        ],
+        "choosecontent": "平等自愿、诚实信用、充分保护投资人合法权益。"
+      }
+    ]
+  },
+  {
+    "page": "5",
+    "mark": [
+      {
+        "mode": 3,
+        "id": "5-1700810742305",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*72px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "176px",
+            "top": "calc(var(--scale-factor)*156.53px)"
+          }
+        ],
+        "tag": "类型",
+        "link": [
+          { "tag": "解释", "id": "5-1700810755561", "linkname": "属性" }
+        ],
+        "choosecontent": "基金或本基金"
+      },
+      {
+        "mode": 3,
+        "id": "5-1700810755561",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*156px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "308px",
+            "top": "calc(var(--scale-factor)*156.53px)"
+          }
+        ],
+        "tag": "解释",
+        "link": [
+          { "linkname": "属性", "id": "5-1700810742305", "tag": "类型" }
+        ],
+        "choosecontent": "博时安盈债券型证券投资基金"
+      },
+      {
+        "mode": 3,
+        "id": "5-1700810818937",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*60px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "167px",
+            "top": "calc(var(--scale-factor)*460.70px)"
+          }
+        ],
+        "tag": "法规",
+        "link": [
+          { "tag": "解释", "id": "5-1700810833874", "linkname": "解释" }
+        ],
+        "choosecontent": "《基金法》"
+      },
+      {
+        "mode": 3,
+        "id": "5-1700810833874",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*306px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "267px",
+            "top": "calc(var(--scale-factor)*460.70px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*414px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*484.22px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*192px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*507.50px)"
+          }
+        ],
+        "tag": "解释",
+        "link": [
+          { "linkname": "解释", "id": "5-1700810818937", "tag": "法规" }
+        ],
+        "choosecontent": " 2003 年 10 月 28 日经第十届全国人民代表大会常务委员会第五次会议通过，自 2004 年 6 月 1 日起实施的《中华人民共和国证券投资基金法》及颁布机关对其不时做出的修订"
+      },
+      {
+        "mode": 1,
+        "id": "5-1700810877912",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*300px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "277px",
+            "top": "calc(var(--scale-factor)*624.67px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*348px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*647.95px)"
+          }
+        ],
+        "choosecontent": "指中国证监会 2004 年 6 月 29 日颁布、同年 7 月 1 日实施的《证券投资基金运作管理办法》及颁布机关对其不时做出的修订"
+      },
+      {
+        "mode": 1,
+        "id": "5-1700810883504",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*384px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "178px",
+            "top": "calc(var(--scale-factor)*531.05px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*348px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*554.33px)"
+          }
+        ],
+        "choosecontent": "《销售办法》：指中国证监会 2011 年 6 月 9 日颁布、同年 10 月 1 日实施的《证券投资基金销售管理办法》及颁布机关对其不时做出的修订"
+      },
+      {
+        "mode": 2,
+        "id": "5-1700810892968",
+        "markcontent": [{ "tag": "机构", "evidence": ["5-1700810904465"] }],
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*108px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "184px",
+            "top": "calc(var(--scale-factor)*694.78px)",
+            "id": "5-1700810892968-0"
+          }
+        ],
+        "istag": true,
+        "choosecontent": "银行业监督管理机构"
+      },
+      {
+        "mode": 2,
+        "id": "5-1700810904465",
+        "markcontent": null,
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*240px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "360px",
+            "top": "calc(var(--scale-factor)*694.78px)",
+            "id": "5-1700810904465-0"
+          },
+          {
+            "width": "calc(var(--scale-factor)*12px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*718.30px)",
+            "id": "5-1700810904465-1"
+          }
+        ],
+        "istag": false,
+        "belong": { "id": "5-1700810892968", "tag": "机构" },
+        "choosecontent": "中国人民银行和/或中国银行业监督管理委员会"
+      }
+    ]
+  },
+  {
+    "page": "6",
+    "mark": [
+      {
+        "mode": 1,
+        "id": "6-1700810949585",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*372px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "184px",
+            "top": "calc(var(--scale-factor)*101.78px)"
+          }
+        ],
+        "choosecontent": "个人投资者：指依据有关法律法规规定可投资于证券投资基金的自然人"
+      },
+      {
+        "mode": 1,
+        "id": "6-1700810961880",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*372px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "185px",
+            "top": "calc(var(--scale-factor)*195.43px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*420px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*218.95px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*108px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*242.23px)"
+          }
+        ],
+        "choosecontent": "合格境外机构投资者：指符合《合格境外机构投资者境内证券投资管理办法》及相关法律法规规定可以投资于在中国境内依法募集的证券投资基金的中国境外的机构投资者"
+      },
+      {
+        "mode": 1,
+        "id": "6-1700810977928",
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*396px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "176px",
+            "top": "calc(var(--scale-factor)*687.10px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*420px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*710.38px)"
+          },
+          {
+            "width": "calc(var(--scale-factor)*12px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*733.90px)"
+          }
+        ],
+        "choosecontent": "、基金合同生效日：指基金募集达到法律法规规定及基金合同规定的条件，基金管理人向中国证监会办理基金备案手续完毕，并获得中国证监会书面确认的日"
+      }
+    ]
+  },
+  {
+    "page": "7",
+    "mark": [
+      {
+        "mode": 2,
+        "id": "7-1700811021168",
+        "markcontent": [{ "tag": "名词", "evidence": ["7-1700811035160"] }],
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*24px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "178px",
+            "top": "calc(var(--scale-factor)*406.20px)",
+            "id": "7-1700811021168-0"
+          }
+        ],
+        "istag": true,
+        "choosecontent": "认购"
+      },
+      {
+        "mode": 2,
+        "id": "7-1700811035160",
+        "markcontent": null,
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*324px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "246px",
+            "top": "calc(var(--scale-factor)*406.20px)",
+            "id": "7-1700811035160-0"
+          },
+          {
+            "width": "calc(var(--scale-factor)*120px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*429.48px)",
+            "id": "7-1700811035160-1"
+          }
+        ],
+        "istag": false,
+        "belong": { "id": "7-1700811021168", "tag": "名词" },
+        "choosecontent": "在基金募集期内，投资人根据基金合同和招募说明书的规定申请购买基金份额的行为"
+      },
+      {
+        "mode": 2,
+        "id": "7-1700811052992",
+        "markcontent": [{ "tag": "名词", "evidence": ["7-1700811065152"] }],
+        "shape": [
+          {
+            "width": "45px",
+            "height": "calc(var(--scale-factor)*12.00px)",
+            "left": "182px",
+            "top": "calc(var(--scale-factor)*616.75px)",
+            "id": "7-1700811052992-0"
+          }
+        ],
+        "istag": true,
+        "choosecontent": "转托管"
+      },
+      {
+        "mode": 2,
+        "id": "7-1700811065152",
+        "markcontent": null,
+        "shape": [
+          {
+            "width": "calc(var(--scale-factor)*312px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "259px",
+            "top": "calc(var(--scale-factor)*616.75px)",
+            "id": "7-1700811065152-0"
+          },
+          {
+            "width": "calc(var(--scale-factor)*144px)",
+            "height": "calc(var(--scale-factor)*13px)",
+            "left": "calc(var(--scale-factor)*90.02px)",
+            "top": "calc(var(--scale-factor)*640.27px)",
+            "id": "7-1700811065152-1"
+          }
+        ],
+        "istag": false,
+        "belong": { "id": "7-1700811052992", "tag": "名词" },
+        "choosecontent": "基金份额持有人在本基金的不同销售机构之间实施的变更所持基金份额销售机构的操作"
+      }
+    ]
+  },
+  {
+    "page": "26",
+    "mark": [
+      {
+        "mode": 2,
+        "id": "26-1700811193849",
+        "markcontent": [{ "tag": "解释", "evidence": [] }],
+        "shape": [
+          {
+            "width": "108px",
+            "height": "calc(var(--scale-factor)*12.00px)",
+            "left": "187px",
+            "top": "calc(var(--scale-factor)*569.93px)",
+            "id": "26-1700811193849-0"
+          }
+        ],
+        "istag": true,
+        "choosecontent": "基金份额持有人"
+      }
+    ]
+  }
+]

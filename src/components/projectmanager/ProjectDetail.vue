@@ -25,7 +25,8 @@
                                     </span>
                                 </div>
                             </div>
-                            <el-table ref="project" :data="showtablelist" @selection-change="handleSelectionChange" :row-key="getrowkey">
+                            <el-table ref="project" :data="showtablelist" @selection-change="handleSelectionChange"
+                                :row-key="getrowkey">
                                 <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
                                 <el-table-column type="expand" width="55" label="任务">
                                     <template slot-scope="scope">
@@ -45,8 +46,6 @@
                                                     <template slot-scope="scope">
                                                         <el-button size="mini"
                                                             @click="handleEdit(scope.$index, scope.row)">查看</el-button>
-                                                        <el-button size="mini"
-                                                            @click="handleEdit(scope.$index, scope.row)">导入</el-button>
                                                     </template>
                                                 </el-table-column>
                                             </el-table>
@@ -127,6 +126,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name: "ProjectDetail",
     components: {
@@ -284,7 +284,6 @@ export default {
     },
     computed: {
         showtablelist() {
-            console.log(this.project);
             return this.project.versions
         },
         marktypelist() {
@@ -298,7 +297,7 @@ export default {
             return []
         },
         deldialogcontent() {
-            console.log(this.multipleSelection.length,this.project.versions.length);
+            console.log(this.multipleSelection.length, this.project.versions.length);
             if (!this.delvisible) {
                 return ""
             }
@@ -315,7 +314,10 @@ export default {
     },
     methods: {
         getproject() {
-
+            axios.get("http://192.168.224.150:10010/items").then((res) => {
+                this.project = res.data.data;
+                console.log(this.project);                
+            })
         },
         goBack() {
             this.$router.push("/ProjectList")
@@ -331,9 +333,15 @@ export default {
         },
         addok() {
             if (this.addnewversion.marktype) {
-                this.addnewversion.projectid = this.project.id
-                /*发请求添加新版本 */
-                console.log(this.addnewversion);
+                this.addnewversion.id = this.project.id
+                let a = {}
+                a.id = this.addnewversion.projectid
+                a.markType = this.addnewversion.marktype
+                a.verAttributes = this.addnewversion.descript
+                a.version = this.addnewversion.versionname
+                axios.post("http://192.168.224.150:10010/items/version/add", a).then(res => {
+                    console.log(res.data);
+                })
                 this.refresh()
                 this.$nextTick(() => {
                     this.centerDialogVisible = false
@@ -354,7 +362,7 @@ export default {
                 let b = parseInt(element.verName.substring(1))
                 a = b > a ? b : a
             });
-            this.addnewversion.versionname = "v" + (a + 1)
+            this.addnewversion.versionname = "V" + (a + 1)
             this.$nextTick(() => {
                 this.centerDialogVisible = true
             })
@@ -362,36 +370,40 @@ export default {
         delok() {
             let form
             if (this.selectrow.length > 0) {
-                form = { projectid: this.chooseitem.id, version: this.selectrow }
+                let a = []
+                this.selectrow.map(item => {
+                    a.push(item.verName)
+                })
+                form = { id: this.chooseitem.id, versionId: a }
             } else {
                 if (this.multipleSelection.length === this.project.versions.length) {
-                    form = { projectid: this.project.id }
+                    form = { tid: this.project.id }
                 } else if (this.multipleSelection.length === 0) {
                     this.delcancel()
                     return
                 }
                 else {
-                    form = { projectid: this.project.id, version: this.multipleSelection }
+                    form = { id: this.project.id, versionId: this.multipleSelection }
                 }
             }
-            console.log(form);
-            /*axios.post('http:xxx.xx.xx.xxx:xxxx/xx/xx', form).then((res) => {
+            axios.post('http://192.168.224.150:10010/items/delete', form).then((res) => {
                 if (res.data.code === 200) {
                     this.$message({ type: "success", message: "删除完毕" })
                     this.chooseitem=""
-                    this.multipleSelection=[]
+                    this.multipleSelection = []
+                    this.selectrow=[]
                     this.$nextTick(()=>{
-                        this.refresh()
+                        this.getproject()
                     })
                     this.delvisible=false
                 } else {
                     this.$message({ type: "error", message: "删除失败" })
                     this.delvisible=false
                 }
-            })*/
+            })
         },
         delcancel() {
-            this.multipleSelection=this.$refs.project.selection
+            this.multipleSelection = this.$refs.project.selection
             this.delvisible = false
             this.selectrow = []
         },
@@ -425,12 +437,22 @@ export default {
         },
         handleiutput(row) {
             console.log(row);
+            let a = {}
+            a.id = this.project.id
+            a.dataType = this.project.dataType
+            a.verName = row.verName
+            a.versionId=row.versionId
+            this.$router.push({ path: "/InputFile", query: a })
         },
         getrowkey(row) {
             return row.verName || row.userId
         },
         handleSelectionChange(val) {
-            this.multipleSelection = val;
+            let a = []
+            val.map(item => {
+                a.push(item.verName)
+            })
+            this.multipleSelection = a;
             //console.log(this.multipleSelection);
         },
     },
@@ -488,6 +510,7 @@ export default {
 .tableplay:hover {
     color: rgb(82, 142, 255);
 }
+
 /deep/.el-table .el-table__cell {
     padding: 12px 0;
     min-width: 0;

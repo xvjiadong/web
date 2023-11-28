@@ -13,20 +13,19 @@
                 <span>基本信息</span>
             </div>
             <el-form ref="form1" :model="task" :rules="taskrule" label-width="100px" class="form" label-position="left">
-                <el-form-item prop="taskname" label="任务名称:" class="formitem">
-                    <el-input style="width: 60%;" size="mini" v-model="task.taskname" placeholder="限制50个字符以内,支持汉字、大小写英文、数字"
+                <el-form-item prop="taskName" label="任务名称:" class="formitem">
+                    <el-input style="width: 60%;" size="mini" v-model="task.taskName" placeholder="限制50个字符以内,支持汉字、大小写英文、数字"
                         maxlength="50" show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item prop="projectid" label="选择数据集:" class="formitem">
-                    <el-select filterable="" v-model="task.projectid" size="mini" style="width: 25%;">
-                        <el-option v-for="item in projectlist" :key="item.projectid" :value="item.projectid"
-                            :label="item.label">
+                <el-form-item prop="id" label="选择数据集:" class="formitem">
+                    <el-select filterable="" v-model="task.id" size="mini" style="width: 25%;">
+                        <el-option v-for="item in projectlist" :key="item.id" :value="item.id" :label="item.name">
                         </el-option>
                     </el-select>
-                    <el-select filterable v-model="task.projectversion" size="mini" :disabled="task.projectid === ''"
+                    <el-select filterable v-model="task.versionId" size="mini" :disabled="task.id === ''"
                         style="width: 22%;margin-left: 8px;">
-                        <el-option v-for="item in versionlist" :key="item.versionid" :value="item.versionname"
-                            :label="`${item.versionname}-${item.marktype}`">
+                        <el-option v-for="item in versionlist" :key="item.versionId" :value="item.versionId"
+                            :label="`${item.verName}-${item.callType}`">
                         </el-option>
                     </el-select>
                     <span style="font-size: 12px; color: rgb(36,104,242);cursor: pointer;margin-left: 8px;"
@@ -78,7 +77,7 @@
                                 style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;">
                                 <div style="display: flex;justify-content: left;align-items: center;">
                                     <select v-model="selectlabelgroup" class="input">
-                                        <option v-for="item in labelgroup" :key="item" :value="item" :label="item">
+                                        <option v-for="item in labelgroup" :key="item.id" :value="item.id" :label="item.name">
                                         </option>
                                     </select>
                                     <i class="el-icon-check labelicon" @click="surelabelgroupselect"></i>
@@ -140,16 +139,16 @@
                 </el-page-header>
             </div>
             <el-form ref="form2" :model="task" :rules="taskrule2" label-width="110px" class="form" label-position="left">
-                <el-form-item label="团队成员" prop="taskperson" class="formitem">
-                    <el-select :disabled="true" filterable size="mini" multiple v-model="task.taskperson" style="width:60%"
+                <el-form-item label="团队成员" prop="userId" class="formitem">
+                    <el-select :disabled="true" filterable size="mini" multiple v-model="task.userId" style="width:60%"
                         placeholder="请选择团队成员">
-                        <el-option v-for="item in members " :key="item.labelerid" :value="item.labelerid"
+                        <el-option v-for="item in members " :key="item.id" :value="item.id"
                             style="margin-top:5px;height:40px">
                             <div slot style="display: flex;justify-content: left;align-items:center;">
                                 <el-avatar icon="el-icon-user-solid"></el-avatar>
                                 <div style="display:flex;flex-direction:column;justify-content:center;margin-left:5px">
-                                    <span style="font: 0.8em sans-serif;">{{ item.labelername }}</span>
-                                    <span style="font: 0.8em sans-serif;">正在执行{{ item.nownumber }}个任务</span>
+                                    <span style="font: 0.8em sans-serif;">{{ item.username }}</span>
+                                    <span style="font: 0.8em sans-serif;">正在执行{{ item.execution }}个任务</span>
                                 </div>
                             </div>
                         </el-option>
@@ -162,26 +161,26 @@
                     </el-tooltip>
                     <el-empty v-if="showmember.length === 0" description="所有人都执行着更多的任务"
                         style="height:200px;padding:0px;"></el-empty>
-                    <el-checkbox-group v-else v-model="task.taskperson" :min="0" :max="10"
+                    <el-checkbox-group v-else v-model="task.userId" :min="0" :max="10"
                         style="width:100%;height:200px;overflow-y: scroll;">
-                        <el-checkbox v-for="item in showmember" :label="item.labelerid" :key="item.labelerid">
+                        <el-checkbox v-for="item in showmember" :label="item.id" :key="item.id">
                             <div style="display: flex;justify-content: left;align-items:center;">
                                 <el-avatar :src="item.avatar"></el-avatar>
                                 <div style="display:flex;flex-direction:column;justify-content:center;">
-                                    <span style="font: 0.8em sans-serif;">{{ item.labelername }}</span>
-                                    <span style="font: 0.8em sans-serif;">正在执行{{ item.nownumber }}个任务</span>
+                                    <span style="font: 0.8em sans-serif;">{{ item.username }}</span>
+                                    <span style="font: 0.8em sans-serif;">正在执行{{ item.execution }}个任务</span>
                                 </div>
                             </div>
                         </el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
-                <el-form-item prop="deadline" label="截止时间" class="formitem">
-                    <el-date-picker size="mini" v-model="task.deadline" type="datetime" placeholder="请选择日期时间"
+                <el-form-item prop="endTime" label="截止时间" class="formitem">
+                    <el-date-picker size="mini" v-model="task.endTime" type="datetime" placeholder="请选择日期时间"
                         :time-arrow-control="true">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item class="formitem">
-                    <el-button size="mini" @click="complete2">导入数据集</el-button>
+                    <el-button size="mini" @click="complete2">开始分配任务</el-button>
                     <el-button size="mini" @click="jump('/TaskList')">取消</el-button>
                 </el-form-item>
             </el-form>
@@ -189,6 +188,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name: "TaskSchedule",
     components: {
@@ -248,19 +248,19 @@ export default {
         return {
             active: 0,
             task: {
-                taskname: "",
-                projectid: "",
-                projectversion: "",
-                taskperson: [],
-                deadline: "",
+                taskName: "",
+                id: "",
+                versionId: "",
+                userId: [],
+                endTime: "",
                 modelfile: [],
-                selectlabel: ["11", "22", "33", "55", "565", "regfd", "46456"]
+                selectlabel: []
             },
             taskrule: {
-                taskname: [
+                taskName: [
                     { required: true, validator: validatetaskname, trigger: 'blur' }
                 ],
-                projectid: [
+                id: [
                     { required: true, validator: validateprojectid, trigger: 'blur' }
                 ],
                 modefile: [
@@ -269,376 +269,44 @@ export default {
                 selectlabel: [{ required: true, validator: validateselectlabel, trigger: 'blur' }]
             },
             taskrule2: {
-                taskperson: [
+                userId: [
                     { required: true, validator: validatetaskperson, trigger: 'blur' }
                 ],
-                deadline: [
+                endTime: [
                     { required: true, validator: validatedeadline, trigger: 'blur' }
                 ],
             },
-            projectlist: [
-                {
-                    projectid: "188865667",     //项目id
-                    name: "测试数据1",          //项目名
-                    datatype: "图像",          //数据类型
-                    version: [                 //下辖版本
-                        {
-                            versionid: "1697286",      //版本id
-                            versionname: "v1",         //版本号
-                            versionnumber: "600",      //数据量
-                            marktype: "图片分类",      //标注任务类型
-                            markprocess: "0%",        //标注进度
-                            children: [               //任务
-                                {
-                                    taskid: "1",       //任务id
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员1",   //任务承担人
-                                    taskprocess: "15%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskid: "2",       //任务id
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员2",   //任务承担人
-                                    taskprocess: "12%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskid: "3",       //任务id
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员3",   //任务承担人
-                                    taskprocess: "42%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskid: "4",       //任务id
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员4",   //任务承担人
-                                    taskprocess: "56%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                }
-                            ]
-                        },
-                        {
-                            versionid: "1592156",
-                            versionname: "v2",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "1578156",
-                            versionname: "v3",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "158756",
-                            versionname: "v4",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "595398126",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "7952926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "2375895",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "1",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "7952926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "2375895",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "2",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "7952926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "2375895",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "3",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "7952926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "2375895",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "4",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "7952926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "2375895",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-            ],
+            projectlist: [],
             labelvalue: "",
             addlabelvisible: false,
             addlabelgroupvisible: false,
             emptylabel: false,
             labelerror: "",
             labelsure: "待添加",
-            labelgroup: ["mouseone", "mousetwo", "mousethree", "mousefour", "mousefive"],
-            mouseone: ["大赛", "11", "22", "13", "23"],
-            mousetwo: ["大sad", "62", "484", "93", "483"],
-            mousethree: ["大瓦尔塔", "11规范", "22规范", "13阿萨德", "2453"],
-            mousefour: ["大赛、突然覆盖", "11覆盖", "规范福贵22", "规划13", "23"],
-            mousefive: ["11", "22", "33", "55", "565", "regfd", "46456", "11", "22", "33", "55", "565", "regfd", "46456"],
+            labelgroup: [],
             selectlabelgroup: "",
             inputvalue: "",
             setlabel: [],
-            members: [
-                {
-                    labelerid: "1",
-                    labelername: "鼠大",
-                    nownumber: 4,
-                    avatar: "http://120.55.63.197:3000/images/33.jpg"
-                },
-                {
-                    labelerid: "2",
-                    labelername: "鼠二",
-                    nownumber: 56,
-                    avatar: ""
-                },
-                {
-                    labelerid: "3",
-                    labelername: "鼠三",
-                    nownumber: 10,
-                    avatar: ""
-                },
-                {
-                    labelerid: "4",
-                    labelername: "鼠四",
-                    nownumber: 28,
-                    avatar: ""
-                },
-                {
-                    labelerid: "5",
-                    labelername: "鼠五",
-                    nownumber: 25,
-                    avatar: ""
-                },
-                {
-                    labelerid: "6",
-                    labelername: "鼠大",
-                    nownumber: 4,
-                    avatar: "http://120.55.63.197:3000/images/33.jpg"
-                },
-                {
-                    labelerid: "7",
-                    labelername: "鼠二",
-                    nownumber: 56,
-                    avatar: ""
-                },
-                {
-                    labelerid: "8",
-                    labelername: "鼠三",
-                    nownumber: 10,
-                    avatar: ""
-                },
-                {
-                    labelerid: "9",
-                    labelername: "鼠四",
-                    nownumber: 28,
-                    avatar: ""
-                },
-                {
-                    labelerid: "10",
-                    labelername: "鼠五",
-                    nownumber: 25,
-                    avatar: ""
-                },
-                {
-                    labelerid: "11",
-                    labelername: "鼠大",
-                    nownumber: 4,
-                    avatar: "http://120.55.63.197:3000/images/33.jpg"
-                },
-                {
-                    labelerid: "12",
-                    labelername: "鼠二",
-                    nownumber: 56,
-                    avatar: ""
-                },
-                {
-                    labelerid: "13",
-                    labelername: "鼠三",
-                    nownumber: 10,
-                    avatar: ""
-                },
-                {
-                    labelerid: "14",
-                    labelername: "鼠四",
-                    nownumber: 28,
-                    avatar: ""
-                },
-                {
-                    labelerid: "15",
-                    labelername: "鼠五",
-                    nownumber: 25,
-                    avatar: ""
-                },
-                {
-                    labelerid: "16",
-                    labelername: "鼠大",
-                    nownumber: 4,
-                    avatar: "http://120.55.63.197:3000/images/33.jpg"
-                },
-                {
-                    labelerid: "17",
-                    labelername: "鼠二",
-                    nownumber: 56,
-                    avatar: ""
-                },
-                {
-                    labelerid: "18",
-                    labelername: "鼠三",
-                    nownumber: 10,
-                    avatar: ""
-                },
-                {
-                    labelerid: "19",
-                    labelername: "鼠四",
-                    nownumber: 28,
-                    avatar: ""
-                },
-                {
-                    labelerid: "20",
-                    labelername: "鼠五",
-                    nownumber: 25,
-                    avatar: ""
-                },
-            ],
+            members: [],
             memberfilter: "",
             accpettasknumber: -1
         }
     },
     computed: {
         versionlist() {
-            if (this.task.projectid) {
-                return this.projectlist.filter(item => {
-                    return item.projectid == this.task.projectid
-                })[0].version
+            if (this.task.id && this.projectlist.length > 0) {
+                let a = this.projectlist.filter(item => {
+                    return item.id == this.task.id
+                })
+                return a[0].versions.filter(item => {
+                    return item.userVOList.length ===0
+                })
             }
             return []
         },
         showmember() {
             return this.members.filter(item => {
-                return (item.labelerid.includes(this.memberfilter) || item.labelername.includes(this.memberfilter)) && (item.nownumber <= this.accpettasknumber || this.accpettasknumber == -1)
+                return (item.username.includes(this.memberfilter)) && (item.execution <= this.accpettasknumber || this.accpettasknumber == -1)
             })
         }
     },
@@ -689,9 +357,26 @@ export default {
         complete2() {
             this.$refs.form2.validate((result) => {
                 if (result) {
-                    this.task.crectetime=this.timeturn(Date.now())
-                    this.task.deadline = this.timeturn(this.task.deadline)
+                    this.task.endTime = this.timeturn(this.task.endTime)
                     console.log(this.task);
+                    let a = {}
+                    a.versionId = this.task.versionId
+                    a.userId = this.task.userId
+                    a.endTime = this.task.endTime
+                    a.taskName = this.task.taskName
+                    axios.post("http://192.168.224.150:10010/items/version", a).then(res => {
+                        console.log(res.data);
+                        if (res.data.code === 200) {
+                            let b = { labels: this.task.selectlabel, versionId: this.task.versionId }
+                            axios.post("http://192.168.224.150:10010/task/label", b).then(res => {
+                                console.log(res.data);
+                                if (res.data.code === 200) {
+                                    this.$message.success("分配成功")
+                                    this.$router.push("/TaskList")
+                                }
+                            })
+                        }
+                    })
                 }
             })
         },
@@ -740,24 +425,27 @@ export default {
                 this.labelerror = "请选择标签组"
                 this.emptylabel = true
             } else {
-                let a = []
-                this[this.selectlabelgroup].map((item) => {
-                    if (this.task.selectlabel.includes(item)) {
-                        a.push(item)
+                axios.get("http://192.168.224.150:10010/label/group/" + this.selectlabelgroup).then(res => {
+                    let data = res.data.data
+                    let a = []
+                    data.map(item => {
+                        if (this.task.selectlabel.includes(item.labels)) {
+                            a.push(item.labels)
+                        } else {
+                            this.task.selectlabel.push(item.labels)
+                        }
+                    })
+                    if (a.length > 0) {
+                        this.labelerror = "以下标签名称重复："
+                        a.forEach(item => {
+                            this.labelerror += item + "  "
+                        })
+                        this.emptylabel = true
                     } else {
-                        this.task.selectlabel.push(item)
+                        this.labelsure = "添加成功"
+                        this.emptylabel = false
                     }
                 })
-                if (a.length > 0) {
-                    this.labelerror = "以下标签名称重复："
-                    a.forEach(item => {
-                        this.labelerror += item + "  "
-                    })
-                    this.emptylabel = true
-                } else {
-                    this.labelsure = "添加成功"
-                    this.emptylabel = false
-                }
             }
         },
         closelabelgroupselect() {
@@ -778,13 +466,34 @@ export default {
             const seconds = String(date.getSeconds()).padStart(2, '0');
             const formattedDateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
             return formattedDateString
+        },
+        getproject() {
+            axios.get("http://192.168.224.150:10010/items").then((res) => {
+                console.log(res.data.data);
+                this.projectlist = res.data.data
+            })
+        },
+        getmember() {
+            axios.get("http://192.168.224.150:10010/users").then(res => {
+                //console.log(res.data);
+                this.members = res.data.data;
+            })
+        },
+        getlabelgroup() {
+            axios.get("http://192.168.224.150:10010/label").then(res => {
+                //console.log(res.data);
+                this.labelgroup = res.data.data
+            })
         }
     },
     mounted() {
-        console.log(this.$route);
-        if (this.$route.query.projectid) {
-            this.task.projectid = this.$route.query.projectid
-            this.task.projectversion = this.$route.query.version
+        //console.log(this.$route);
+        this.getproject()
+        this.getmember()
+        this.getlabelgroup()
+        if (this.$route.query.id) {
+            this.task.id = this.$route.query.id
+            this.task.versionId = this.$route.query.version
         }
     },
 }
@@ -816,6 +525,8 @@ export default {
 .form {
     font-size: 30px;
     padding: 15px;
+    height: 550px;
+    overflow-y: auto;
 }
 
 .formitem {

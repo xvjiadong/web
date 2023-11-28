@@ -1,24 +1,26 @@
 <template>
 	<div style="text-align: left;padding-left: 40px;margin-top: 2px;box-shadow: 7px 7px 12px rgba(0, 0, 0, 0.4),
-      -7px -7px 12px rgba(255, 255, 255, 0.9);display: flex;" v-loading="loading" element-loading-text="拼命加载中"
-		>
+      -7px -7px 12px rgba(255, 255, 255, 0.9);display: flex;" v-loading="loading" element-loading-text="拼命加载中">
 		<el-card class="teachcard2">
 			<div slot="header">
-				<el-page-header @back="goBack" :content="`${project.projectid} ${project.version}`">
+				<el-page-header @back="goBack" :content="`${project.taskName} ${project.version}`">
 				</el-page-header>
 			</div>
 			<div style="display: flex;flex-direction: column;">
 				<span>
-					项目id:{{ project.projectid }}
+					项目所有人:{{ project.adminNane }}
 				</span>
 				<span>
-					项目名称:{{ project.projectname }}
+					项目名称:{{ project.projectName }}
 				</span>
 				<span>
 					项目版本:{{ project.version }}
 				</span>
 				<span>
 					标注进度:15/200
+				</span>
+				<span>
+					标注模式:{{ mode === 1 ? '长文本字段标注' : (mode === 2 ? '标签证据字段标注' : (mode === 3 ? "关联关系字段标注" : "智能标注")) }}
 				</span>
 			</div>
 		</el-card>
@@ -92,7 +94,7 @@
 				</div>
 			</div>
 			<div v-if="mode === 3">
-				<div style="height: 130px;overflow-y: scroll;">
+				<div style="height: 130px;overflow-y: auto;">
 					<div>
 						<div>
 							<el-tag v-if="mode3tag !== ''">{{ mode3tag }}</el-tag>
@@ -148,6 +150,63 @@
 					<el-button @click="mode3cancel">取消</el-button>
 				</div>
 			</div>
+			<div v-if="mode === 4">
+				<el-select @change="mode4select" v-model="smarttask" size="mini" placeholder="请选择智能标注任务">
+					<el-option v-for="item in mode4list" :key="item.value" :value="item.value"
+						:label="item.label"></el-option>
+				</el-select>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '文本分类'">
+					<el-select size="mini" v-model="mode41" multiple collapse-tags placeholder="请选择文本分类类别">
+						<el-option v-for="item in classification" :key="item.id" :value="item.labels"
+							:label="item.labels"></el-option>
+					</el-select>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '关键词识别'">
+					<el-input size="mini" v-model="mode42" placeholder="请输入待识别关键词"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '情感分析'">
+					<el-select size="mini" v-model="mode44" multiple collapse-tags placeholder="请选择分类类别">
+						<el-option v-for="item in emotion" :key="item.value" :value="item.value"
+							:label="item.value"></el-option>
+					</el-select>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '实体识别'">
+					<el-input size="mini" v-model="mode45" placeholder="请输入待识别实体类型"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '意图识别'">
+					<el-input size="mini" v-model="mode46" placeholder="请输入待识别意图"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '新闻分类'">
+					<el-select size="mini" v-model="mode48" multiple collapse-tags placeholder="请选择新闻分类类别">
+						<el-option v-for="item in newsclassification" :key="item.labels" :value="item.labels"
+							:label="item.labels"></el-option>
+					</el-select>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '抽取式阅读理解'">
+					<el-input size="mini" v-model="mode49" placeholder="请输入抽取问题"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '多项选择'">
+					<el-input size="mini" v-model="mode410.question" placeholder="请输入问题"></el-input>
+					<el-input size="mini" v-model="mode410.answer" placeholder="请输入选项,不同选项之间用/分隔"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '自然语言推理'">
+					<el-input size="mini" v-model="mode411.sentence1" placeholder="请划选语句1"></el-input>
+					<el-input size="mini" v-model="mode411.sentence2" placeholder="请划选语句2"></el-input>
+					<el-input size="mini" v-model="mode411.answer" placeholder="请输入推理选项,不同选项之间用/分隔"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '指代消解'">
+					<el-input size="mini" v-model="mode412.question" placeholder="请输入问题"></el-input>
+					<el-input size="mini" v-model="mode412.answer" placeholder="请输入问题选项,不同选项之间用/分隔"></el-input>
+				</div>
+				<div style="height: 50px;overflow-y: auto;" v-if="smarttask === '语义匹配'">
+					<el-input size="mini" v-model="mode413.sentence1" placeholder="请划选语句1"></el-input>
+					<el-input size="mini" v-model="mode413.sentence2" placeholder="请划选语句2"></el-input>
+				</div>
+				<div>
+					<el-button type="primary" size="mini" @click="mode4sure">确定</el-button>
+					<el-button size="mini" @click="mode4cancel">取消</el-button>
+				</div>
+			</div>
 			<iframe v-if="$store.state.pdflist.length > 0" slot="reference" ref="a"
 				:src="`/pdfjs/web/viewer.html?file=${$store.state.pdflist[$store.state.index].url}`" width="830"
 				height="650"></iframe>
@@ -164,12 +223,14 @@
 					<div v-for="mark in item.mark" :key="mark.id">
 						<div class="result" v-if="mark.mode === 1">
 							<span>标注ID:{{ mark.id }}</span>
+							<span>标注模式:长文本字段标注</span>
 							<span
 								style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">标注内容:{{
 									mark.choosecontent }}</span>
 						</div>
 						<div class="result" v-if="mark.mode === 2">
 							<span>标注ID:{{ mark.id }}</span>
+							<span>标注模式:标签证据字段标注</span>
 							<span
 								style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">标注内容:{{
 									mark.choosecontent }}</span>
@@ -203,6 +264,7 @@
 							<span style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 								标注内容:{{ mark.choosecontent }}
 							</span>
+							<span>标注模式:关联关系字段标注</span>
 							<span>关系实体:<el-tag size="mini" :disable-transitions="false">{{ mark.tag }}</el-tag></span>
 							<div v-if="mark.link.length > 0">
 								<div v-for="link in mark.link" :key="link.id" style="display: flex;align-items: center;">
@@ -224,6 +286,24 @@
 							</div>
 							<div v-else>无关联关系</div>
 						</div>
+						<div class="result" v-if="mark.mode === 4">
+							<span>标注ID:{{ mark.id }}</span>
+							<span>标注模式:智能标注</span>
+							<span>标注类型:{{ mark.mode4kind }}</span>
+							<span v-if="mark.mode4kind === '语义匹配' || mark.mode4kind === '自然语言推理'">
+								<span style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+									标注内容1:{{ mark.choosecontent1 }}
+								</span>
+								<span style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+									标注内容2:{{ mark.choosecontent2 }}
+								</span>
+							</span>
+							<span v-else
+								style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								标注内容:{{ mark.choosecontent }}
+							</span>
+							<span>标注结果:{{ mark.markcontent }}</span>
+						</div>
 					</div>
 				</el-collapse-item>
 			</el-collapse>
@@ -231,31 +311,13 @@
 	</div>
 </template>
 <script>
-import JsonData from '/public/TextMark.json'
+//import JsonData from '/public/TextMark.json'
+import axios from 'axios'
+//import FileSaver from "file-saver";
 export default {
 	data() {
 		return {
 			pdflist: [
-				{
-					url: "http://120.55.63.197:3000/images/1.pdf",
-					label: ["大鼠", "二鼠"]
-				},
-				{
-					url: "http://120.55.63.197:3000/images/2.pdf",
-					label: ["三鼠", "四鼠"]
-				},
-				{
-					url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-					label: ["五鼠", "六鼠"]
-				},
-				{
-					url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-					label: ["七", "八鼠"]
-				},
-				{
-					url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-					label: ["九鼠", "十鼠"]
-				},
 			],
 			project: {},
 			pageNo: null,
@@ -276,7 +338,7 @@ export default {
 			markpage: [],
 			pageheight: 0,
 			pagewidth: 0,
-			mode: 3,
+			mode: 1,
 			/*mode2状态变量*/
 			vis: false,
 			dynamicTags: [],
@@ -286,20 +348,20 @@ export default {
 			inputValue: '',
 			markdata: [],
 			options: [{
-				value: '黄金糕',
-				label: '黄金糕'
+				value: '合同类型',
+				label: '合同类型'
 			}, {
-				value: '花花花',
-				label: '花花花'
+				value: '基金类型',
+				label: '基金类型'
 			}, {
-				value: '双皮奶',
-				label: '双皮奶'
+				value: '具体项目条款',
+				label: '具体项目条款'
 			}, {
-				value: '龙须面',
-				label: '龙须面'
+				value: '合同描述',
+				label: '合同描述'
 			}, {
-				value: '北京烤鸭',
-				label: '北京烤鸭'
+				value: '生效时机',
+				label: '生效时机'
 			}
 			],
 			marklist: [],
@@ -321,46 +383,74 @@ export default {
 			mode3inputVisible: false,
 			mode3inputValue: '',
 			mode3options: [{
-				value: '黄金糕',
-				label: '黄金糕'
+				value: '类型',
+				label: '类型'
 			}, {
-				value: '花花花',
-				label: '花花花'
+				value: '条款',
+				label: '条款'
 			}, {
-				value: '双皮奶',
-				label: '双皮奶'
+				value: '原因',
+				label: '原因'
 			}, {
-				value: '龙须面',
-				label: '龙须面'
+				value: '法规',
+				label: '法规'
 			}, {
-				value: '北京烤鸭',
-				label: '北京烤鸭'
+				value: '金额',
+				label: '金额 '
 			}
 			],
 			mode3tag: "",
 			mode3link: [],
 			linklist: [
 				{
-					value: "目标",
-					label: "目标"
+					value: "解释",
+					label: "解释"
+				},
+				{
+					value: "目的",
+					label: "目的"
+				},
+				{
+					value: "属性",
+					label: "属性"
 				},
 				{
 					value: "从属",
 					label: "从属"
-				},
-				{
-					value: "比例",
-					label: "比例"
-				},
-				{
-					value: "类别",
-					label: "类别"
 				}
 			],
 			chooselink: "",
 			linkname: "",
 			mode3mouseover: "",
-			chooosecontent: ""
+			chooosecontent: "",
+			/*******************mode4变量**********************/
+			mode4list: [{ label: "文本分类", value: "文本分类" }, { label: "关键词识别", value: "关键词识别" }, { label: "关键词抽取", value: "关键词抽取" }, { label: "情感分析", value: "情感分析" }, { label: "实体识别", value: "实体识别" }, { label: "意图识别", value: "意图识别" }, { label: "生成式摘要", value: "生成式摘要" }, { label: "新闻分类", value: "新闻分类" }, { label: "抽取式阅读理解", value: "抽取式阅读理解" }, { label: "多项选择", value: "多项选择" }, { label: "自然语言推理", value: "自然语言推理" }, { label: "指代消解", value: "指代消解" }, { label: "语义匹配", value: "语义匹配" }],
+			smarttask: "",
+			/*文本分类变量 */
+			mode41: [],
+			classification: [{ labels: "财经", id: 1 }, { labels: "军事", id: 2 }, { labels: "政治", id: 3 }, { labels: "文化", id: 4 }, { labels: "社会", id: 5 },],
+			/*关键词识别变量 */
+			mode42: "",
+			/*情感分析变量 */
+			mode44: [],
+			emotion: [{ value: "开心" }, { value: "激动" }, { value: "伤心" }, { value: "沮丧" }, { value: "烦闷" }],
+			/*实体识别变量 */
+			mode45: "",
+			/*意图识别变量 */
+			mode46: "",
+			/*新闻分类变量 */
+			mode48: [],
+			newsclassification: [{ labels: "财经", id: 1 }, { labels: "军事", id: 2 }, { labels: "政治", id: 3 }, { labels: "文化", id: 4 }, { labels: "社会", id: 5 }],
+			/*抽取式阅读理解变量 */
+			mode49: "",
+			/*多项选择变量 */
+			mode410: { question: "", answer: "" },
+			/*自然语言推理变量 */
+			mode411: { sentence1: "", sentence2: "", answer: "" },
+			/*指代消解变量 */
+			mode412: { question: "", answer: "" },
+			/*语义匹配变量 */
+			mode413: { sentence1: "", sentence2: "", answer: "" },
 		}
 	},
 	computed: {
@@ -426,10 +516,21 @@ export default {
 	},
 	mounted() {
 		//console.log(JsonData);
-		this.$store.commit("setpdflist", this.pdflist)
-		this.markdata = JsonData
 		this.project = this.$route.query;
-		console.log(this.project);
+		//this.smartmark("抽取式阅读理解任务：阅读文章【谷歌公司首席执行官表示，他们计划在未来五年内全面实现碳中和，并将投资额翻倍用于太阳能和风能等清洁能源项目。同时，亚马逊也发布了雄心勃勃的计划，承诺在2030年前投资100亿美元用于推动可再生能源的创新和发展。】问题【谷歌公司的目标是什么】的答案是什么？")
+		if (this.$store.state.pdflist.length === this.$store.state.index) {
+			console.log();
+			axios.post("http://192.168.224.150:10010/dataset/task", { version: this.project.versionId, page: Math.floor(this.$store.state.index / 5) + 1, number: 5 }).then(res => {
+				console.log(res.data);
+				res.data.data.map(item => {
+					this.$store.commit("setpdflist", item)
+				})
+				console.log(this.$store.state.pdflist[this.$store.state.index].mark);
+				this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
+			})
+		} else {
+			this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
+		}
 		setTimeout(() => {
 			this.doc = this.$refs.a
 			this.docselection = this.doc.contentWindow
@@ -448,8 +549,189 @@ export default {
 
 	},
 	methods: {
+		getmark(item) {
+			console.log(item);
+			axios.get(item).then(res => {
+				console.log(res.data);
+				if (typeof res.data === "string") {
+					this.markdata = []
+				} else {
+					this.markdata = res.data
+				}
+
+			})
+		},
+		mode4select(item) {
+			if (item === "自然语言推理") {
+				if (this.mode411.sentence1 === "") {
+					this.mode411.sentence1 = this.docselection.getSelection().getRangeAt(0).toString()
+				} else {
+					this.mode411.sentence2 = this.docselection.getSelection().getRangeAt(0).toString()
+				}
+			} else if (item === "语义匹配") {
+				if (this.mode413.sentence1 === "") {
+					this.mode413.sentence1 = this.docselection.getSelection().getRangeAt(0).toString()
+				} else {
+					this.mode413.sentence2 = this.docselection.getSelection().getRangeAt(0).toString()
+				}
+			}
+		},
+		mode4sure() {
+			let a
+			if (this.smarttask === "文本分类") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode41.length === 0) {
+					this.$message.warning("请选择至少一个类别")
+					return
+				}
+				a += `这篇文章的类别是什么？{${this.mode41.join("/")}}`
+			} else if (this.smarttask === "关键词识别") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode42 === "") {
+					this.$message.warning("请输入待识别关键词")
+					return
+				}
+				a += `问题【${this.mode42}】`
+			} else if (this.smarttask === "关键词抽取") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				a += "这篇文章的关键词是什么？"
+			} else if (this.smarttask === "情感分析") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode44.length === 0) {
+					this.$message.warning("请选择至少一个类别")
+					return
+				}
+				a += `这篇文章的情感态度是什么？{${this.mode44.join("/")}}`
+			} else if (this.smarttask === "实体识别") {
+				a = `${this.smarttask}任务；找出【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode45 === "") {
+					this.$message.warning("请输入识别关键词类型")
+					return
+				}
+				a += `这篇文章中所有【${this.mode45}】类型的实体？`
+			} else if (this.smarttask === "意图识别") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode46 === "") {
+					this.$message.warning("请输入意图类型")
+					return
+				}
+				a += `这句话的意图是什么？{${this.mode46}}`
+			} else if (this.smarttask === "生成式摘要") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				a += "这篇文章的摘要是什么？"
+			} else if (this.smarttask === "新闻分类") {
+				a = `${this.smarttask}任务；【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode48.length === 0) {
+					this.$message.warning("请选择至少一个类别")
+					return
+				}
+				a += `这篇文章的类别是什么？{${this.mode48.join("/")}}`
+			} else if (this.smarttask === "抽取式阅读理解") {
+				a = `${this.smarttask}任务；阅读文章【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode49 === "") {
+					this.$message.warning("请输入问题")
+					return
+				}
+				a = a + `问题【${this.mode49}】的答案是什么？`
+			} else if (this.smarttask === "多项选择") {
+				a = `${this.smarttask}任务；阅读文章【${this.docselection.getSelection().getRangeAt(0).toString()}】`
+				if (this.mode410.question === "" || this.mode410.answer === "") {
+					this.$message.warning("请输入问题和选项")
+					return
+				}
+				a = a + `问题【${this.mode410.question}】？{${this.mode410.answer}}`
+			} else if (this.smarttask === "自然语言推理") {
+				if (this.mode411.sentence1 === "" || this.mode411.sentence2 === "" || this.mode411.answer === "") {
+					this.$message.warning("请填写句子和逻辑选择")
+					return
+				}
+				a = `${this.smarttask}任务；【${this.mode411.sentence1}】和【${this.mode411.sentence2}】，以上两句话的逻辑关系是什么？{${this.mode411.answer}}`
+			} else if (this.smarttask === "指代消解") {
+				if (this.mode412.question === "" || this.mode412.answer === "") {
+					this.$message.warning("请填写问题和选项")
+					return
+				}
+				a = `${this.smarttask}任务；文章【${this.docselection.getSelection().getRangeAt(0).toString()}】中{${this.mode412.question}}{${this.mode412.answer}}`
+			} else if (this.smarttask === "语义匹配") {
+				if (this.mode413.sentence1 === "" || this.mode413.sentence2 === "") {
+					this.$message.warning("请填写匹配句子和匹配选项")
+					return
+				}
+				a = `${this.smarttask}任务；【${this.mode413.sentence1}】和【${this.mode413.sentence2}】，以上两句话的内容是否相似？{相似/不相似}`
+			}
+			this.smartmark(a)
+		},
+		mode4cancel() {
+			this.vis = false
+			if (this.smarttask === "文本分类") {
+				this.mode41 = []
+			} else if (this.smarttask === "关键词识别") {
+				this.mode42 = ""
+			} else if (this.smarttask === "情感分析") {
+				this.mode44 = []
+			} else if (this.smarttask === "实体识别") {
+				this.mode45 = ""
+			} else if (this.smarttask === "意图识别") {
+				this.mode46 = ""
+			} else if (this.smarttask === "新闻分类") {
+				this.mode48 = []
+			} else if (this.smarttask === "抽取式阅读理解") {
+				this.mode49 = ""
+			} else if (this.smarttask === "多项选择") {
+				this.mode410 = { question: "", answer: "" }
+			} else if (this.smarttask === "自然语言推理") {
+				this.mode411 = { sentence1: "", sentence2: "", answer: "" }
+			} else if (this.smarttask === "指代消解") {
+				this.mode412 = { question: "", answer: "" }
+			} else if (this.smarttask === "语义匹配") {
+				this.mode413 = { sentence1: "", sentence2: "", answer: "" }
+			}
+			this.smarttask = ""
+		},
+		smartmark(item) {
+			axios.post("http://home.itzyc.com:12349/predict/", { text: item }).then(res => {
+				console.log(res.data);
+				const regex = /【(.*?)】/g;
+				const matches = [];
+				let match;
+				while ((match = regex.exec(item)) !== null) {
+					matches.push(match[1]); // 将匹配到的内容存入数组
+				}
+				let result = { markcontent: res.data.prediction[0], id: this.id, mode: 4, mode4kind: this.smarttask }
+				if (item.split("任务")[0] === "自然语言推理" || item.split("任务")[0] === "语义匹配") {
+					result.choosecontent1 = matches[0]
+					result.choosecontent2 = matches[1]
+				} else {
+					result.choosecontent = matches[0]
+				}
+				let ispage = false
+				this.markdata.map(item => {
+					if (item.page === this.id.split("-")[0]) {
+						ispage = true
+						item.mark.push(result)
+					}
+				})
+				if (!ispage) {
+					let c = []
+					c.push(result)
+					let a = { page: this.id.split("-")[0], mark: c }
+					this.markdata.push(a)
+				}
+				this.etarget = ""
+				this.id = ""
+				this.mode4cancel()
+			})
+		},
 		goBack() {
-			this.$router.push("/MakeMark")
+			let a = JSON.stringify(this.markdata)
+			let file = new FormData()
+			const blob = new Blob([a]);
+			file.set("file", blob, "data.json")
+			file.set("id", this.$store.state.pdflist[this.$store.state.index].id)
+			axios.put("http://192.168.224.150:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+				console.log(res.data);
+				this.$router.push("/MakeMark")
+			})
 		},
 		addlink() {
 			let c = { linkname: this.linkname, id: this.chooselink.id, tag: this.chooselink.tag }
@@ -649,6 +931,7 @@ export default {
 		},
 		setmode(mode) {
 			this.mode = mode
+
 		},
 		percenttopx(element, number) {
 			let a = parseFloat(element.split("%")[0]) / 100
@@ -758,6 +1041,7 @@ export default {
 						if (istag) {
 							childbutton.addEventListener("mouseover", (e) => {
 								this.mode = 2
+								this.docselection.that.changemode(2)
 								this.popoverposition(e)
 								this.popbutton = false
 								this.mouseover = false
@@ -782,6 +1066,7 @@ export default {
 						} else {
 							childbutton.addEventListener("mouseover", (e) => {
 								this.mode = 2
+								this.docselection.that.changemode(2)
 								this.popoverposition(e)
 								this.popbutton = false
 								this.mouseover = false
@@ -892,6 +1177,7 @@ export default {
 						childbutton.setAttribute("id", id + "-" + "button")
 						childbutton.addEventListener("mouseover", (e) => {
 							this.mode = 3
+							this.docselection.that.changemode(3)
 							this.mode3mouseover = id
 							this.popoverposition(e)
 							this.$nextTick(() => {
@@ -931,8 +1217,9 @@ export default {
 				if (isadd === 0) {
 					this.mode3link.forEach(item => {
 						this.markdata.forEach(item2 => {
-							if (item2.page === item.id.substring(0, 1)) {
+							if (item2.page === item.id.split("-")[0]) {
 								item2.mark.forEach(item3 => {
+									console.log(item3.id, item.id);
 									if (item3.id === item.id) {
 										item3.link.push({ tag: mode3tag, id: id, linkname: item.linkname })
 									}
@@ -983,10 +1270,29 @@ export default {
 				}
 			})
 			sel.getElementById("prepdf").addEventListener("click", () => { this.$store.commit("changeindex", { value: -1 }) })
-			sel.getElementById("nextpdf").addEventListener("click", () => { this.$store.commit("changeindex", { value: 1 }) })
-			sel.getElementById("mode1").addEventListener("click", () => { this.mode = 1 })
-			sel.getElementById("mode2").addEventListener("click", () => { this.mode = 2 })
-			sel.getElementById("mode3").addEventListener("click", () => { this.mode = 3 })
+			sel.getElementById("nextpdf").addEventListener("click", () => {
+				/*let a = JSON.stringify(this.markdata)
+				const blob = new Blob([a]);
+				FileSaver.saveAs(blob, (this.$store.state.index + 1) + ".json")*/
+				this.$store.commit("changeindex", { value: 1 })
+
+			})
+			sel.getElementById("mode1").addEventListener("click", () => {
+				this.mode = 1
+				this.docselection.that.changemode(1)
+			})
+			sel.getElementById("mode2").addEventListener("click", () => {
+				this.mode = 2
+				this.docselection.that.changemode(2)
+			})
+			sel.getElementById("mode3").addEventListener("click", () => {
+				this.mode = 3
+				this.docselection.that.changemode(3)
+			})
+			sel.getElementById("mode4").addEventListener("click", () => {
+				this.mode = 4
+				this.docselection.that.changemode(4)
+			})
 			for (let i = 0; i < sel.getElementsByClassName('page').length; i++) {
 				sel.getElementsByClassName("page")[i].setAttribute("id", "page" + sel.getElementsByClassName("page")[i].getAttribute("data-page-number"))
 				sel.getElementsByClassName('page')[i].addEventListener("mousedown", (e) => {
@@ -999,6 +1305,7 @@ export default {
 					this.mode3link = []
 					this.mode3tag = ""
 					this.mode3mouseover = ""
+					this.smarttask = ""
 					if (!e.target.style.left) {
 						return
 					}
@@ -1050,6 +1357,9 @@ export default {
 							this.etarget = e.target
 							this.marklist = shape
 							this.id = id
+							this.vis = true
+						} else if (this.mode === 4) {
+							this.popoverposition(e)
 							this.vis = true
 						}
 						return
@@ -1181,7 +1491,6 @@ export default {
 						this.etarget = e.target
 						this.marklist = marklist
 						this.id = id
-						console.log(this.id);
 						this.popbutton = true
 						this.mouseover = true
 						this.vis = true
@@ -1189,6 +1498,11 @@ export default {
 						this.popoverposition(e)
 						this.etarget = e.target
 						this.marklist = marklist
+						this.id = id
+						this.vis = true
+					} else if (this.mode === 4) {
+						this.popoverposition(e)
+						this.etarget = e.target
 						this.id = id
 						this.vis = true
 					}

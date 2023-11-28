@@ -40,7 +40,7 @@
 									</el-tag>
 									<div>证据列表:</div>
 									<div :key="index" v-for="(evidence, index) in tag.evidence" class="evidence">
-										<span @click="jump(`#${evidence}-0`)">{{ evidence }}</span>
+										<span @click="jump(`#${evidence}`)">{{ evidence }}</span>
 									</div>
 									<div v-if="tag.evidence.length == 0">
 										无证据标注
@@ -182,7 +182,7 @@
 									</el-tag>
 									<div>证据列表:</div>
 									<div :key="index" v-for="(evidence, index) in tag.evidence" class="evidence">
-										<span @click="jump(`#${evidence}-0`)">{{ evidence }}</span>
+										<span @click="jump(`#${evidence}`)">{{ evidence }}</span>
 									</div>
 									<div v-if="tag.evidence.length == 0">
 										无证据标注
@@ -213,7 +213,7 @@
 									</div>
 									<div class="linkright">
 										<div class="righttext">
-											<span @click="jump(`#${link.id}-0`)" class="evidence">{{ link.tag
+											<span @click="jump(`#${link.id}`)" class="evidence">{{ link.tag
 											}}</span>
 										</div>
 										<div class="righttext">
@@ -231,36 +231,43 @@
 	</div>
 </template>
 <script>
-import JsonData from '/public/TextMark.json'
+import axios from "axios"
 export default {
     name:"PdfReview",
 	data() {
 		return {
 			pdflist: [
 				{
-					url: "http://120.55.63.197:3000/images/1.pdf",
-                    label: ["大鼠", "二鼠"],
-                    access:false
+					url: "/信息抽取标注/1.pdf",
+					mark: "/信息抽取标注/1.json"
 				},
 				{
-					url: "http://120.55.63.197:3000/images/2.pdf",
-                    label: ["三鼠", "四鼠"],
-                    access:false
+					url: "/信息抽取标注/2.pdf",
+					mark: "/信息抽取标注/2.json"
 				},
 				{
-					url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-                    label: ["五鼠", "六鼠"],
-                    access:false
+					url: "/信息抽取标注/3.pdf",
+					mark: "/信息抽取标注/3.json"
 				},
 				{
-					url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-                    label: ["七", "八鼠"],
-                    access:false
+					url: "/信息抽取标注/4.pdf",
+					mark: "/信息抽取标注/4.json"
 				},
 				{
-					url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-                    label: ["九鼠", "十鼠"],
-                    access:false
+					url: "/信息抽取标注/5.pdf",
+					mark: ""
+				},
+				{
+					url: "/信息抽取标注/6.pdf",
+					mark: ""
+				},
+				{
+					url: "/信息抽取标注/7.pdf",
+					mark: ""
+				},
+				{
+					url: "/信息抽取标注/8.pdf",
+					mark: ""
 				},
 			],
 			project: {},
@@ -432,12 +439,15 @@ export default {
 	},
 	mounted() {
         //console.log(JsonData);
-        if (!this.$store.state.isaddpdf) {
-            this.$store.commit("setpdflist", this.pdflist)
-            console.log("setpdflist");
-        }
-		this.markdata = JsonData
+		if (!this.$store.state.isaddpdf) {
+			this.pdflist.map(item => {
+				this.$store.commit("setpdflist", item)
+			})
+            //this.$store.commit("setpdflist", this.pdflist)
+            //console.log("setpdflist");
+		}
 		this.project = this.$route.query;
+		this.getmark(this.$store.state.pdflist[this.$store.state.index].mark) 
 		setTimeout(() => {
             this.doc = this.$refs.a
             this.docselection = this.doc.contentWindow
@@ -456,6 +466,11 @@ export default {
 
 	},
 	methods: {
+		getmark(item) {
+			axios.get(item).then(res => {
+				this.markdata=res.data
+			})
+		},
 		goBack() {
 			this.$router.push("/DataReview")
 		},
@@ -529,12 +544,14 @@ export default {
 		},
 		jump(href) {
 			let a = this.doc.contentDocument.createElement("a")
+			console.log(this.doc.contentDocument.querySelector("#page" + href.substring(1, 2)).querySelector(".textLayer"));
 			if (this.doc.contentDocument.querySelector("#page" + href.substring(1, 2)).querySelector(".textLayer")) {
-				a.href = href
+				console.log("#page" + href.split("-")[0].split("#")[1]);
+				a.href = "#page" + href.split("-")[0].split("#")[1]
 				a.click()
 				a.remove()
 			} else {
-				a.href = "#page" + href.substring(1, 2)
+				a.href = "#page" + href.split("-")[0].split("#")[1]
 				a.click()
 				a.remove()
 			}

@@ -109,7 +109,7 @@
                             </div>
                         </div>
                         <el-table :ref="`project${item.id}`" :data="item.versions"
-                            @selection-change="handleSelectionChange($event, item)" :row-key="getrowkey">
+                            @selection-change="handleSelectionChange($event, item)" :row-key="getrowkey" :key="fresh">
                             <el-table-column type="selection" width="35" :reserve-selection="true"></el-table-column>
                             <el-table-column type="expand" width="55" label="任务">
                                 <template slot-scope="scope">
@@ -157,12 +157,13 @@
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
                                     <span class="tableplay" @click="handleinput(item, scope.row)">导入</span>
-                                    <span class="tableplay" @click="handlelook(item, scope.row)">查看</span>
+                                    <span class="tableplay" @click="handlepredict(item, scope.row)"
+                                        v-if="item.dataType === '图像'">预标注</span>
                                     <span v-if="!scope.row.task" class="tableplay"
                                         @click="handleSchedule(item, scope.row)">调度</span>
                                     <span class="tableplay" @click="handleDelete(item, scope.row)">删除</span>
                                     <span class="tableplay" @click="handleOutput(item, scope.row)"
-                                        v-if="scope.row.markprocess === '100%'">导出</span>
+                                        v-if="scope.row.progress === '100%'">导出</span>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -189,13 +190,13 @@
                         inactive-text="不继承">
                     </el-switch>
                 </el-form-item>
-                <el-form-item v-if="isextends" label="历史版本" class="formitem">
+                <el-form-item v-if="isextends" prop="addnewversion.marktype" label="历史版本" class="formitem">
                     <el-select size="mini" v-model="addnewversion.marktype" placeholder="请选择历史版本">
-                        <el-option v-for="item in chooseitem.versions" :key="item.id" :value="item.marktype"
+                        <el-option v-for="item in chooseitem.versions" :key="item.id" :value="item.callType"
                             :label="`${item.verName}-${item.callType}`"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item v-else label="标注类型" v-model="addnewversion.marktype" class="formitem">
+                <el-form-item v-else label="标注类型" prop="addnewversion.marktype" class="formitem">
                     <el-select size="mini" v-model="addnewversion.marktype" placeholder="请选择标注类型">
                         <el-option v-for="item in marktypelist" :key="item.value" :value="item.value"
                             :label="item.value"></el-option>
@@ -215,11 +216,26 @@
                 <el-button size="mini" @click="delcancel">取 消</el-button>
             </span>
         </el-dialog>
+        <el-dialog width="24%" top="15%" title="预测标签添加" :visible.sync="predictvisible" :destroy-on-close="true"
+            :show-close="false" :close-on-click-modal="false">
+            <div style="display: flex;flex-direction: column;align-items: flex-start;" v-if="chooseitem.callType==='图片分类'">
+                <el-input v-model="predictvalue" size="mini" placeholder="请在版本标签基础上新增预定义标签"></el-input>
+                <span style="font-size: 12px;color: #84868c;">请以，分隔不同标签</span>
+                <span style="font-size: 12px;color: #84868c;">支持为标签添加注释，例如【基金】合同，【第一条】法案</span>
+            </div>
+            <div v-else>
+                 确定进行图像文本预标注吗
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button size="mini" type="primary" @click="predictok">确 定</el-button>
+                <el-button size="mini" @click="predictcancel">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
 import axios from 'axios'
-import Project from '../../../public/project.json'
+//import Project from '../../../public/project.json'
 export default {
     name: "ProjectList",
     components: {
@@ -235,222 +251,21 @@ export default {
             select: [{ label: "全部", value: "全部" }, { value: "图像", label: "图像" }, { value: "文本", label: "文本" }],
             showprojecttype: "全部",
             inputvalue: "",
-            projectlist: [
-                {
-                    projectid: "188865667",     //项目id
-                    name: "测试数据1",          //项目名
-                    datatype: "图像",          //数据类型
-                    version: [                 //下辖版本
-                        {
-                            versionid: "1697286",      //版本id
-                            versionname: "v1",         //版本号
-                            versionnumber: "600",      //数据量
-                            marktype: "图片分类",      //标注任务类型
-                            markprocess: "100%",        //标注进度
-                            task: [               //任务
-                                {
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员1",   //任务承担人
-                                    taskprocess: "15%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员2",   //任务承担人
-                                    taskprocess: "12%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员3",   //任务承担人
-                                    taskprocess: "42%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                },
-                                {
-                                    taskname: "4848",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员4",   //任务承担人
-                                    taskprocess: "56%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                }
-                            ]
-                        },
-                        {
-                            versionid: "1592156",
-                            versionname: "v2",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-                            task: [               //任务
-                                {
-                                    taskname: "496",
-                                    tasknumber: "150",   //任务标注数量
-                                    taskperson: "测试标注员1",   //任务承担人
-                                    taskprocess: "15%",  //任务进度
-                                    taskcreatetime: "2023-11-05 10:47",   //任务创建时间
-                                    taskdeadline: "2023-11-15 10:47",     //任务截止时间
-                                    juideprocess: "0%",     //审核进度
-                                }
-                            ]
-                        },
-                        {
-                            versionid: "1578156",
-                            versionname: "v3",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "15598756",
-                            versionname: "v4",
-                            versionnumber: "452",
-                            datatype: "图像",
-                            marktype: "图像文本识别",
-                            markprocess: "15%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "595398126",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "79526",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "7595",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "1",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "926",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "59623",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "2",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "79kl",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "awf",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "3",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "79iojk6",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "28+95",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-                {
-                    projectid: "4",
-                    name: "测试数据2",
-                    datatype: "文本",
-                    version: [
-                        {
-                            versionid: "5965mokl",
-                            versionname: "v1",
-                            versionnumber: "456",
-
-                            marktype: "文本分类",
-                            markprocess: "15%",
-
-                        },
-                        {
-                            versionid: "tyguhj",
-                            versionname: "v2",
-                            versionnumber: "324",
-                            datatype: "文本",
-                            marktype: "信息抽取标注",
-                            markprocess: "78%",
-
-                        }
-                    ]
-                },
-            ],
+            projectlist: [{
+                "id": 25,
+                "name": "牛尾花",
+                "dataNumber": null,
+                "dataType": "图像",
+                "versions": [
+                    {
+                        "verName": "V1",
+                        "progress": null,
+                        "callType": "点标注",
+                        "dataNumber": null,
+                        "userVOList": []
+                    }
+                ]
+            },],
             multipleSelection: [],
             addnewversion: {
                 versionname: "",
@@ -459,13 +274,16 @@ export default {
             },
             isextends: true,
             chooseitem: "",
-            selectrow: ""
+            selectrow: "",
+            fresh: false,
+            predictvalue: "",
+            predictvisible: false
         }
     },
     computed: {
         showlist() {
             return this.projectlist.filter(item => {
-                return ( item.name.includes(this.inputvalue)) && (this.showprojecttype === "全部" || item.datatype === this.showprojecttype)
+                return (item.name.includes(this.inputvalue)) && (this.showprojecttype === "全部" || item.datatype === this.showprojecttype)
             })
         },
         marktypelist() {
@@ -492,6 +310,30 @@ export default {
         }
     },
     methods: {
+        predictok() {
+            /*axios.get("http://192.168.224.150:10010/xxx/" + {id:this.chooseitem.id,verName:this.chooseitem.verName}).then(res => {
+                内含版本标签组和标注数据url
+                let data = res.data.data.ossPath
+                data.label = res.data.data.labels.join(",") + this.predictvalue
+                向python后台发送请求标注
+                if(this.chooseitem.callType ===图片分类){
+
+                }else{
+                    
+                }
+                获取数据后保存文件发到后台 
+            })*/
+
+            setTimeout(() => {
+                this.$message.success("预标注完成")
+            },2000)
+            this.predictcancel()
+        },
+        predictcancel() {
+            this.chooseitem = ""
+            this.predictvalue = ""
+            this.predictvisible = false
+        },
         addcancel() {
             this.centerDialogVisible = false
             this.chooseitem = ""
@@ -503,10 +345,20 @@ export default {
             }
         },
         addok() {
+            console.log(this.addnewversion);
             if (this.addnewversion.marktype) {
                 this.addnewversion.projectid = this.chooseitem.id
                 console.log(this.addnewversion);
-                this.refresh()
+                let a = {}
+                a.id = this.addnewversion.projectid
+                a.markType = this.addnewversion.marktype
+                a.verAttributes = this.addnewversion.descript
+                a.version = this.addnewversion.versionname
+                axios.post("http://192.168.224.150:10010/items/version/add", a).then(res => {
+                    console.log(res.data);
+                })
+                this.fresh = !this.fresh
+                this.getproject()
                 this.$nextTick(() => {
                     this.centerDialogVisible = false
                     this.chooseitem = ""
@@ -528,32 +380,37 @@ export default {
                 let b = parseInt(element.verName.substring(1))
                 a = b > a ? b : a
             });
-            this.addnewversion.versionname = "v" + (a + 1)
+            this.addnewversion.versionname = "V" + (a + 1)
             this.$nextTick(() => {
                 this.centerDialogVisible = true
             })
         },
         detail(item) {
             console.log(item);
-            let a=JSON.stringify(item)
-            this.$router.push({ path: "/ProjectDetail/", query: {project:a} })
+            let a = JSON.stringify(item)
+            this.$router.push({ path: "/ProjectDetail/", query: { project: a } })
 
         },
         delok() {
             let form
             if (this.selectrow) {
-                console.log(this.selectrow);
-                form = { projectid: this.chooseitem.projectid, version: this.selectrow }
+                //console.log(this.selectrow);
+                let a = []
+                this.selectrow.map(item => {
+                    a.push(item.verName)
+                })
+                //console.log(a);
+                form = { id: this.chooseitem.id, versionId: a }
             } else {
                 if (this[`multipleSelection${this.chooseitem.id}`].length === this.chooseitem.versions.length) {
-                    form = { projectid: this.chooseitem.id }
+                    form = { id: this.chooseitem.id }
 
                 } else if (this[`multipleSelection${this.chooseitem.id}`].length === 0) {
                     this.delcancel()
                     return
                 }
                 else {
-                    form = { projectid: this.chooseitem.id, version: this[`multipleSelection${this.chooseitem.id}`] }
+                    form = { id: this.chooseitem.id, versionId: this[`multipleSelection${this.chooseitem.id}`] }
                 }
             }
             console.log(form);
@@ -566,23 +423,26 @@ export default {
                     this[`multipleSelection${item.id}`] = []
                 })
             })
-            /*axios.post('http:xxx.xx.xx.xxx:xxxx/xx/xx', form).then((res) => {
+            
+            axios.post('http://192.168.224.150:10010/items/delete', form).then((res) => {
+                console.log(res.data);
                 if (res.data.code === 200) {
                     this.$message({ type: "success", message: "删除完毕" })
-                    this.chooseitem=""
-                    this.selectrow=""
-                    this.$nextTick(()=>{
+                    this.chooseitem = ""
+                    this.selectrow = ""
+                    this.fresh = !this.fresh
+                    this.$nextTick(() => {
                         this.getproject()
                         this.projectlist.forEach(item => {
-                            this[`multipleSelection${item.projectid}`] = []
+                            this[`multipleSelection${item.id}`] = []
                         })
                     })
-                    this.delvisible=false
+                    this.delvisible = false
                 } else {
                     this.$message({ type: "error", message: "删除失败" })
-                    this.delvisible=false
+                    this.delvisible = false
                 }
-            })*/
+            })
         },
         delcancel() {
             this.delvisible = false
@@ -598,17 +458,12 @@ export default {
             })
         },
         getproject() {
-            /*axios.get("http://10.99.254.235:10010/items").then((res) => {
+            axios.get("http://192.168.224.150:10010/items").then((res) => {
                 this.projectlist = res.data.data;
                 console.log(this.projectlist);
                 this.projectlist.forEach(item => {
                     this[`multipleSelection${item.id}`] = []
                 })
-            })*/
-            this.projectlist = Project.data;
-            console.log(this.projectlist);
-            this.projectlist.forEach(item => {
-                this[`multipleSelection${item.id}`] = []
             })
         },
         refresh() {
@@ -626,23 +481,31 @@ export default {
         create() {
             this.$router.push("/CreateProject")
         },
-        handlelook(item, row) {
+        handlepredict(item, row) {
             console.log(item, row);
+            this.chooseitem = { id: item.id, verName: row.verName,callType:row.callType }
+            this.predictvisible = true
+
         },
         handleSelectionChange(val, item) {
-            console.log(val, item);
-            this[`multipleSelection${item.id}`] = val;
+            let a = []
+            val.map(item => {
+                a.push(item.verName)
+            })
+            this[`multipleSelection${item.id}`] = a;
+            console.log(this[`multipleSelection${item.id}`]);
             //console.log(this.multipleSelection);
         },
         handleDelete(item, row) {
             let a = []
             a.push(row)
+            this.chooseitem = item
             this.selectrow = a
             //console.log(this[`multipleSelection${item.projectid}`]);
             this.del(item)
         },
         handleSchedule(item, row) {
-            this.$router.push({ path: "/TaskSchedule/", query: { projectid: item.id, version: row.verName } })
+            this.$router.push({ path: "/TaskSchedule/", query: { id: item.id, version: row.versionId } })
         },
         a(item) {
             console.log(item);
@@ -654,8 +517,9 @@ export default {
             console.log(item, row);
             let a = {}
             a.id = item.id
-            a.dataType = item.dataYype
+            a.dataType = item.dataType
             a.verName = row.verName
+            a.versionId = row.versionId
             this.$router.push({ path: "/InputFile", query: a })
         },
         handleTaskLook(item, row) {

@@ -60,7 +60,7 @@
         </el-card>
         <el-card class="teachcard">
             <div slot="header" style="display: flex;justify-content: space-between;align-items:center">
-                <el-button type="primary" size="mini" style="background-color: rgb(36,104,242);margin-right: 20px">
+                <el-button type="primary" size="mini" style="background-color: rgb(36,104,242);margin-right: 20px" @click="addvisible=true">
                     <i class="el-icon-plus"></i>&emsp;创建标签组
                 </el-button>
                 <div style="display: flex;justify-content: space-between;">
@@ -71,11 +71,8 @@
                 </div>
             </div>
             <el-table :data="labelGroup">
-                <el-table-column width="150" prop="id" label="标签组ID"></el-table-column>
-                <el-table-column width="200" prop="name" label="标签组名称"></el-table-column>
-                <el-table-column width="250" prop="descript" label="标签组描述"></el-table-column>
-                <el-table-column width="220" prop="startTime" label="创建时间"></el-table-column>
-                <el-table-column width="220" prop="endTime" label="更新时间"></el-table-column>
+                <el-table-column width="350" prop="id" label="标签组ID"></el-table-column>
+                <el-table-column width="350" prop="name" label="标签组名称"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <span class="tableplay" @click="handleinput(scope.row)">管理</span>
@@ -89,11 +86,8 @@
             :close-on-click-modal="false">
             <span slot="title"><i class="el-icon-prompt"></i>编辑标签组</span>
             <el-form ref="editform" label-width="110px" label-position="left" :rules="editformrule" :model="editform">
-                <el-form-item label="标签组名称" prop="labelgroupName">
-                    <el-input placeholder="请输入标签组名称" v-model="editform.labelgroupName"></el-input>
-                </el-form-item>
-                <el-form-item label="标签组描述" prop="labelgroupDescript">
-                    <el-input show-word-limit maxlength="100" placeholder="请输入标签组描述" type="textarea" v-model="editform.labelgroupDescript"></el-input>
+                <el-form-item label="标签组名称" prop="name">
+                    <el-input placeholder="请输入标签组名称" v-model="editform.name"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -110,9 +104,50 @@
                 <el-button size="mini" @click="delcancel">取 消</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="新建标签组" :visible.sync="addvisible" width="24%" top="15%" :destroy-on-close="true"
+            :show-close="false" :close-on-click-modal="false">
+            <div><input placeholder="请输入标签组名" v-model="newgroup.labelName" class="inputlabel"></div>
+            <div style="height: 160px;overflow-y: auto;">
+                <div style="display: flex;justify-content: left;">
+                    <span>序号</span>
+                    <span style="margin-left: 15px;">标签名</span>
+                </div>
+                <div v-for="(item, index) in newgroup.labels" :key="index"
+                    style="display: flex;justify-content: left;align-items: center;margin-top: 12px;">
+                    <div style="font-size: 15px;margin-left: 8px;">
+                        {{ index + 1 }}
+                    </div>
+                    <div class="labelblock">{{ item }}</div>
+                    <i class="el-icon-close labelicon" @click="deletelabel(item)"></i>
+                </div>
+            </div>
+            <i v-if="!addnewlabel" class="el-icon-circle-plus-outline labelicon" @click="addnewlabel = true"></i>
+            <div v-else style="display: flex;flex-direction: column;justify-content: left;">
+                <div style="display: flex;justify-content: left;align-items: center;">
+                    <input placeholder="请输入新标签;不允许重复和空标签" v-model="newlabel" class="inputlabel">
+                    <el-tooltip content="保存编辑" placement="top-start">
+                        <i class="el-icon-check labelicon" @click="addsure"></i>
+                    </el-tooltip>
+                    <el-tooltip content="取消编辑" placement="top-end">
+                        <i class="el-icon-close labelicon" @click="addcancel"></i>
+                    </el-tooltip>
+                </div>
+                <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
+                    {{ labelerror }}
+                </span>
+                <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
+                    {{ labelsure }}
+                </span>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="isupdate" size="mini" type="primary" @click="addgroup">创建</el-button>
+                <el-button size="mini" @click="labelcancel">关闭</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name: "LabelManager",
     components: {
@@ -126,60 +161,92 @@ export default {
                 callback()
             }
         };
-        let validatelabelgroupDescript = (rule, value, callback) => {
-            if (value==="") {
-                return callback(new Error('请输入标签组描述'));
-            } else {
-                callback()
-            }
-        };
         return {
+            addvisible:false,
             hideintroduction: false,
             labelGroup: [
-                {
-                    id: "1",
-                    name: "1",
-                    descript: "1",
-                    startTime: "2023-11-05 19:31:26",
-                    endTime: "2023-11-05 19:31:26",
-                    label: ["鼠鼠", "哈哈哈", "耶比", "蛙入啊入啊"]
-                },
-                {
-                    id: "2",
-                    name: "2",
-                    descript: "2",
-                    startTime: "2023-11-05 19:31:26",
-                    endTime: "2023-11-05 19:31:26",
-                    label: ["鼠", "哈哈", "耶", "蛙入啊入"]
-                },
-                {
-                    id: "3",
-                    name: "3",
-                    descript: "3",
-                    startTime: "2023-11-05 19:31:26",
-                    endTime: "2023-11-05 19:31:26",
-                    label: ["鼠三", "哈哈", "比", "蛙啊入啊"]
-                },
             ],
+            newgroup: {
+                labelName: "",
+                labels:[]
+            },
             inputvalue: "",
             delvisible: false,
             editvisible: false,
             chooserow: {},
-            editform: { labelgroupName: "", labelgroupDescript: "" },
+            editform: { name: "" },
             editformrule: {
-                labelgroupName: [
+                name: [
                     { required: true, validator: validatelabelgroupName, trigger: 'blur' }
                 ],
-                labelgroupDescript: [
-                    { required: true, validator: validatelabelgroupDescript, trigger: 'blur' }
-                ],
-            }
+            },
+            labelvisible: false,
+            addnewlabel: false,
+            emptylabel: false,
+            labelerror: "",
+            labelsure: "待添加",
+            isupdate: false,
+            newlabel:""
         }
     },
     computed: {
 
     },
     methods: {
+        addgroup() {
+            if (this.newgroup.labels.length === 0) {
+                this.$message.error("请为标签组添加至少一条标签")
+            } else if (this.newgroup.labelName ==="") {
+                this.$message.error("请填写标签组名")
+            } else {
+                axios.post("http://192.168.224.150:10010/label", this.newgroup).then(res => {
+                    if (res.data.code === 200) {
+                        this.$message.success("创建成功")
+                        this.getlabelgroup()
+                        this.addvisible=false
+                    }
+                })
+            }  
+        },
+        addsure() {
+            if (this.newlabel === "") {
+                this.labelerror = "标签不能为空"
+                this.emptylabel = true
+            } else if (this.newgroup.labels.includes(this.newlabel)) {
+                this.labelerror = "标签重复"
+                this.emptylabel = true
+            } else {
+                this.newgroup.labels.push(this.newlabel)
+                this.labelsure = "添加成功"
+                this.newlabel = ""
+                this.emptylabel = false
+                this.isupdate = true
+            }
+        },
+        deletelabel(item) {
+            this.newgroup.labels = this.newgroup.labels.filter(element => {
+                return item !== element
+            })
+            this.isupdate = true
+        },
+        addcancel() {
+            this.newlabel = ""
+            this.addnewlabel = false
+            this.addnewlabel = false
+            this.emptylabel = false
+            this.labelerror = ""
+            this.labelsure = "待添加"
+
+        },
+        labelcancel() {
+            this.addvisible = false
+            this.addnewlabel = false
+            this.emptylabel = false
+            this.labelerror = ""
+            this.labelsure = "待添加"
+            this.newgroup.labels = []
+            this.isupdate = false
+        },
         hide() {
             this.hideintroduction = !this.hideintroduction
         },
@@ -190,13 +257,14 @@ export default {
         },
         delok() {
             let a = { id: this.chooserow.id }
-            let b=0
-            this.labelGroup.map((item,index) => {
-                if (item.id === a.id) {
-                   b=index 
+            axios.delete("http://192.168.224.150:10010/label/"+a.id).then(res => {
+                if (res.data.code === 200) {
+                    this.$message.success("删除成功")
+                    this.getlabelgroup()
+                } else {
+                    this.$message.error("删除失败")
                 }
             })
-            this.labelGroup.slice(b)
             /*发请求删除*/
             this.chooserow = {}
             this.delvisible = false
@@ -207,17 +275,17 @@ export default {
         },
         handlelook(row) {
             this.chooserow = row
-            this.editform.labelgroupName = row.name
-            this.editform.labelgroupDescript = row.descript
+            this.editform.labelId=row.id
             this.editvisible=true
         },
         editok() {
             this.$refs.editform.validate((result) => {
                 if (result) {
-                    this.labelGroup.map(item => {
-                        if (item.id === this.chooserow.id) {
-                            item.name = this.editform.labelgroupName
-                            item.descript =this.editform.labelgroupDescript
+                    console.log(this.editform);
+                    axios.put("http://192.168.224.150:10010/label", this.editform).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("编辑成功")
+                            this.getlabelgroup()
                         }
                     })
                     this.chooserow = {}
@@ -228,16 +296,25 @@ export default {
         editcancel() {
             this.chooserow = {}
             this.editvisible = false
-            this.editform.labelgroupName = ""
-            this.editform.labelgroupDescript = ""
+            this.editform.name = ""
         },
         handleinput(row) {
             console.log(row);
-            this.$router.push({path:"/LabelDetail",query:{group:JSON.stringify(row)}})
+            let a = {}
+            a.id = row.id
+            a.name = row.name
+            console.log(row);
+            this.$router.push({ path: "/LabelDetail", query: a  })
+        },
+        getlabelgroup() {
+            axios.get("http://192.168.224.150:10010/label").then((res) => {
+                console.log(res.data.data);
+                this.labelGroup=res.data.data
+            })
         }
     },
     mounted() {
-
+        this.getlabelgroup()
     },
 }
 </script>
@@ -318,12 +395,10 @@ export default {
     height: 598px;
     margin-left: 1%;
 }
-
 .teachcard {
     text-align: left;
     margin: 10px;
 }
-
 /deep/.el-card__header {
     padding: 8px;
     padding-bottom: 0px;
@@ -334,7 +409,6 @@ export default {
     margin-left: 30px;
     font-size: 16px;
 }
-
 .el-menu--horizontal>.el-menu-item.is-active {
     border-bottom: 2px solid #409EFF;
     color: rgb(36, 104, 242);
@@ -343,7 +417,6 @@ export default {
 /deep/.el-card__body {
     padding: 15px;
 }
-
 .listheaderitem {
     font-size: 14px;
     cursor: pointer;
@@ -353,11 +426,9 @@ export default {
     display: inline-flex;
     align-items: center;
 }
-
 .projectlist {
     margin-top: 15px
 }
-
 /deep/.el-table .el-table__cell {
     padding: 12px 0;
     min-width: 0;
@@ -377,5 +448,111 @@ export default {
 
 .tableplay:hover {
     color: rgb(82, 142, 255);
+}
+
+.labelblock {
+    border: 1px solid rgb(221, 221, 221);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 30px;
+    width: 240px;
+    padding-left: 5px;
+    cursor: pointer;
+    margin-left: 22px;
+}
+
+.labelblock:hover {
+    border: 1px solid rgb(36, 104, 242);
+}
+
+.labelicon {
+    margin-left: 12px;
+    cursor: pointer;
+    font-size: 25px;
+}
+
+.labelicon:hover {
+    color: rgb(36, 104, 242);
+}
+
+.inputlabel {
+    width: 308px;
+    height: 28px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding-left: 5px;
+    border-radius: 0px;
+    border: 1px solid rgb(221, 221, 221);
+    outline-style: none;
+    font-size: 14px;
+}
+
+.inputlabel:focus {
+    border: 1px solid rgb(36, 104, 242);
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5px, -5px);
+    }
+
+    20% {
+        transform: translate(5px, 5px);
+    }
+
+    30% {
+        transform: translate(-5px, -5px);
+    }
+
+    40% {
+        transform: translate(5px, 5px);
+    }
+
+    50% {
+        transform: translate(-5px, -5px);
+    }
+
+    60% {
+        transform: translate(5px, 5px);
+    }
+
+    70% {
+        transform: translate(-5px, -5px);
+    }
+
+    80% {
+        transform: translate(5px, 5px);
+    }
+
+    90% {
+        transform: translate(-5px, -5px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+#repeattext {
+    animation: shake 0.8s 1 forwards;
+    color: red;
+    font-size: 18px;
+    text-align: left;
+}
+
+.suretext {
+    color: rgb(192, 196, 204);
+    font-size: 18px;
+    text-align: left;
+}
+
+.addok {
+    color: green;
 }
 </style>

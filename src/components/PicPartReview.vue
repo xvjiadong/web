@@ -36,7 +36,7 @@
                             <el-checkbox v-model="access">合格</el-checkbox>
                             <i @click="save(nowselect - 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-left toparrow"></i>
-                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共10张</span>
+                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共30张</span>
                             <i @click="save(nowselect + 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-right toparrow"></i>
                         </div>
@@ -135,7 +135,7 @@ export default {
             mode: "",
             chooselabel: [],
             search: "",
-            label: ["鼠鼠", "可爱", "捏", "放心", "交给", "我", "一定", "会", "成功", "天坑", "哥哥", "好厉害", "捏", "你们好啊", "我", "是鼠鼠"],
+            label: ["狗", "猫", "鸟类", "鱼类", "汽车", "自行车", "飞机", "船", "成年人", "儿童", "老年人", "山脉", "森林", "河流", "食物", "水果", "蔬菜", "主食", "饮料", "建筑", "城市建筑", "农村房屋", "古老建筑"],
             addlabelvisible: false,
             emptylabel: false,
             labelerror: "",
@@ -143,55 +143,55 @@ export default {
             labelvalue: "",
             imagelist: [
                 {
-                    url: "http://120.55.63.197:3000/images/图片1.png",
-                    label: ["大鼠", "二鼠"],
+                    url: "/图像标注/1.webp.jpg",
+                    label: ["鸟类"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/92ECD77B012246391BBE80247F874F10.jpg",
-                    label: ["三鼠", "四鼠"],
+                    url: "/图像标注/10.webp.jpg",
+                    label: [ "自行车"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/A7855138426B8FFB9842F1B7C1163FEF.jpg",
-                    label: ["五鼠", "六鼠"],
+                    url: "/图像标注/11.png",
+                    label: ["基金报表"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/BE1EC0EA3D37378187BDF3669EA3AEFD.jpg",
-                    label: ["七", "八鼠"],
+                    url: "/图像标注/12.webp.jpg",
+                    label: ["金融合同","报表"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/2278C7600B22C5344BD06D071C53B13A.jpg",
-                    label: ["九鼠", "十鼠"],
+                    url: "/图像标注/13.webp.jpg",
+                    label: ["财务汇总"],
                     access: false
                 },
             ],
             imagelist2: [
                 {
-                    url: "http://120.55.63.197:3000/images/2278C7600B22C5344BD06D071C53B13A.jpg",
-                    label: ["十一鼠", "十二鼠"],
+                    url: "/图像标注/15.webp (1).jpg",
+                    label: [""],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/92ECD77B012246391BBE80247F874F10.jpg",
-                    label: ["十三鼠", "十四鼠"],
+                    url: "/图像标注/17.jpg",
+                    label: ["金融"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/BE1EC0EA3D37378187BDF3669EA3AEFD.jpg",
-                    label: ["十五鼠", "十六鼠"],
+                    url: "/图像标注/18.jpg",
+                    label: ["财务报表"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/A7855138426B8FFB9842F1B7C1163FEF.jpg",
-                    label: ["十七", "十八鼠"],
+                    url: "/图像标注/19.jpg",
+                    label: ["金融"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/图片1.png",
-                    label: ["十九鼠", "二十鼠"],
+                    url: "/图像标注/2.webp.jpg",
+                    label: ["金融"],
                     access: false
                 },
             ],

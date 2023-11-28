@@ -4,7 +4,7 @@
             <div slot="header" style="display: flex;justify-content: left;align-items: center;">
                 <el-page-header @back="goBack" :content="project.name">
                 </el-page-header>
-                <span>{{ project.projectname }}->{{ project.version }}->{{ project.marktype }}</span>
+                <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
             </div>
             <div style="border: 1px solid #eee;height: 585px;display: flex;">
                 <el-card class="teachcard" style="width: 1050px;">
@@ -35,7 +35,7 @@
                         <div style="display: flex;align-items: center;margin-right: 8px;">
                             <i @click="save(nowselect - 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-left toparrow"></i>
-                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共10张</span>
+                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共4张</span>
                             <i @click="save(nowselect + 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-right toparrow"></i>
                         </div>
@@ -121,6 +121,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 import AILabel from "ailabel";
 export default {
     name: "ImageClassification",
@@ -134,7 +135,7 @@ export default {
             mode: "",
             chooselabel: [],
             search: "",
-            label: ["鼠鼠", "可爱", "捏", "放心", "交给", "我", "一定", "会", "成功", "天坑", "哥哥", "好厉害", "捏", "你们好啊", "我", "是鼠鼠"],
+            label: ["狗", "猫", "鸟类", "鱼类", "汽车", "自行车", "飞机", "船", "成年人", "儿童", "老年人", "山脉", "森林", "河流", "食物", "水果", "蔬菜", "主食", "饮料", "建筑", "城市建筑", "农村房屋", "古老建筑"],
             addlabelvisible: false,
             emptylabel: false,
             labelerror: "",
@@ -142,46 +143,51 @@ export default {
             labelvalue: "",
             imagelist: [
                 {
-                    url: "http://120.55.63.197:3000/images/图片1.png",
-                    label: ["大鼠", "二鼠"]
+                    url: "http://120.55.63.197:3000/images/甘达.webp.jpg",
+                    label: [],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/92ECD77B012246391BBE80247F874F10.jpg",
-                    label: ["三鼠", "四鼠"]
+                    url: "http://120.55.63.197:3000/images/卡拉什.webp.jpg",
+                    label: [],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/A7855138426B8FFB9842F1B7C1163FEF.jpg",
-                    label: ["五鼠", "六鼠"]
+                    url: "http://120.55.63.197:3000/images/熔岩.webp.jpg",
+                    label: [],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/BE1EC0EA3D37378187BDF3669EA3AEFD.jpg",
-                    label: ["七", "八鼠"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/2278C7600B22C5344BD06D071C53B13A.jpg",
-                    label: ["九鼠", "十鼠"]
+                    url: "http://120.55.63.197:3000/images/竹木.webp.jpg",
+                    label: [],
+                    access: false
                 },
             ],
             imagelist2: [
                 {
-                    url: "http://120.55.63.197:3000/images/2278C7600B22C5344BD06D071C53B13A.jpg",
-                    label: ["十一鼠", "十二鼠"]
+                    url: "/图像标注/15.webp (1).jpg",
+                    label: [""],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/92ECD77B012246391BBE80247F874F10.jpg",
-                    label: ["十三鼠", "十四鼠"]
+                    url: "/图像标注/17.jpg",
+                    label: ["金融"],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/BE1EC0EA3D37378187BDF3669EA3AEFD.jpg",
-                    label: ["十五鼠", "十六鼠"]
+                    url: "/图像标注/18.jpg",
+                    label: ["财务报表"],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/A7855138426B8FFB9842F1B7C1163FEF.jpg",
-                    label: ["十七", "十八鼠"]
+                    url: "/图像标注/19.jpg",
+                    label: ["金融"],
+                    access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/图片1.png",
-                    label: ["十九鼠", "二十鼠"]
+                    url: "/图像标注/2.webp.jpg",
+                    label: ["金融"],
+                    access: false
                 },
             ],
             nowselect: 0,
@@ -260,6 +266,7 @@ export default {
                 //autoPan: false,
             });
             this.gMap = gMap;
+            this.chooselabel = item.label
             const gFirstImageLayer = new AILabel.Layer.Image(
                 "first-layer-image", // id
                 {
@@ -281,7 +288,13 @@ export default {
             );
             // 添加到gMap对象
             gMap.addLayer(gFirstImageLayer);
-            this.chooselabel = item.label
+            if (item.label.length === 0) {
+                axios.post("http://home.itzyc.com:12349/img/", { url: item.url },{timeout:500000000000}).then(res => {
+                    console.log(res.data);
+                    this.chooselabel.push(res.data.label)
+                })
+            }
+            //this.chooselabel = item.label
         },
         zoomIn() {
             this.gMap.zoomIn();
@@ -291,10 +304,7 @@ export default {
         },
     },
     mounted() {
-        this.project.projectid = this.$route.query.projectid
-        this.project.projectname = this.$route.query.projectname
-        this.project.version = this.$route.query.version
-        this.project.marktype = this.$route.query.marktype
+        this.project = this.$route.query
         /*请求图片*/
         this.createLayer(this.imagelist[0])
     },

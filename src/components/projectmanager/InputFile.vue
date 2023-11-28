@@ -7,14 +7,14 @@
             </div>
             <el-form ref="form2" :model="dataset" label-width="110px" class="form" label-position="left">
                 <el-form-item label="导入项目版本" class="formitem">
-                    <el-select filterable size="mini" v-model="dataset.projectid" placeholder="请选择项目">
-                        <el-option v-for="item in projectlist" :key="item.projectid" :label="item.name"
-                            :value="item.projectid"></el-option>
+                    <el-select filterable size="mini" v-model="dataset.id" placeholder="请选择项目">
+                        <el-option v-for="item in projectlist" :key="item.id" :label="item.name"
+                            :value="item.id"></el-option>
                     </el-select>
-                    <el-select filterable v-model="dataset.version" size="mini" :disabled="dataset.projectid === ''"
+                    <el-select filterable v-model="dataset.verName" size="mini" :disabled="dataset.id === ''"
                         style="width: 22%;margin-left: 8px;">
-                        <el-option v-for="item in versionlist" :key="item.versionid" :value="item.versionname"
-                            :label="`${item.versionname}-${item.marktype}`">
+                        <el-option v-for="item in versionlist" :key="item.verName" :value="item.verName"
+                            :label="`${item.verName}-${item.callType}`">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -65,13 +65,14 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     data() {
         return {
             dataset: {
-                datatype: "",
-                projectid: "",
-                version: "",
+                dataType: "",
+                id: "",
+                verName: "",
                 ismarked: false,
                 inputway: "",
                 inputway2: "",
@@ -305,19 +306,19 @@ export default {
     },
     computed: {
         versionlist() {
-            if (this.dataset.projectid) {
+            if (this.dataset.id) {
                 return this.projectlist.filter(item => {
-                    return item.projectid == this.dataset.projectid
-                })[0].version
+                    return item.id == this.dataset.id
+                })[0].versions
             }
             return []
         },
         uploadway() {
-            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }]
+            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" },{ value: "上传txt", label: "上传txt" }]
             let b = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传图片", label: "上传图片" }]
-            if (this.dataset.datatype === "文本") {
+            if (this.dataset.dataType === "文本") {
                 return a
-            } else if (this.dataset.datatype === "图像") {
+            } else if (this.dataset.dataType === "图像") {
                 if (this.dataset.ismarked) {
                     return [{ value: "上传压缩包", label: "上传压缩包" }]
                 }
@@ -338,6 +339,8 @@ export default {
                 return "上传docx:"
             } else if (this.dataset.inputway2 === "上传图片") {
                 return "上传图片:"
+            } else if (this.dataset.inputway2 === "上传txt") {
+                return "上传txt:"
             }
             return ""
         },
@@ -350,6 +353,8 @@ export default {
                 return ".docx,.doc"
             } else if (this.uploadlabel === "上传图片:") {
                 return ".bmp,.jpg,.jpeg,.png"
+            } else if (this.uploadlabel === "上传txt:") {
+                return ".txt"
             }
             return ""
         },
@@ -399,6 +404,47 @@ export default {
         },
         complete2() {
             console.log(this.dataset);
+            let file = new FormData()
+            this.dataset.file.forEach(item => {
+                file.append("file", item.raw)
+            })
+            file.append("id", this.dataset.id)
+            file.append("version", this.dataset.verName)
+            console.log(file.getAll("file"), file.get("id"));
+            if (this.dataset.inputway2 === "上传图片") {
+                axios.post("http://192.168.224.150:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                    console.log(res2.data);
+                    setTimeout(() => {
+                        this.active += 1
+                        this.$router.push("/Projectlist")
+                    }, 1000);
+                })
+            } else if (this.dataset.inputway2 === "上传docx") {
+                axios.post("http://192.168.224.150:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                    console.log(res2.data);
+                    setTimeout(() => {
+                        this.active += 1
+                        this.$router.push("/Projectlist")
+                    }, 1000);
+                })
+            } else if (this.dataset.inputway2 === "上传PDF") {
+                axios.post("http://192.168.224.150:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                    console.log(res2.data);
+                    setTimeout(() => {
+                        this.active += 1
+                        this.$router.push("/Projectlist")
+                    }, 1000);
+                })
+            } else if (this.dataset.inputway2 === "上传txt") {
+                axios.post("http://192.168.224.150:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                    console.log(res2.data);
+                    this.$message({ type: 'success', message: "创建项目成功" })
+                    setTimeout(() => {
+                        this.active += 1
+                        this.$router.push("/Projectlist")
+                    }, 1000);
+                })
+            }
         },
         jump() {
             this.$router.push("/ProjectList")
@@ -418,7 +464,7 @@ export default {
             }
         },
         uploadsuccess() {
-            this.dataset.file=[]
+            this.dataset.file = []
         },
         uploaderror() {
 
@@ -433,10 +479,14 @@ export default {
     mounted() {
         console.log(this.$route.query);
         let a = this.$route.query
-        this.dataset.datatype = a.datatype
-        this.dataset.projectid = a.projectid
-        this.dataset.version = a.version
 
+        axios.get("http://192.168.224.150:10010/items").then((res) => {
+            this.projectlist = res.data.data;
+            console.log(this.projectlist);
+            this.dataset.dataType = a.dataType
+            this.dataset.id = a.id
+            this.dataset.verName = a.verName
+        })
     },
 }
 </script>

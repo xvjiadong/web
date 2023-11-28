@@ -100,10 +100,11 @@ router.beforeEach((to, from, next) => {
           to.name === "TextPartReview" ||
           to.name === "PicPartReview"
         ) {
-          if (
-            Object.prototype.hasOwnProperty.call(to.query, "marktype") &&
-            Object.prototype.hasOwnProperty.call(to.query, "projectid") &&
-            Object.prototype.hasOwnProperty.call(to.query, "projectname") &&
+          next()
+          /*if (
+            Object.prototype.hasOwnProperty.call(to.query, "callType") &&
+            Object.prototype.hasOwnProperty.call(to.query, "taskName") &&
+            Object.prototype.hasOwnProperty.call(to.query, "projectName") &&
             Object.prototype.hasOwnProperty.call(to.query, "version")
           ) {
             if (to.name !== "PdfReview") {
@@ -114,7 +115,7 @@ router.beforeEach((to, from, next) => {
             next({
               path: "/",
             });
-          }
+          }*/
         } else {
           next();
         }

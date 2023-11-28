@@ -4,7 +4,7 @@
             <div slot="header" style="display: flex;justify-content: left;align-items: center;">
                 <el-page-header @back="goBack" :content="project.name">
                 </el-page-header>
-                <span>{{ project.projectname }}->{{ project.version }}->{{ project.marktype }}</span>
+                <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
             </div>
             <div style="border: 1px solid #eee;height: 585px;display: flex;">
                 <el-card class="teachcard" style="width: 1050px;">
@@ -20,7 +20,7 @@
                         <div style="display: flex;align-items: center;margin-right: 8px;">
                             <i @click="save(nowselect - 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-left toparrow"></i>
-                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共10张</span>
+                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共30张</span>
                             <i @click="save(nowselect + 1)" style="cursor: pointer;font-size: 12px;"
                                 class="el-icon-arrow-right toparrow"></i>
                         </div>
@@ -28,8 +28,7 @@
                     <div style="display: flex;justify-content: space-around;align-items: flex-start;">
                         <div
                             style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;">
-                            <iframe width="830" height="500"
-                                :src="`/pdfjs-4.0.189-dist/web/viewer.html?file=${imagelist[nowselect].url}`"></iframe>
+                            <div style="width: 830px;height: 480px;">{{ showtext }}</div>
                             <div style="display: flex;justify-content: center;align-items: center;">
                             </div>
                         </div>
@@ -87,7 +86,7 @@
                     <div style="padding: 15px;border-bottom: 1px solid #eee;text-align: center;">
                         <el-input suffix-icon="el-icon-search" v-model="search" placeholder="请输入标签名称"
                             size="medium"></el-input>
-                        <div class="tip">根据图片内容，选择标签<br>标注员临时定义的标签无法保存</div>
+                        <div class="tip">根据文本内容，选择标签<br>标注员临时定义的标签无法保存</div>
                     </div>
                     <el-checkbox-group v-model="chooselabel" style="overflow-y: auto;height: 380px;">
                         <el-checkbox v-for="(item, index) in showlabel" :key="index" class="label"
@@ -108,12 +107,12 @@ export default {
     },
     data() {
         return {
-            project: { projectid: "fdsafd", projectname: "dsa", version: "v1", marktype: "信息抽取标注" },
+            project: { projectid: "fdsafd", projectname: "dsa", version: "v1", marktype: "文本分类标注" },
             gMap: null,
             mode: "",
             chooselabel: [],
             search: "",
-            label: ["鼠鼠", "可爱", "捏", "放心", "交给", "我", "一定", "会", "成功", "天坑", "哥哥", "好厉害", "捏", "你们好啊", "我", "是鼠鼠"],
+            label: ["告示","法规","条款","合同","金额","解释","条件","原因","通知","财务","报表","统计","汇总"],
             addlabelvisible: false,
             emptylabel: false,
             labelerror: "",
@@ -122,45 +121,45 @@ export default {
             imagelist: [
                 {
                     url: "http://120.55.63.197:3000/images/1.pdf",
-                    label: ["大鼠", "二鼠"]
+                    label: ["告示", "法规"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/2.pdf",
-                    label: ["三鼠", "四鼠"]
+                    label: ["条款","合同"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-                    label: ["五鼠", "六鼠"]
+                    label: ["条款","合同"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-                    label: ["七", "八鼠"]
+                    label: ["解释"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-                    label: ["九鼠", "十鼠"]
+                    label: ["原因","通知"]
                 },
             ],
             imagelist2: [
                 {
                     url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-                    label: ["十一鼠", "十二鼠"]
+                    label: ["统计","汇总"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/1.pdf",
-                    label: ["十三鼠", "十四鼠"]
+                    label: ["解释","条件"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-                    label: ["十五鼠", "十六鼠"]
+                    label: ["财务"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/2.pdf",
-                    label: ["十七", "十八鼠"]
+                    label: ["报表"]
                 },
                 {
                     url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-                    label: ["十九鼠", "二十鼠"]
+                    label: ["汇总"]
                 },
             ],
             nowselect: 0,
@@ -172,6 +171,32 @@ export default {
             return this.label.filter(item => {
                 return item.includes(this.search) || this.search === ""
             })
+        },
+        showtext() {
+            if (this.nowselect === 0) {
+                return "基金认购份额具体的计算方法在招募说明书中列示。"
+            } else if (this.nowselect === 1) {
+                return "认购份额的计算保留到小数点后两位，小数点两位以后的部分四舍五入，由此误差产生的收益或损失由基金财产承担。"
+            } else if (this.nowselect === 2) {
+                return "有效认购款项在募集期间产生的利息将折算为基金份额归基金份额持有人所有，其中利息转份额以登记机构的记录为准。"
+            } else if (this.nowselect === 3) {
+                return "基金认购份额具体的计算方法在招募说明书中列示。"
+            } else if (this.nowselect === 4) {
+                return "认购份额的计算保留到小数点后两位，小数点两位以后的部分四舍五入，由此误差产生的收益或损失由基金财产承担。"
+            } else if (this.nowselect === 5) {
+                return "基金销售机构对认购申请的受理并不代表该申请一定成功，而仅代表销售机构确实接收到认购申请。认购的确认以登记机构或基金管理人的确认结果为准。"
+            } else if (this.nowselect === 6) {
+                return "亲自出席会议者持有基金份额的凭证、受托出席会议者出具的委托人持有基金份额的凭证及委托人的代理投票授权委托证明符合法律法规、《基金合同》和会议通知的规定，并且持有基金份额的凭证与基金管理人持有的登记资料相符；"
+            } else if (this.nowselect === 7) {
+                return "经核对，汇总到会者出示的在权益登记日持有基金份额的凭证显示，有效的基金份额不少于本基金在权益登记日基金总份额的 50%（含 50%）。"
+            } else if (this.nowselect === 8) {
+                return "通讯开会。通讯开会系指基金份额持有人将其对表决事项的投票以书面形式在表决截至日以前送达至召集人指定的地址。通讯开会应以书面方式进行表决。"
+            } else if (this.nowselect === 9) {
+                return "会议召集人按《基金合同》约定公布会议通知后，在 2 个工作日内连续公布相关提示性公告；"
+            } else if (this.nowselect === 10) {
+                return "本人直接出具书面意见或授权他人代表出具书面意见的，基金份额持有人所持有的基金份额不小于在权益登记日基金总份额的 50%（含 50%）；"
+            }
+            return ""
         }
     },
     methods: {
@@ -182,7 +207,7 @@ export default {
                 return
             } else if (index === this.imagelist.length) {
                 if (index === 10) {
-                    this.$message.warning("已经是最后一份PDF了")
+                    this.$message.warning("已经是最后一份文档了")
                     return
                 } else {
                     this.imagelist2.map(item => {
@@ -231,10 +256,8 @@ export default {
         },
     },
     mounted() {
-        this.project.projectid = this.$route.query.projectid
-        this.project.projectname = this.$route.query.projectname
-        this.project.version = this.$route.query.version
-        this.project.marktype = this.$route.query.marktype
+        console.log(this.$route.query);
+        this.project=this.$route.query
         this.chooselabel = this.imagelist[0].label
     },
 }

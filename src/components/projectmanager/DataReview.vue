@@ -114,78 +114,78 @@ export default {
             hideintroduction: false,
             createtask: [
                 {
-                    taskName: "45845",
+                    taskName: "图像文本任务",
                     callType: "图像文本标注",
-                    version: "v1",
+                    version: "V1",
                     id: "4965",
-                    projectName: "4445",
-                    progress: "15%",
+                    projectName: "图像文本标注",
+                    progress: "23%",
                     startTime: "2023-11-07 18:23",
                     endTime: "2023-11-17 18:23",
                     taskUser: [
                         {
-                            userId: 1,
+                            userId: "小王",
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "8%"
                         },
                         {
-                            userId: 2,
+                            userId: "小李",
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "0%"
                         },
                         {
-                            userId: 3,
+                            userId: "小六",
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "18%"
                         },
                     ]
                 },
                 {
-                    taskName: "4596",
+                    taskName: "信息抽取任务",
                     callType: "信息抽取标注",
-                    version: "v1",
+                    version: "V1",
                     id: "49654845",
-                    projectName: "4445",
-                    progress: "15%",
+                    projectName: "信息抽取标注",
+                    progress: "34%",
                     startTime: "2023-11-07 18:23",
                     endTime: "2023-11-17 18:23",
                     taskUser: [
                         {
-                            userId: 4,
+                            userId: "小刘",
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "25%"
                         },
                         {
                             userId: 5,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "43%"
                         },
                         {
                             userId: 6,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "37%"
                         },
                     ]
                 },
                 {
-                    taskName: "45",
+                    taskName: "文本分类任务",
                     callType: "文本分类标注",
-                    version: "v1",
+                    version: "V1",
                     id: "496uiu5",
-                    projectName: "4445",
-                    progress: "15%",
+                    projectName: "文本分类标注",
+                    progress: "41%",
                     startTime: "2023-11-07 18:23",
                     endTime: "2023-11-17 18:23",
                     taskUser: [
                         {
                             userId: 7,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "26%"
                         },
                         {
                             userId: 8,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "35%"
                         },
                         {
                             userId: 9,
@@ -195,29 +195,29 @@ export default {
                     ]
                 },
                 {
-                    taskName: "484535",
+                    taskName: "图片分类任务",
                     callType: "图片分类标注",
-                    version: "v1",
+                    version: "V1",
                     id: "496iuiu7t5",
-                    projectName: "4445",
-                    progress: "15%",
+                    projectName: "图片分类标注",
+                    progress: "25%",
                     startTime: "2023-11-07 18:23",
                     endTime: "2023-11-17 18:23",
                     taskUser: [
                         {
                             userId: 10,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "52%"
                         },
                         {
                             userId: 11,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "78%"
                         },
                         {
                             userId: 12,
                             dataNumber: "159",
-                            personalProgress: "15%"
+                            personalProgress: "63%"
                         },
                     ]
                 },

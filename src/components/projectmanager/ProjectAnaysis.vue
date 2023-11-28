@@ -1,6 +1,6 @@
 <template>
     <div>
-        ProjectAnaysis
+        <iframe src="/projectmanager/index/index.html" width="1460" height="650"></iframe>
     </div>
 </template>
 <script>

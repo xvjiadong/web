@@ -78,14 +78,15 @@
             <div>
                 <el-table ref="accept" :data="accepttask">
                     <el-table-column type="expand" width="0"></el-table-column>
-                    <el-table-column width="80" prop="projectid" label="所属项目"></el-table-column>
-                    <el-table-column width="80" prop="projectversion" label="所属版本"></el-table-column>
-                    <el-table-column width="150" prop="taskcreator" label="任务创建者"></el-table-column>
-                    <el-table-column width="150" prop="tasknumber" label="数据量"></el-table-column>
-                    <el-table-column width="150" prop="taskprocess" label="标注进度"></el-table-column>
-                    <el-table-column width="150" prop="marktype" label="标注类型"></el-table-column>
-                    <el-table-column width="150" prop="createtime" label="创建时间"></el-table-column>
-                    <el-table-column width="150" prop="deadlinetime" label="截止时间"></el-table-column>
+                    <el-table-column width="150" prop="taskName" label="任务名称"></el-table-column>
+                    <el-table-column width="120" prop="projectName" label="所属项目"></el-table-column>
+                    <el-table-column width="120" prop="version" label="所属版本"></el-table-column>
+                    <el-table-column width="120" prop="adminNane" label="任务创建者"></el-table-column>
+                    <el-table-column width="80" prop="dataNumber" label="数据量"></el-table-column>
+                    <el-table-column width="80" prop="progress" label="标注进度"></el-table-column>
+                    <el-table-column width="150" prop="callType" label="标注类型"></el-table-column>
+                    <el-table-column width="150" prop="startTime" label="创建时间"></el-table-column>
+                    <el-table-column width="150" prop="endTime" label="截止时间"></el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
                             <span size="mini" class="tableplay" v-if="scope.row.taskprocess!=='100%'" @click="push(scope.row)">标注</span>
@@ -99,6 +100,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name: "MakeMark",
     components: {
@@ -108,50 +110,7 @@ export default {
         return {
             hideintroduction: false,
             accepttask: [
-                {
-                    projectid: "48557",
-                    projectname:"49656",
-                    projectversion: "v1",
-                    taskcreator: "484554",
-                    tasknumber: 159,
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    marktype: "图像文本标注"
-                },
-                {
-                    projectid: "48557",
-                    projectname:"49656",
-                    projectversion: "v1",
-                    taskcreator: "484554",
-                    tasknumber: 159,
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    marktype: "信息抽取标注"
-                },
-                {
-                    projectid: "48557",
-                    projectname:"49656",
-                    projectversion: "v1",
-                    taskcreator: "484554",
-                    tasknumber: 159,
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    marktype: "图片分类标注"
-                },
-                {
-                    projectid: "48557",
-                    projectname:"49656",
-                    projectversion: "v1",
-                    taskcreator: "484554",
-                    tasknumber: 159,
-                    taskprocess: "15%",
-                    createtime: "2023-11-07 18:23",
-                    deadlinetime: "2023-11-17 18:23",
-                    marktype: "文本分类标注"
-                },
+                
             ],
         }
     },
@@ -160,24 +119,20 @@ export default {
     },
     methods: {
         push(row) {
+            console.log(row);
             let router
-            if (row.marktype === "图像文本标注") {
+            if (row.callType === "图像文本标注") {
                 router="/"+"PicView"
-            } else if (row.marktype === "信息抽取标注") {
+            } else if (row.callType === "信息抽取标注") {
                 router="/"+"PdfView"
-            } else if (row.marktype === "图片分类标注") {
+            } else if (row.callType === "图片分类标注") {
                 router="/"+"ImageClassification"
-            } else if (row.marktype === "文本分类标注") {
+            } else if (row.callType === "文本分类标注") {
                 router="/"+"TextClassification"
             }
             this.$router.push({
                 path: router,
-                query: {
-                    projectid: row.projectid,
-                    version: row.projectversion,
-                    marktype: row.marktype,
-                    projectname:row.projectname
-                }
+                query: row
             })
         },
         hide() {
@@ -188,10 +143,16 @@ export default {
         },
         turn(item) {
             console.log(item);
+        },
+        gettask() {
+            axios.get("http://192.168.224.150:10010/task/user").then((res) => {
+                console.log(res.data);
+                this.accepttask=res.data.data
+            })
         }
     },
     mounted() {
-
+        this.gettask()
     },
 }
 </script>

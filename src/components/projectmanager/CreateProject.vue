@@ -8,8 +8,8 @@
                 </el-steps>
             </div>
         </div>
-        <el-card :class="{boxCard1:$store.state.islight,boxCard2:!$store.state.islight}" v-if="active == 0">
-            <div slot="header" :class="{cardheader:$store.state.islight,cardheader2:!$store.state.islight}">
+        <el-card :class="{ boxCard1: $store.state.islight, boxCard2: !$store.state.islight }" v-if="active == 0">
+            <div slot="header" :class="{ cardheader: $store.state.islight, cardheader2: !$store.state.islight }">
                 <span>基本信息</span>
             </div>
             <el-form ref="form1" :model="dataset" :rules="datasetrule" label-width="100px" class="form"
@@ -25,7 +25,9 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item prop="version" label="数据集版本:" class="formitem version">
-                    <span :style="$store.state.islight?{color:'black'}:{color:'rgb(96,98,102)'}">{{ dataset.version }}</span>
+                    <span :style="$store.state.islight ? { color: 'black' } : { color: 'rgb(96,98,102)' }">{{
+                        dataset.version
+                    }}</span>
                 </el-form-item>
                 <el-form-item prop="marktype" label="标注类型" class="formitem">
                     <el-select filterable="" v-model="dataset.marktype" size="small" :disabled="dataset.datatype === ''">
@@ -40,7 +42,7 @@
             </el-form>
 
         </el-card>
-        <el-card :class="{boxCard1:$store.state.islight,boxCard2:!$store.state.islight}" v-if="active == 1">
+        <el-card :class="{ boxCard1: $store.state.islight, boxCard2: !$store.state.islight }" v-if="active == 1">
             <div slot="header" class="cardheader">
                 <el-page-header @back="goBack" content="导入配置">
                 </el-page-header>
@@ -75,6 +77,7 @@
                         </div>
                         <div class="el-upload__tip" slot="tip">文件大小限制在14MB内，请确保文件格式正确</div>
                     </el-upload>
+                    <el-progress v-if="uploadProgress >= 0" :percentage="uploadProgress" :format="format"></el-progress>
                 </el-form-item>
                 <el-form-item v-if="dataset.inputway === '分享链接导入' || dataset.inputway === '平台已有数据集'" :label="uploadlabel"
                     class="formitem" prop="link">
@@ -178,7 +181,8 @@ export default {
                 ismarked: false,
                 inputway: "",
                 inputway2: "",
-                link: ""
+                link: "",
+                uploadProgress: -1
             },
             datasetrule: {
                 name: [
@@ -214,8 +218,8 @@ export default {
     },
     computed: {
         marktypelist() {
-            let a = [{ value: "图像分类", label: "图像分类" }, { value: "多边形标注", label: "多边形标注" }, { value: "文本检测", label: "文本检测" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
-            let b = [{ value: "关系抽取", label: "关系抽取" }, { value: "证据划选", label: "证据划选" }, { value: "实体抽取", label: "实体抽取" }, { value: "混合标注", label: "混合标注" }]
+            let a = [{ value: "图像文本标注", label: "图像文本标注" },{ value: "图片分类标注", label: "图片分类标注" }, { value: "多边形标注", label: "多边形标注" }, { value: "文本检测", label: "文本检测" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
+            let b = [{ value: "关系抽取", label: "关系抽取" }, { value: "证据划选", label: "证据划选" }, { value: "实体抽取", label: "实体抽取" }, { value: "混合标注", label: "混合标注" }, { value: "文本分类标注", label: "文本分类标注" }, { value: "信息抽取标注", label: "信息抽取标注" }]
             if (this.dataset.datatype === "图像") {
                 return a
             } else if (this.dataset.datatype === "文本") {
@@ -224,7 +228,7 @@ export default {
             return []
         },
         uploadway() {
-            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }]
+            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }, { value: "上传txt", label: "上传txt" }]
             let b = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传图片", label: "上传图片" }]
             if (this.dataset.datatype === "文本") {
                 return a
@@ -249,6 +253,8 @@ export default {
                 return "上传docx:"
             } else if (this.dataset.inputway2 === "上传图片") {
                 return "上传图片:"
+            } else if (this.dataset.inputway2 === "上传txt") {
+                return "上传txt:"
             }
             return ""
         },
@@ -261,6 +267,8 @@ export default {
                 return ".docx,.doc"
             } else if (this.uploadlabel === "上传图片:") {
                 return ".bmp,.jpg,.jpeg,.png"
+            } else if (this.uploadlabel === "上传txt:") {
+                return ".txt"
             }
             return ""
         },
@@ -305,6 +313,9 @@ export default {
         }
     },
     methods: {
+        format(percentage) {
+            return percentage === 100 ? '满' : `${percentage}%`;
+        },
         goBack() {
             this.active -= 1
             this.dataset.name = ""
@@ -344,7 +355,7 @@ export default {
                 } else {
                     uploadform.set("file", this.dataset.link)
                 }*/
-                axios.post("http://10.99.254.235:10010/items", uploadform).then((res) => {
+                axios.post("http://192.168.224.150:10010/items", uploadform).then((res) => {
                     console.log(res.data);
                     if (res.data.code === 200) {
                         let file = new FormData()
@@ -358,7 +369,13 @@ export default {
                         file.append("version", this.dataset.version)
                         file.append("id", res.data.data)
                         if (this.dataset.inputway2 === "上传图片") {
-                            axios.post("http://10.99.254.235:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                            axios.post("http://192.168.224.150:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                                onUploadProgress: progress => {
+                                    this.uploadProgress = Number(
+                                        ((progress.loaded / progress.total) * 100).toFixed(2)
+                                    )
+                                }
+                            }).then((res2) => {
                                 console.log(res2.data);
                                 this.$message({ type: 'success', message: "创建项目成功" })
                                 setTimeout(() => {
@@ -367,7 +384,13 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传docx") {
-                            axios.post("http://10.99.254.235:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                            axios.post("http://192.168.224.150:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                                onUploadProgress: progress => {
+                                    this.uploadProgress = Number(
+                                        ((progress.loaded / progress.total) * 100).toFixed(2)
+                                    )
+                                }
+                            }).then((res2) => {
                                 console.log(res2.data);
                                 this.$message({ type: 'success', message: "创建项目成功" })
                                 setTimeout(() => {
@@ -376,7 +399,28 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传PDF") {
-                            axios.post("http://10.99.254.235:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                            axios.post("http://192.168.224.150:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                                onUploadProgress: progress => {
+                                    this.uploadProgress = Number(
+                                        ((progress.loaded / progress.total) * 100).toFixed(2)
+                                    )
+                                }
+                            }).then((res2) => {
+                                console.log(res2.data);
+                                this.$message({ type: 'success', message: "创建项目成功" })
+                                setTimeout(() => {
+                                    this.active += 1
+                                    this.$router.push("/Projectlist")
+                                }, 1000);
+                            })
+                        } else if (this.dataset.inputway2 === "上传txt") {
+                            axios.post("http://192.168.224.150:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                                onUploadProgress: progress => {
+                                    this.uploadProgress = Number(
+                                        ((progress.loaded / progress.total) * 100).toFixed(2)
+                                    )
+                                }
+                            }).then((res2) => {
                                 console.log(res2.data);
                                 this.$message({ type: 'success', message: "创建项目成功" })
                                 setTimeout(() => {
@@ -408,6 +452,7 @@ export default {
         },
         uploadsuccess() {
             this.dataset.file = []
+            console.log("成功");
         },
         uploaderror() {
 
@@ -439,12 +484,14 @@ export default {
     height: 560px;
     background-color: #fff;
 }
+
 .boxCard2 {
     width: 100%;
     margin-left: 1%;
     height: 560px;
-    background-color: rgb(36,46,62);
+    background-color: rgb(36, 46, 62);
 }
+
 .cardheader {
     display: flex;
     justify-content: left;
@@ -452,14 +499,16 @@ export default {
     align-items: center;
     font-size: 25px;
 }
+
 .cardheader2 {
     display: flex;
     justify-content: left;
     padding-left: 15px;
     align-items: center;
     font-size: 25px;
-    color:white;
+    color: white;
 }
+
 .form {
     font-size: 30px;
     padding: 15px;
@@ -468,7 +517,6 @@ export default {
 .formitem {
     width: 60%;
     text-align: left;
-
 }
 
 /deep/.el-upload-list {

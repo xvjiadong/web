@@ -12,7 +12,7 @@
 <script>
 import TopMenu from '@/components/TopMenu.vue'
 import SideMenu from '@/components/SideMenu.vue'
-import axios from 'axios'
+//import axios from 'axios'
 export default {
     name:"MainBox",
     components: {
@@ -28,9 +28,9 @@ export default {
 
     },
     mounted() {
-        axios.get("https://items-storage.oss-cn-beijing.aliyuncs.com/UserAvatar/project.json",).then((res) => {
+        /*axios.get("https://items-storage.oss-cn-beijing.aliyuncs.com/UserAvatar/project.json",).then((res) => {
             console.log(res.data);
-        })
+        })*/
     }
 }
 </script>

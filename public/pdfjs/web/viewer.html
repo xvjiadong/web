@@ -43,6 +43,11 @@ See https://github.com/adobe-type-tools/cmap-resources
     <!-- 引入样式 -->
     <link rel="stylesheet" href="../../lib//lib-master/theme-chalk/index.css" />
     <!-- 引入组件库 -->
+    <style>
+      .cho{
+        background-color: rgb(221,221,223);
+      }
+    </style>
   </head>
 
   <body tabindex="1">
@@ -453,7 +458,6 @@ See https://github.com/adobe-type-tools/cmap-resources
                 >Rotate Counterclockwise</span
               >
             </button>
-
             <div class="horizontalToolbarSeparator"></div>
 
             <div id="cursorToolButtons" role="radiogroup">
@@ -599,7 +603,7 @@ See https://github.com/adobe-type-tools/cmap-resources
             <div id="toolbarViewer">
               <div id="toolbarViewerLeft">
                 <button
-                  style="display: none;"
+                  style="display: none"
                   id="sidebarToggle"
                   class="toolbarButton"
                   title="Toggle Sidebar"
@@ -704,20 +708,19 @@ See https://github.com/adobe-type-tools/cmap-resources
                 >
                   <span data-l10n-id="save_label">Save</span>
                 </button>
-                <el-tooltip content="长文本字段标注" placement="top-start">
+                <el-tooltip content="长文本字段标注" placement="top-start" :class="{cho:mode === 1}">
                   <el-button
                     type="text"
                     id="mode1"
                     class="hiddenMediumView"
                     size="mini"
-                    style="height: 30px; width: 30px; margin-left: 0"
-                    ><i
+                    style="height: 30px; width: 30px; margin-left: 0"><i
                       style="font-size: 20px; color: rgb(36, 104, 242)"
                       class="el-icon-edit"
                     ></i>
                   </el-button>
                 </el-tooltip>
-                <el-tooltip content="标签证据字段标注" placement="top-start">
+                <el-tooltip content="标签证据字段标注" placement="top-start" :class="{cho:mode === 2}">
                   <el-button
                     type="text"
                     id="mode2"
@@ -730,7 +733,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                     ></i>
                   </el-button>
                 </el-tooltip>
-                <el-tooltip content="关联关系字段标注" placement="top-start">
+                <el-tooltip content="关联关系字段标注" placement="top-start" :class="{cho:mode === 3}">
                   <el-button
                     type="text"
                     id="mode3"
@@ -743,6 +746,20 @@ See https://github.com/adobe-type-tools/cmap-resources
                     ></i>
                   </el-button>
                 </el-tooltip>
+                <el-tooltip content="智能标注" placement="top-start" :class="{cho:mode === 4}"> 
+                  <el-button
+                    type="text"
+                    id="mode4"
+                    class="hiddenMediumView"
+                    size="mini"
+                    style="height: 30px; width: 30px; margin-left: 0"
+                    ><i
+                      style="font-size: 20px; color: rgb(36, 104, 242)"
+                      class="el-icon-magic-stick"
+                    ></i>
+                  </el-button>
+                </el-tooltip>
+
                 <div class="verticalToolbarSeparator hiddenMediumView"></div>
 
                 <div
@@ -814,19 +831,24 @@ See https://github.com/adobe-type-tools/cmap-resources
                 >
                   <span data-l10n-id="tools_label">Tools</span>
                 </button>
-                <el-tooltip :content="access?'审核通过':'审核不通过'" placement="top-start">
+                <el-tooltip
+                  :content="access?'审核通过':'审核不通过'"
+                  placement="top-start"
+                >
                   <el-button
-                  @click="access=!access"
+                    @click="access=!access"
                     type="text"
                     id="access"
                     class="hiddenMediumView"
                     size="mini"
                     style="height: 30px; width: 30px; margin-left: 0"
-                    ><i v-if="access"
+                    ><i
+                      v-if="access"
                       style="font-size: 20px; color: rgb(36, 104, 242)"
                       class="el-icon-check"
                     ></i>
-                    <i v-if="!access"
+                    <i
+                      v-if="!access"
                       style="font-size: 20px; color: rgb(36, 104, 242)"
                       class="el-icon-close"
                     ></i>
@@ -844,7 +866,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                       class="el-icon-d-arrow-right"
                     ></i>
                   </el-button>
-                </el-tooltip>  
+                </el-tooltip>
               </div>
               <div style="display: none" id="toolbarViewerMiddle">
                 <div class="splitToolbarButton">
@@ -1265,26 +1287,30 @@ See https://github.com/adobe-type-tools/cmap-resources
 <script src="../../vue.js"></script>
 <script src="../../lib/lib-master/index.js"></script>
 <script>
-  var that
+  var that;
   new Vue({
     el: "#outerContainer",
     data() {
       return {
-        access:false
-      }
+        access: false,
+        mode:1
+      };
     },
     methods: {
-      changeaccess(value){
-        this.access = value
+      changeaccess(value) {
+        this.access = value;
         console.log(value);
       },
-      getaccess(){
-        let a=this.access
-        return a
-      } 
+      getaccess() {
+        let a = this.access;
+        return a;
+      },
+      changemode(item){
+        this.mode=item
+      }
     },
     mounted() {
-      that=this
+      that = this;
     },
   });
 </script>

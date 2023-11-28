@@ -1,5 +1,10 @@
 const platformmanagerrouter = [
   {
+    name: "PersonCenter",
+    path: "/PersonCenter",
+    component: () => import("../views/PersonCenter.vue"),
+  },
+  {
     name: "CreareProject",
     path: "/CreateProject",
     component: () => import("../components/platformmanager/CreateProject.vue"),
@@ -50,6 +55,11 @@ const platformmanagerrouter = [
   },
 ];
 const projectmanagerrouter = [
+  {
+    name: "PersonCenter",
+    path: "/PersonCenter",
+    component: () => import("../views/PersonCenter.vue"),
+  },
   {
     name: "CreareProject",
     path: "/CreateProject",
@@ -152,6 +162,11 @@ const projectmanagerrouter = [
   },
 ];
 const datalabelerrouter = [
+  {
+    name: "PersonCenter",
+    path: "/PersonCenter",
+    component: () => import("../views/PersonCenter.vue"),
+  },
   {
     name: "MakeMark",
     path: "/MakeMark",

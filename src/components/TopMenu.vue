@@ -33,7 +33,7 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </li>
-                <li>
+                <li @click="$router.push('/PersonCenter')">
                     个人
                 </li>
                 <li @click="exit">

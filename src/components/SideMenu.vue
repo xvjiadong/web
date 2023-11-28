@@ -52,40 +52,41 @@
             :collapse="$store.state.iscollapse" v-if="$store.state.user.identity === 2" router :collapse-transition="false">
             <el-submenu index="project">
                 <template slot="title">
-                    <i class="el-icon-location"></i>
+                    <i class="el-icon-money-funds"></i>
                     <span slot="title">项目管理</span>
                 </template>
-                <el-menu-item index="/ProjectList">项目列表</el-menu-item>
-                <el-menu-item index="/ProjectSchedule">项目调度</el-menu-item>
-                <el-menu-item index="/CreateProject">新增项目</el-menu-item>
+                <el-menu-item index="/ProjectList"><i class="el-icon-icon-test1"></i>项目列表</el-menu-item>
+                <el-menu-item index="/ProjectSchedule"><i class="el-icon-refresh"></i>项目调度</el-menu-item>
+                <el-menu-item index="/CreateProject"><i class="el-icon-product"></i>新增项目</el-menu-item>
             </el-submenu>
             <el-submenu index="user">
                 <template slot="title">
-                    <i class="el-icon-location"></i>
+                    <i class="el-icon-user"></i>
                     <span slot="title">用户管理</span>
                 </template>
-                <el-menu-item index="/UserList">用户列表</el-menu-item>
-                <el-menu-item index="/UserSchedule">用户调度</el-menu-item>
+                <el-menu-item index="/UserList"><i class="el-icon-user-solid"></i>用户列表</el-menu-item>
+                <el-menu-item index="/UserSchedule"><i class="el-icon-bell"></i>用户调度</el-menu-item>
             </el-submenu>
             <el-submenu index="Permission">
                 <template slot="title">
-                    <i class="el-icon-location"></i>
+                    <i class="el-icon-s-check"></i>
                     <span slot="title">权限管理</span>
                 </template>
-                <el-menu-item index="/PermissionReview">权限审核</el-menu-item>
-                <el-menu-item index="/PermissionChange">权限修改</el-menu-item>
+                <el-menu-item index="/PermissionReview"><i class="el-icon-coordinate"></i>权限审核</el-menu-item>
+                <el-menu-item index="/PermissionChange"><i class="el-icon-collection"></i>权限修改</el-menu-item>
             </el-submenu>
             <el-menu-item index="/PlatformRegulation">
-                <i class="el-icon-menu"></i>
+                <i class="el-icon-takeaway-box"></i>
                 <span slot="title">平台规范</span>
             </el-menu-item>
             <el-menu-item index="/TaskAnaysis">
-                <i class="el-icon-menu"></i>
+                <i class="el-icon-tickets"></i>
                 <span slot="title">业务分析</span>
             </el-menu-item>
         </el-menu>
         <el-menu class="el-menu-vertical-demo" :class="{ elMenu: $store.state.islight, elMenu2: !$store.state.islight }"
-            :collapse="$store.state.iscollapse" :collapse-transition="false" v-if="$store.state.user.identity === 0" router>
+            :collapse="$store.state.iscollapse" :collapse-transition="false" v-if="$store.state.user.identity === 0" router
+            :default-active="'/' + $route.fullPath.split('/')[1]">
             <el-menu-item index="/MakeMark"><i class="el-icon-icon-test"></i><span slot="title">任务标注</span></el-menu-item>
             <el-menu-item index="/PermissionReuest"><i class="el-icon-printer"></i><span slot="title">权限申请</span></el-menu-item>
         </el-menu>

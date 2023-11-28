@@ -3,7 +3,7 @@
         <div slot="header" style="display: flex;justify-content: left;align-items: center;">
             <el-page-header @back="goBack" :content="project.name">
             </el-page-header>
-            <span>{{ project.projectname }}->{{ project.version }}->{{ project.marktype }}</span>
+            <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
         </div>
         <div class="main">
             <!--<div class="operation">
@@ -101,7 +101,8 @@
                         </el-tooltip>
                         <el-tooltip content="保存" placement="top-end">
                             <div class="toolblock">
-                                <el-button type="text" class="el-icon-suitcase button" @click="together"></el-button>
+                                <el-button type="text" class="el-icon-suitcase button"
+                                    @click="together(nowselect)"></el-button>
                             </div>
                         </el-tooltip>
                         <!--<el-button type="text" class="el-icon-location-outline" @click="setMode('MARKER')">注记</el-button>-->
@@ -118,7 +119,7 @@
                     <div style="display: flex;align-items: center;margin-right: 8px;">
                         <i style="cursor: pointer;font-size: 12px;" class="el-icon-arrow-left toparrow"
                             @click="together(nowselect - 1)"></i>
-                        <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共10张</span>
+                        <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共30张</span>
                         <i style="cursor: pointer;font-size: 12px;" class="el-icon-arrow-right toparrow"
                             @click="together(nowselect + 1)"></i>
                     </div>
@@ -178,7 +179,9 @@
 </template>
 <script>
 import AILabel from "ailabel";
-//import axios from 'axios'
+//import FileSaver from "file-saver";
+import axios from 'axios'
+
 //import PicDoc from '../../public/PicDoc.json'
 //import data from '../../public/data (1).json'
 //import example from "../../public/示例.json"
@@ -209,143 +212,38 @@ export default {
             shapelist: [],
             imagelist1: [
                 {
-                    url: "http://120.55.63.197:3000/images/11.jpg",
-                    mark: [
-                        {
-                            "id": "1",
-                            "shape": {
-                                "x": 216.477,
-                                "y": 0.753,
-                                "width": 32.386,
-                                "height": 9.045
-                            },
-                            "type": "RECT",
-                            "text": { "id": "1-1", "text": "职业信息收集表" }
-                        }]
+                    url: "/图像标注/4.webp.jpg",
+                    data: "/图像标注/1.json",
+                    mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/22.jpg", mark: [{
-                        "id": "1699373091244",
-                        "type": "RECT",
-                        "shape": {
-                            "height": 41.875,
-                            "width": 101.25,
-                            "x": 90,
-                            "y": 105.125
-                        },
-                        "text": {
-                            "id": "1699373091244-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/10.webp.jpg", data: "/图像标注/2.json", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/33.jpg", mark: [{
-                        "id": "1699374169739",
-                        "type": "POLYGON",
-                        "shape": [
-                            { "x": 198.125, "y": 141.375 },
-                            { "x": 285.625, "y": 110.75 },
-                            { "x": 311.875, "y": 168.25 },
-                            { "x": 200.625, "y": 182 },
-                            { "x": 132.5, "y": 170.75 }
-                        ],
-                        "text": {
-                            "id": "1699374169739-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/11.png", data: "/图像标注/3.json", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/4.jpeg", mark: [{
-                        "id": "1699374713865",
-                        "type": "CIRCLE",
-                        "shape": {
-                            "cx": 370.625,
-                            "cy": 63.25,
-                            "r": 45.573601185335356
-                        },
-                        "text": {
-                            "id": "1699374713865-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/12.webp.jpg", data: "/图像标注/4.json", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/6.jpeg", mark: [{
-                        "id": "1699375117322",
-                        "type": "POLYLINE",
-                        "shape": [
-                            { "x": 240.625, "y": 142.625 },
-                            { "x": 350, "y": 91.375 },
-                            { "x": 355.625, "y": 276.375 },
-                            { "x": 419.375, "y": 190.125 }
-                        ],
-                        "text": {
-                            "id": "1699375117322-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/13.webp.jpg", data: "/图像标注/5.json", mark: []
                 },
             ],
             imagelist2: [
                 {
-                    url: "http://120.55.63.197:3000/images/test3.jpg", mark: [{
-                        "id": "1699375246644",
-                        "type": "LINE",
-                        "shape": {
-                            "start": {
-                                "x": 138.125,
-                                "y": 92.625
-                            },
-                            "end": {
-                                "x": 283.75,
-                                "y": 71.375
-                            }
-                        },
-                        "text": {
-                            "id": "1699375246644-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/14.webp.jpg", data: "", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/示例.jpg", mark: [{
-                        "id": "",
-                        "type": "POINT",
-                        "shape": {
-                            "x": 111.25,
-                            "y": 80.125
-                        },
-                        "text": {
-                            "id": "1699375246644-0",
-                            "text": "人脸"
-                        }
-                    }]
+                    url: "/图像标注/15.webp (1).jpg", data: "", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/虎戏.jpg", mark: [{
-                        "id": "1699412613558",
-                        "type": "RECT",
-                        "shape": { "x": 314.375, "y": 273.875, "width": 38.125, "height": 50.625 },
-                        "text": { "id": "1699412613558-0", "text": "人脸" }
-                    }]
+                    url: "/图像标注/15.webp.jpg", data: "", mark: []
                 },
                 {
-                    url: "https://items-storage.oss-cn-beijing.aliyuncs.com/7fab767a6f214935bc9024cc4a723f2c-%E7%89%9B%E5%B0%BE%E8%8A%B1/V1/123.png", mark: [{
-                        "id": "1699412611639",
-                        "type": "RECT",
-                        "shape": { "x": 84.375, "y": 281.375, "width": 48.125, "height": 21.25 },
-                        "text": { "id": "1699412611639-0", "text": "人脸" }
-                    }]
+                    url: "/图像标注/16.webp.jpg", data: "", mark: []
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/login.jpg", mark: [{
-                        "id": "1699412609975",
-                        "type": "RECT",
-                        "shape": { "x": 185.625, "y": 222.625, "width": 66.875, "height": 35 },
-                        "text": { "id": "1699412609975-0", "text": "人脸" }
-                    }]
+                    url: "/图像标注/17.jpg", data: "", mark: []
                 }
             ],
             imagelist3: [
@@ -475,7 +373,7 @@ export default {
                 feature.id = item.id
                 feature.type = item.type
                 b.forEach(item2 => {
-                    if (item2.id.split("-")[0] === item.id) {
+                    if (item2.id && item2.id.split("-")[0] === item.id) {
                         feature.text = { id: item2.id, text: item2.textInfo.text }
                     }
                 })
@@ -489,7 +387,14 @@ export default {
             })
             this.imagelist1[this.nowselect].mark = this.shapelist
             this.shapelist = []
-            //console.log(this.gMap);
+            let data = JSON.stringify(this.imagelist1[this.nowselect].mark)
+            let file = new FormData()
+            const blob = new Blob([data]);
+            file.set("file", blob, "data.json")
+            file.set("id", this.imagelist1[this.nowselect].id)
+            axios.put("http://192.168.224.150:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                console.log(res.data);
+            })
             if (index === -1) {
                 this.$message.warning("已经是第一张图片了")
                 return
@@ -501,8 +406,31 @@ export default {
                     this.imagelist2.map(item => {
                         this.imagelist1.push(item)
                     })
+
                 }
             }
+            /*let data = JSON.stringify(this.imagelist1[this.nowselect].mark)
+            let file = new FormData()
+            const blob = new Blob([data]);
+            file.set("file", blob, "data.json")
+            file.set("id", this.imagelist1[this.nowselect].id)
+            axios.put("http://192.168.224.150:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                console.log(res.data);
+            })
+            if (index === -1) {
+                this.$message.warning("已经是第一张图片了")
+                return
+            } else if (index === this.imagelist1.length) {
+                axios.post("http://192.168.224.150:10010/dataset/task", { version: this.project.versionId, page: Math.floor(index/5)+1, number: 5 }).then(res => {
+                    console.log(res.data);
+                    res.data.data.map(item => {
+                        this.imagelist1.push(item)
+                    })
+                })
+            }*/
+            /* const json = JSON.stringify(this.imagelist1[this.nowselect].mark)
+             const blob = new Blob([json], { type: 'application/json' });
+             FileSaver.saveAs(blob, (this.nowselect + 1) + ".json");*/
             this.gMap.destroy()
             this.allText = null
             this.allFeatures = null
@@ -568,7 +496,6 @@ export default {
                 this.tagtextLayer.addText(polygontext)
                 this.imagelist1[this.nowselect].mark.push({ type: "LINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             }
-            console.log(this.gFirstFeatureLayer, this.tagtextLayer);
             this.vis = false
             this.Recognizetextcontent = ""
         },
@@ -1223,20 +1150,50 @@ export default {
             window.onresize = function () {
                 this.gMap && this.gMap.resize();
             };
-            this.keepdraw(item.mark)
+            /*"https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/1094cb6a6f964e0eae2990477b9ec5c0-图像文本标注/V1/4.webp.jpg"*/
+
+            if (item.data) {
+                axios.get(item.data).then(res => {
+                    item.mark = res.data
+                    this.keepdraw(res.data)
+                })
+            }
         },
         goBack() {
             this.$router.push("/MakeMark")
+        },
+        getdata(page) {
+            axios.post("http://192.168.224.150:10010/dataset/task", { version: this.$route.query.versionId, page: page, number: 5 }).then(res => {
+                //this.imagelist1 = res.data.data;
+                console.log(res.data.data);
+            })
         }
     },
     mounted() {
-        console.log(this.$route);
+        /*axios.post("http://home.itzyc.com:12349/img/", { url: "http://120.55.63.197:3000/images/92ECD77B012246391BBE80247F874F10.jpg" }, { timeout: 5000000000 }).then(res => {
+            console.log(res.data);
+        }).catch(e => {
+            console.log(e);
+        })*/
         this.project = this.$route.query
+        this.getdata(this.page)
         /*axios.post("http://localhost:3000/imagelist").then((res) => {
             console.log(res.data);
             this.imagelist=res.data
         })*/
-        this.changepic(this.imagelist1[0])
+        setTimeout(() => {
+            this.changepic(this.imagelist1[0])
+        }, 1000)
+
+        /*let file = new FormData()
+        let a = JSON.stringify(data)
+        const blob = new Blob([a]);
+        file.set("file", blob, "data.json")
+        console.log(file.getAll("file"));
+        file.append("id", 15)
+        axios.put("http://10.99.254.235:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+            console.log(res.data);
+        })*/
     },
     beforeDestroy() {
         this.gMap.destroy();

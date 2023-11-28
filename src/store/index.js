@@ -12,6 +12,7 @@ export default new Vuex.Store({
     isaddpdf: false,
     pdflist: [],
     index: 0,
+    page:1
   },
   getters: {},
   mutations: {
@@ -31,8 +32,7 @@ export default new Vuex.Store({
       state.islight = value;
     },
     setpdflist(state, value) {
-      state.pdflist = value;
-      state.isaddpdf = true;
+      state.pdflist.push(value)
     },
     clearpdflist(state) {
       state.pdflist = [];
