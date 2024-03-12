@@ -156,12 +156,78 @@ const projectmanagerrouter = [
     component: () => import("../components/PdfReview.vue"),
   },
   {
+    path: "/segment",
+    name: "segment",
+    component: () => import("../components/PicSegment.vue"),
+    children: [],
+  },
+  {
     path: "/TextPartReview",
     name: "TextPartReview",
     component: () => import("../components/TextPartReview.vue"),
   },
+  {
+    path: "/detect",
+    name: "PicDetect",
+    component: () => import("../components/PicDetect.vue"),
+  },
+  {
+    path: "/entity",
+    name: "entity",
+    component: () => import("../components/EntityRecognize.vue"),
+  },
+  {
+    path: "/keyandsummary",
+    name: "keyandsummary",
+    component: () => import("../components/KeyAndSummary.vue"),
+  },
+  {
+    path: "/languageinference",
+    name: "languageinference",
+    component: () => import("../components/LanguageInference.vue"),
+  },{
+    path: "/readview",
+    name: "readview",
+    component: () => import("../components/ReadView.vue"),
+  },
+  {
+    path: "/publishdetail",
+    name: "publishdetail",
+    component: () => import("../components/projectmanager/PublishDetail.vue"),
+  },
 ];
 const datalabelerrouter = [
+  {
+    path: "/readview",
+    name: "readview",
+    component: () => import("../components/ReadView.vue"),
+  },
+  {
+    path: "/languageinference",
+    name: "languageinference",
+    component: () => import("../components/LanguageInference.vue"),
+  },
+  {
+    path: "/keyandsummary",
+    name: "keyandsummary",
+    component: () => import("../components/KeyAndSummary.vue"),
+  },
+  {
+    path: "/entity",
+    name: "entity",
+    component: () => import("../components/EntityRecognize.vue"),
+  },
+  {
+    path: "/detect",
+    name: "PicDetect",
+    component: () => import("../components/PicDetect.vue"),
+  },
+  {
+    path: "/segment",
+    name: "segment",
+    component: () => import("../components/PicSegment.vue"),
+    children: [],
+  },
   {
     name: "PersonCenter",
     path: "/PersonCenter",

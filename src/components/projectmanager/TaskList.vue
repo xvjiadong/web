@@ -297,7 +297,7 @@ export default {
         },
         labelupdate() {
             console.log(this.show);
-            axios.post("http://192.168.224.150:10010/task/label", this.show).then(res => {
+            axios.post("http://120.26.142.114:10010/task/label", this.show).then(res => {
                 console.log(res.data);
                 this.$message.success("更新成功")
                 this.handleTasklabel(this.show)
@@ -330,6 +330,22 @@ export default {
         },
         handlemark(item) {
             console.log(item);
+            let router
+            if (item.callType === "图像文本标注") {
+                router="/PicView"
+            } else if (item.callType === "信息抽取标注") {
+                router="/PdfView"
+            } else if (item.callType === "图片分类标注") {
+                router="/ImageClassification"
+            } else if (item.callType === "文本分类标注") {
+                router="/TextClassification"
+            }else if (item.callType === "分割标注") {
+                router="/segment"
+            }
+            this.$router.push({
+                path: router,
+                query: item
+            })
         },
         handlereview(item) {
             console.log(item);
@@ -338,7 +354,7 @@ export default {
             console.log(item);
         },
         handleTasklabel(item) {
-            axios.get("http://192.168.224.150:10010/task/label/" + item.versionId).then(res => {
+            axios.get("http://120.26.142.114:10010/task/label/" + item.versionId).then(res => {
                 res.data.data.map(item => {
                     this.show.labels.push(item.label)
                 })
@@ -350,7 +366,7 @@ export default {
             this.$router.push({ path: "/TaskSchedule/", query: { id: item.projectId, version: item.versionId } })
         },
         getcreatetask() {
-            axios.get("http://192.168.224.150:10010/items/version").then(res => {
+            axios.get("http://120.26.142.114:10010/items/version").then(res => {
                 console.log(res.data.data);
                 this.createtask = res.data.data
             })

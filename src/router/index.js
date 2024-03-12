@@ -98,7 +98,8 @@ router.beforeEach((to, from, next) => {
           to.name === "PicReview" ||
           to.name === "PdfReview" ||
           to.name === "TextPartReview" ||
-          to.name === "PicPartReview"
+          to.name === "PicPartReview" ||
+          to.name==='PicSegment'
         ) {
           next()
           /*if (

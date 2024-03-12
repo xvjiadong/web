@@ -74,7 +74,7 @@ export default {
             this.$refs[item].validate((result) => {
                 if (result) {
                     //console.log(JSON.stringify(this.user));
-                    axios.post("http://192.168.224.150:10010/users/login", this.user).then((res) => {
+                    axios.post("http://120.26.142.114:10010/users/login", this.user).then((res) => {
                         if (res.data.code === 200) {
                             this.$store.commit("setuser", res.data.data)
                             this.$store.commit("changeisadd", false)

@@ -355,7 +355,7 @@ export default {
                 } else {
                     uploadform.set("file", this.dataset.link)
                 }*/
-                axios.post("http://192.168.224.150:10010/items", uploadform).then((res) => {
+                axios.post("http://120.26.142.114:10010/items", uploadform).then((res) => {
                     console.log(res.data);
                     if (res.data.code === 200) {
                         let file = new FormData()
@@ -369,7 +369,7 @@ export default {
                         file.append("version", this.dataset.version)
                         file.append("id", res.data.data)
                         if (this.dataset.inputway2 === "上传图片") {
-                            axios.post("http://192.168.224.150:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -384,7 +384,7 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传docx") {
-                            axios.post("http://192.168.224.150:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -399,7 +399,7 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传PDF") {
-                            axios.post("http://192.168.224.150:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -414,7 +414,7 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传txt") {
-                            axios.post("http://192.168.224.150:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)

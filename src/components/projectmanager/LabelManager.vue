@@ -199,7 +199,7 @@ export default {
             } else if (this.newgroup.labelName ==="") {
                 this.$message.error("请填写标签组名")
             } else {
-                axios.post("http://192.168.224.150:10010/label", this.newgroup).then(res => {
+                axios.post("http://120.26.142.114:10010/label", this.newgroup).then(res => {
                     if (res.data.code === 200) {
                         this.$message.success("创建成功")
                         this.getlabelgroup()
@@ -257,7 +257,7 @@ export default {
         },
         delok() {
             let a = { id: this.chooserow.id }
-            axios.delete("http://192.168.224.150:10010/label/"+a.id).then(res => {
+            axios.delete("http://120.26.142.114:10010/label/"+a.id).then(res => {
                 if (res.data.code === 200) {
                     this.$message.success("删除成功")
                     this.getlabelgroup()
@@ -282,7 +282,7 @@ export default {
             this.$refs.editform.validate((result) => {
                 if (result) {
                     console.log(this.editform);
-                    axios.put("http://192.168.224.150:10010/label", this.editform).then(res => {
+                    axios.put("http://120.26.142.114:10010/label", this.editform).then(res => {
                         if (res.data.code === 200) {
                             this.$message.success("编辑成功")
                             this.getlabelgroup()
@@ -307,7 +307,7 @@ export default {
             this.$router.push({ path: "/LabelDetail", query: a  })
         },
         getlabelgroup() {
-            axios.get("http://192.168.224.150:10010/label").then((res) => {
+            axios.get("http://120.26.142.114:10010/label").then((res) => {
                 console.log(res.data.data);
                 this.labelGroup=res.data.data
             })

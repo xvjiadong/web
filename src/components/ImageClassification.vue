@@ -1,261 +1,957 @@
 <template>
-    <div>
-        <el-card class="teachcard">
-            <div slot="header" style="display: flex;justify-content: left;align-items: center;">
-                <el-page-header @back="goBack" :content="project.name">
-                </el-page-header>
-                <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
-            </div>
-            <div style="border: 1px solid #eee;height: 585px;display: flex;">
-                <el-card class="teachcard" style="width: 1050px;">
-                    <div slot="header" class="operation">
-                        <div class="button-wrap">
-                            <el-tooltip content="缩小" placement="top-end">
-                                <div class="toolblock">
-                                    <el-button type="text" class="el-icon-zoom-out button" @click="zoomOut"></el-button>
-                                </div>
-                            </el-tooltip>
-                            <el-tooltip content="放大" placement="top-end">
-                                <div class="toolblock">
-                                    <el-button type="text" class="el-icon-zoom-in button" @click="zoomIn"></el-button>
-                                </div>
-                            </el-tooltip>
-                            <el-tooltip content="平移" placement="top-start">
-                                <div class="toolblock" :class="{ modeing: mode === 'PAN' }">
-                                    <el-button type="text" class="el-icon-thumb button"></el-button>
-                                </div>
-                            </el-tooltip>
-                            <el-tooltip content="保存" placement="top-end">
-                                <div class="toolblock">
-                                    <el-button @click="save((page - 1) * 5 + nowselect)" type="text"
-                                        class="el-icon-suitcase button"></el-button>
-                                </div>
-                            </el-tooltip>
-                        </div>
-                        <div style="display: flex;align-items: center;margin-right: 8px;">
-                            <i @click="save(nowselect - 1)" style="cursor: pointer;font-size: 12px;"
-                                class="el-icon-arrow-left toparrow"></i>
-                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共4张</span>
-                            <i @click="save(nowselect + 1)" style="cursor: pointer;font-size: 12px;"
-                                class="el-icon-arrow-right toparrow"></i>
-                        </div>
-                    </div>
-                    <div style="display: flex;justify-content: space-around;align-items: flex-start;">
-                        <div
-                            style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;">
-                            <div id="map"></div>
-                            <div style="display: flex;justify-content: center;align-items: center;">
-                                <i @click="save(nowselect - 1)" class="el-icon-arrow-left button"></i>
-                                <img @click="save((page - 1) * 5 + index)"
-                                    style="cursor: pointer;width: 100px;height: 100px;margin-left: 15px;"
-                                    :class="{ selected: (nowselect) % 5 === index }" :src="item.url"
-                                    v-for="(item, index) in imagelist.slice((page - 1) * 5, page * 5)" :key="item.url">
-                                <i @click="save(nowselect + 1)" class="el-icon-arrow-right button"></i>
+    <el-card>
+        <div slot="header" style="display: flex;justify-content: left;align-items: center;">
+            <el-page-header @back="goBack" :content="project.name">
+            </el-page-header>
+            <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
+        </div>
+        <div class="main">
+            <el-card class="teachcard">
+                <div slot="header" class="operation">
+                    <div class="button-wrap">
+                        <el-tooltip content="平移" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'PAN' }">
+                                <el-button type="text" class="el-icon-thumb" @click="setMode('PAN')"></el-button>
                             </div>
-                        </div>
-                        <div class="mapresult">
-                            <div class="mapresultheader">标注结果</div>
-                            <div v-if="chooselabel.length > 0">
-                                <div v-for="(item, index) in chooselabel" :key="index"
-                                    style="display: flex;justify-content: left;align-items: center;margin-top: 8px;margin-left: 8px;">
-                                    <div style="margin-left: 15px;display: flex;justify-content: left;align-items: center;">
-                                        <div class="labelblock" :id="`labeldiv${index + 1}`">
-                                            <span>{{ item }}</span>
-                                            <i class="el-icon-error" style="margin-right: 5px;" @click="pop(index)"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                        </el-tooltip>
+                        <!--
+                        <el-tooltip content="点标注" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'POINT' }">
+                                <el-button type="text" class="el-icon-more-outline" @click="setMode('POINT')"></el-button>
                             </div>
-                            <div v-else>
-                                <el-empty description="请在右侧选择标签"></el-empty>
+                        </el-tooltip> 
+                        <el-tooltip content="线标注" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'LINE' }">
+                                <el-button type="text" class="el-icon-minus button" @click="setMode('LINE')"></el-button>
                             </div>
-                        </div>
-                    </div>
-                </el-card>
-                <div class="mapresult2">
-                    <div>
-                        <div v-if="!addlabelvisible" class="mapresultheader2">
-                            <span
-                                style="font-size: 16px;color: #000;letter-spacing: 0;text-align: left;line-height: 22px;flex: 1;">
-                                标签栏
-                            </span>
-                            <el-button style="background-color: rgb(36,104,242);font-size: 12px;color: white;" size="mini"
-                                @click="addlabelvisible = true">
-                                <i class="el-icon-price-tag"></i>
-                                添加标签
-                            </el-button>
-                        </div>
-                        <div v-else
-                            style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;padding: 10px 10px;border-bottom: 1px solid #eee;line-height: 32px;">
-                            <div style="display: flex;justify-content: left;align-items: center;">
-                                <input class="input" size="mini" v-model="labelvalue" placeholder="请输入标签名称，不支持重复标签">
-                                <el-tooltip content="确认添加标签" placement="top-start">
-                                    <i class="el-icon-check labelicon" @click="surelabelinput"></i>
-                                </el-tooltip>
-                                <el-tooltip content="取消添加" placement="top-start">
-                                    <i class="el-icon-close labelicon" @click="closelabelinput"></i>
-                                </el-tooltip>
+                        </el-tooltip>
+                        <el-tooltip content="多段线标注" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'POLYLINE' }">
+                                <el-button type="text" class="el-icon-share button"
+                                    @click="setMode('POLYLINE')"></el-button>
                             </div>
-                            <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
-                                {{ labelerror }}
-                            </span>
-                            <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
-                                {{ labelsure }}
-                            </span>
-                        </div>
+                        </el-tooltip>
+                                                <el-tooltip content="放大" placement="top-end">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-plus button" @click="zoomIn"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="缩小" placement="top-end">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-minus button" @click="zoomOut"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="保存" placement="top-end">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-suitcase button"
+                                    @click="together(nowselect)"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="填充" placement="top-end">
+                            <div class="toolblock" :class="{ modeing: mode === 'FILL' }">
+                                <el-button type="text" class="el-icon-magic-stick button" @click="Fill()"></el-button>
+                            </div>
+                        </el-tooltip>
+                         <el-tooltip content="圆标注" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'CIRCLE' }">
+                                <el-button type="text" class="el-icon-orange button" @click="setMode('CIRCLE')"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="多边形标注" placement="top-end">
+                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
+                                <el-button type="text" class="el-icon-house button" @click="setMode('POLYGON')"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="撤销" placement="top-end">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-refresh-left button" @click="Revoke()"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="矩形标注" placement="top-start">
+                            <div class="toolblock" :class="{ modeing: mode === 'RECT' }">
+                                <el-button type="text" class="el-icon-full-screen button"
+                                    @click="setMode('RECT')"></el-button>
+                            </div>
+                        </el-tooltip>
+                        -->
+
+                        <el-tooltip content="保存" placement="top-end">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-suitcase button"
+                                    @click="together(nowselect)"></el-button>
+                            </div>
+                        </el-tooltip>
                     </div>
-                    <div style="padding: 15px;border-bottom: 1px solid #eee;text-align: center;">
-                        <el-input suffix-icon="el-icon-search" v-model="search" placeholder="请输入标签名称"
-                            size="medium"></el-input>
-                        <div class="tip">根据图片内容，选择标签<br>标注员临时定义的标签无法保存</div>
-                    </div>
-                    <el-checkbox-group v-model="chooselabel" style="overflow-y: auto;height: 380px;">
-                        <el-checkbox v-for="(item, index) in showlabel" :key="index" class="label"
-                            :class="{ choose: chooselabel.includes(item) }" :label="item">
-                            {{ item }}
-                        </el-checkbox>
-                    </el-checkbox-group>
                 </div>
-            </div>
-        </el-card>
-    </div>
+                <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
+                    <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
+                        <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
+                            <div style="display: flex;justify-content: space-between;align-items: center;">
+                                <div :style="'backgroundColor:' + item.color" style="width: 15px;height: 15px;"></div>
+                                <span>{{ item.label }}</span>
+                            </div>
+                        </el-option>
+                    </el-select>
+                    <div style="display: flex;justify-content: space-around;margin-top: 5px;">
+                        <el-button size="mini" type="primary" @click="ok">
+                            确定
+                        </el-button>
+                        <el-button size="mini" @click="Revoke">
+                            取消
+                        </el-button>
+                    </div>
+                    <div id="map" slot="reference" @click="la" @dblclick="la2"></div>
+                </el-popover>
+            </el-card>
+            <el-card class="teachcard">
+                <div slot="header" style="text-align: center;">
+                    <i class="el-icon-top toparrow" @click="together(nowselect - 1)"></i>
+                </div>
+                <div
+                    style="display: flex;flex-direction: column;justify-content: flex-start;height: 540px;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
+                    <div style="width: 120px;height: 120px;margin-top: 15px;padding: 5px;" v-for="(item, index) in showlist"
+                        :key="item.url">
+                        <img @click="together(index)" :src="item.url" :class="{ select: index === nowselect % 5 }"
+                            style="width: 120px;height: 75px;cursor: pointer;">
+                    </div>
+                </div>
+                <el-divider style="padding: 0;margin: 0;"></el-divider>
+                <div style="text-align: center;">
+                    <i class="el-icon-bottom toparrow" @click="together(nowselect + 1)"></i>
+                </div>
+            </el-card>
+            <el-collapse v-model="colitem">
+                <el-collapse-item name="results">
+                    <template slot="title">
+                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
+                            <span>分类结果</span>
+                        </div>
+                    </template>
+                    <el-card class="teachcard">
+                        <div
+                            style="height:450px;overflow-y: auto;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
+                            <div v-for="(item) in nowpicdata" :key="item.id" class="resultlist">
+                                <el-card>
+                                    <div slot="header" style="display: flex;justify-content: space-between;">
+                                        <span style="font-size: 20px;">
+                                            <span v-if="!item.edit"
+                                                @dblclick="item.edit=true">{{
+                                                    item.textInfo.text
+                                                }}</span>
+                                            <span v-else>
+                                                <el-input v-model="item.textInfo.text" size="mini"
+                                                    style="width:60%"></el-input>
+                                                <i style="cursor: pointer;font-size: 20px;" class="el-icon-check"
+                                                    @click="item.edit=false"></i>
+                                            </span>
+                                        </span>
+                                        <i @click="delmask(item)" style="cursor: pointer;font-size: 20px;"
+                                            class="el-icon-close"></i>
+                                    </div>
+                                </el-card>
+                            </div>
+                        </div>
+                    </el-card>
+                </el-collapse-item>
+                <el-collapse-item name="labels">
+                    <template slot="title">
+                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
+                            <span>分类标签</span>
+                        </div>
+                    </template>
+                    <div style="display: flex;justify-content: flex-start;justify-content: center;padding: 8px;">
+                        <el-input placeholder="新增标签" size="mini" v-model="newlabel"></el-input>
+                        <i @click="addlabel" style="font-size: 20px;cursor: pointer;" class="el-icon-check"></i>
+                    </div>
+                    <div
+                        style="height: 400px;overflow-x:auto;overflow-y: auto;margin-left: 15px;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
+                        <div @click="choose(item)" v-for="item in seglabels" :key="item.label" class="labelblock">
+                            <div :style="'backgroundColor:' + item.color" style="width: 25px;height: 25px;"></div>
+                            <span style="margin-left: 15px;">{{ item.label }}</span>
+                        </div>
+                    </div>
+                </el-collapse-item>
+            </el-collapse>
+        </div>
+    </el-card>
 </template>
 <script>
-import axios from 'axios'
 import AILabel from "ailabel";
+import axios from "axios";
+//import FileSaver from "file-saver";
+//import PicDoc from '../../public/PicDoc.json'
+//import data from '../../public/data (1).json'
+//import example from "../../public/示例.json"
+//import * as cv from 'opencv.js'
 export default {
-    name: "ImageClassification",
-    components: {
-
-    },
     data() {
         return {
-            project: { projectid: "fdsafd", projectname: "dsa", version: "v1", marktype: "信息抽取标注" },
-            gMap: null,
+            colitem: [],
+            drawingStyle: {},
             mode: "",
-            chooselabel: [],
-            search: "",
-            label: ["狗", "猫", "鸟类", "鱼类", "汽车", "自行车", "飞机", "船", "成年人", "儿童", "老年人", "山脉", "森林", "河流", "食物", "水果", "蔬菜", "主食", "饮料", "建筑", "城市建筑", "农村房屋", "古老建筑"],
-            addlabelvisible: false,
-            emptylabel: false,
-            labelerror: "",
-            labelsure: "待添加",
-            labelvalue: "",
-            imagelist: [
-                {
-                    url: "http://120.55.63.197:3000/images/甘达.webp.jpg",
-                    label: [],
-                    access: false
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/卡拉什.webp.jpg",
-                    label: [],
-                    access: false
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/熔岩.webp.jpg",
-                    label: [],
-                    access: false
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/竹木.webp.jpg",
-                    label: [],
-                    access: false
-                },
-            ],
-            imagelist2: [
-                {
-                    url: "/图像标注/15.webp (1).jpg",
-                    label: [""],
-                    access: false
-                },
-                {
-                    url: "/图像标注/17.jpg",
-                    label: ["金融"],
-                    access: false
-                },
-                {
-                    url: "/图像标注/18.jpg",
-                    label: ["财务报表"],
-                    access: false
-                },
-                {
-                    url: "/图像标注/19.jpg",
-                    label: ["金融"],
-                    access: false
-                },
-                {
-                    url: "/图像标注/2.webp.jpg",
-                    label: ["金融"],
-                    access: false
-                },
-            ],
+            itemName: "",
+            editId: "", //待填充图形id
+            deleteIconId: "delete01",
+            gMap: null, //AILabel实例
+            gFirstFeatureLayer: null, //矢量图层实例(矩形，多边形等矢量)
+            allFeatures: null, //所有features,
+            tagtextLayer: null,
+            allText: null,
+            labelcontent: null,
+            vis: false,
+            height: 0,
+            list: [],
+            data2: null,
+            type: "",
+            selected: false,
+            power: false,
+            shapelist: [],
+            showlist: [],
+            Recognizetextcontent: "",
             nowselect: 0,
-            page: 1
-        }
+            page: 1,
+            markfilter: "",
+            marktype: [{ value: "POLYGON", label: "多边形" }, { value: "POLYLINE", label: "多段线" }, { value: "RECT", label: "矩形" }, { value: "CIRCLE", label: "圆" }, { value: "LINE", label: "线" }, { value: "POINT", label: "点" }],
+            project: { projectid: "fdsafd", projectname: "dsa", version: "v1", marktype: "图像文本标注" },
+            //处理分割
+            rightclick: false,
+            segvis: false,
+            rect: [],
+            pointlist: [],
+            seglabels: [],
+            newlabel: "",
+            segpop: [],
+            storage: {},
+            nowpicdata: []
+        };
+    },
+    watch: {
+        mode: {
+            handler(mode) {
+                this.gMap.setMode(mode);
+                this.setDrawingStyle(mode);
+            },
+            deep: true
+        },
     },
     computed: {
-        showlabel() {
-            return this.label.filter(item => {
-                return item.includes(this.search) || this.search === ""
-            })
-        }
     },
     methods: {
-        save(index) {
-            this.imagelist[this.nowselect].label = this.chooselabel
-            if (index === -1) {
-                this.imagelist[index + 1].label = this.chooselabel
-                this.$message.warning("已经是第一张图片了")
-                return
-            } else if (index === this.imagelist.length) {
-                if (index === 10) {
-                    this.$message.warning("已经是最后一张图片了")
-                    return
-                } else {
-                    this.imagelist2.map(item => {
-                        this.imagelist.push(item)
+        delmask(item) {
+            this.nowpicdata = this.nowpicdata.filter(item2 => {
+                return item2.textid !== item.textid
+            })
+        },
+        choose(item) {
+            if (this.project.callType.includes("单标签") && this.nowpicdata.length > 0) {
+                this.nowpicdata[0].textInfo.text = item.label
+                this.nowpicdata[0].color = item.color
+            } else if (this.project.callType.includes("单标签") && this.nowpicdata.length === 0) {
+                this.nowpicdata.push({
+                    filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
+                    textid: Date.now() + "-0",
+                    textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
+                    color: item.color
+                })
+            } else if (this.project.callType.includes("多标签")) {
+                let a = this.nowpicdata.findIndex(ele => ele.textInfo.text === item.label)
+                if (a === -1) {
+                    this.nowpicdata.push({
+                        filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
+                        textid: Date.now() + "-0",
+                        textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
+                        color: item.color
                     })
                 }
             }
-            this.gMap.destroy()
-            this.createLayer(this.imagelist[index])
-            this.nowselect = index
-            this.page = Math.floor(this.nowselect / 5 + 1)
         },
-        closelabelinput() {
-            this.labelvalue = ""
-            this.emptylabel = false
-            this.addlabelvisible = false
-            this.labelsure = "待添加"
-        },
-        surelabelinput() {
-            if (this.labelvalue && !this.label.includes(this.labelvalue)) {
-                this.label.push(this.labelvalue)
-                this.labelvalue = ""
-                this.labelsure = "添加成功"
-                this.emptylabel = false
-                return
-            } else if (this.labelvalue === "") {
-                this.labelerror = "标签名称不能为空"
-                this.emptylabel = true
+        addlabel() {
+            if (this.seglabels.includes(this.newlabel) || this.newlabel === "") {
+                this.$notify.error({
+                    title: '添加失败',
+                    message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
+                    duration: 3000
+                });
             } else {
-                this.labelerror = "标签名称重复"
-                this.emptylabel = true
+                this.$notify.success({
+                    title: '',
+                    message: '添加成功',
+                    duration: 3000
+                });
+                this.seglabels.push({ label: this.newlabel, color: 'rgb(' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ')' })
+            }
+            this.newlabel = ""
+        },
+        /*切图片时把已标注数据标上 */
+        keepdraw(markdata) {
+            markdata.forEach((item, index) => {
+                let a = this.seglabels.findIndex(item2 => item2.label == item.label)
+                if (a !== -1) {
+                    this.nowpicdata[index].color = this.seglabels[a].color
+                } else {
+                    this.seglabels.push({ label: item.label, color: item.color })
+                }
+                let text = new AILabel.Text(item.textid, item.textInfo, { name }, { FontColor: item.color, FontSize: '20px' })
+                this.tagtextLayer.addText(text)
+            })
+        },
+        //汇总框选向后台提交//
+        together(num) {
+            let jsondata = JSON.stringify(this.nowpicdata)
+            let file = new FormData()
+            const blob = new Blob([jsondata]);
+            file.set("file", blob, "data.json")
+            file.set("id", this.showlist[this.nowselect].id)
+            axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                console.log(res.data);
+            })
+            let a = (this.colitem.findIndex(item => item === 'results'))
+            this.colitem.splice(a, 1)
+            if (this.page === 1 && num === -1) {
+                this.$message.warning("已经是第一张了")
+                return
+            } else if (num === this.showlist.length || num == -1) {
+                this.gMap.destroy()
+                this.page = num == -1 ? this.page - 1 : this.page + 1
+                this.getdata(this.page, num == -1 ? 0 : 1)
+            } else {
+                this.gMap.destroy()
+                this.changepic(this.showlist[num])
+                this.nowselect = num
             }
         },
-        goBack() {
-            this.$router.push("/MakeMark")
+        ok() {
+            this.power = false
+            if (this.Recognizetextcontent === "") {
+                return
+            }
+            if (this.type === "RECT") {
+                this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
+                this.nowpicdata.push({
+                    id: this.storage.id,
+                    type: "RECT",
+                    vis: true,
+                    color: this.seglabels[this.Recognizetextcontent].color,
+                    shape: this.storage.data,
+                    textid: this.storage.id + "-0",
+                    edit: false,
+                    textInfo: { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
+                })
+                let textid = this.storage.id + "-0"
+                const recttext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } })
+                this.tagtextLayer.addText(recttext)
+                this.Recognizetextcontent = ""
+                //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            }
+            this.vis = false
         },
-        pop(index) {
-            console.log(index);
-            this.chooselabel.splice(index, 1)
+        la(e) {
+            if (this.type === "POINT") {
+                let a = setTimeout(() => {
+                    if (this.selected || !this.power) {
+                        return
+                    }
+                    if (this.type === "LINE") {
+                        this.linenumber += 1
+                    }
+                    if (this.type === 'RECT' || this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
+                        if (!this.vis) {
+                            const popover = this.$refs.popover;
+                            let timer = setTimeout(() => {
+                                const { clientX, clientY } = e;
+                                const bodyWidth = document.body.clientWidth;
+                                const { popperElm } = popover;
+                                let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                    ? clientX
+                                    : bodyWidth - popperElm.offsetWidth;
+                                let disY = clientY - this.height
+                                popover.popperElm.style.left = disX + "px";
+                                popover.popperElm.style.top = disY + "px";
+                                popover.popperElm.style.zIndex = '99';
+                                clearTimeout(timer);
+                            }, 5);
+                            this.vis = true
+                        }
+                    }
+                    clearTimeout(a)
+                }, 200)
+            } else {
+                if (this.selected || !this.power) {
+                    return
+                }
+                if (this.type === "POINT" || this.type === "RECT" || this.type === "CIRCLE" || (this.type === "LINE")) {
+                    //if (!this.vis) {
+                    const popover = this.$refs.popover;
+                    let timer = setTimeout(() => {
+                        const { clientX, clientY } = e;
+                        const bodyWidth = document.body.clientWidth;
+                        const { popperElm } = popover;
+                        let disX = clientX + popperElm.offsetWidth < bodyWidth
+                            ? clientX
+                            : bodyWidth - popperElm.offsetWidth;
+                        let disY = clientY - this.height
+                        popover.popperElm.style.left = disX + "px";
+                        popover.popperElm.style.top = disY + "px";
+                        popover.popperElm.style.zIndex = '99';
+                        clearTimeout(timer);
+                    }, 5);
+                    this.vis = true
+                    //}
+                }
+            }
         },
-        createLayer(item) {
+        la2(e) {
+            if (this.selected || !this.power) {
+                return
+            }
+            if ((this.type === "POLYGON" || this.type === "POLYLINE") && this.data2) {
+                //if (!this.vis) {
+                const popover = this.$refs.popover;
+                let timer = setTimeout(() => {
+                    const { clientX, clientY } = e;
+                    const bodyWidth = document.body.clientWidth;
+                    const { popperElm } = popover;
+                    let disX = clientX + popperElm.offsetWidth < bodyWidth
+                        ? clientX
+                        : bodyWidth - popperElm.offsetWidth;
+                    let disY = clientY - this.height
+                    popover.popperElm.style.left = disX + "px";
+                    popover.popperElm.style.top = disY + "px";
+                    popover.popperElm.style.zIndex = '99';
+                    clearTimeout(timer);
+                }, 5);
+                this.vis = true
+                //}
+            }
+        },
+        zoomIn() {
+            this.gMap.zoomIn();
+        },
+        zoomOut() {
+            this.gMap.zoomOut();
+        },
+        setMode(mode) {
+            this.mode = mode;
+            this.linenumber = 0
+            this.type = mode
+        },
+        // 获取所有features
+        getFeatures() {
+            this.allFeatures = this.gFirstFeatureLayer.getAllFeatures();
+        },
+        getText() {
+            this.allText = this.tagtextLayer.texts;
+        },
+        // 初始样式
+        setDrawingStyle(mode) {
+            let drawingStyle = {};
+            switch (mode) {
+                //平移
+                case "PAN": {
+                    break;
+                }
+                //注记
+                case "MARKER": {
+                    // 忽略
+                    break;
+                }
+                //点
+                case "POINT": {
+                    this.drawingStyle = { fillStyle: "rgb(255,0,0)" };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //圆
+                case "CIRCLE": {
+                    this.drawingStyle = {
+                        fillStyle: "#ff0000",
+                        strokeStyle: "#ff0000",
+                        lineWidth: 5,
+                        stroke: true,
+                        fill: true,
+                    };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //线段
+                case "LINE": {
+                    this.drawingStyle = {
+                        strokeStyle: "rgb(255,0,0)",
+                        lineJoin: "round",
+                        lineCap: "round",
+                        lineWidth: 8,
+                        arrow: false,
+                    };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //多线段
+                case "POLYLINE": {
+                    this.drawingStyle = {
+                        strokeStyle: "rgb(255,0,0)",
+                        lineJoin: "round",
+                        lineCap: "round",
+                        lineWidth: 8,
+                        stroke: true
+                    };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //矩形
+                case "RECT": {
+                    this.drawingStyle = { strokeStyle: "rgb(255,0,0)", lineWidth: 2, stroke: true };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //多边形
+                case "POLYGON": {
+                    this.drawingStyle = {
+                        strokeStyle: "rgb(255,0,0)", //边框颜色
+                        fill: true, //是否填充
+                        //fillStyle: "rgb(145,172,218)", //填充色
+                        globalAlpha: 0.3,
+                        lineWidth: 12,
+                        stroke: true,
+                    };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //涂抹
+                case "DRAWMASK": {
+                    this.drawingStyle = {
+                        strokeStyle: "rgba(255, 0, 0, .5)",
+                        fillStyle: "#00f",
+                        lineWidth: 50,
+                    };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                //擦除
+                case "CLEARMASK": {
+                    this.drawingStyle = { fillStyle: "#00f", lineWidth: 30 };
+                    this.gMap.setDrawingStyle(drawingStyle);
+                    break;
+                }
+                default:
+                    break;
+            }
+        },
+
+        // 添加图形
+        addFeature(data, type, id, color = null, textInfo = null, isappear = false) {
+            console.log(isappear);
+            let that = this;
+            let drawingStyle = this.drawingStyle;
+            //线
+            if (type === "LINE") {
+                const scale = that.gMap.getScale();
+                const width = drawingStyle.lineWidth / scale;
+                const lineFeature = new AILabel.Feature.Line(
+                    id, // id
+                    { ...data, width }, // shape
+                    { name }, // props
+                    drawingStyle // style
+                );
+                that.gFirstFeatureLayer.addFeature(lineFeature);
+            }
+            //线段
+            else if (type === "POLYLINE") {
+                const scale = that.gMap.getScale();
+                const width = drawingStyle.lineWidth / scale;
+                const polylineFeature = new AILabel.Feature.Polyline(
+                    id, // id
+                    { points: data, width }, // shape
+                    { name }, // props
+                    drawingStyle // style
+                );
+                that.gFirstFeatureLayer.addFeature(polylineFeature);
+            }
+            //矩形
+            else if (type === "RECT") {
+                const rectFeature = new AILabel.Feature.Rect(
+                    id, // id
+                    data, // shape
+                    textInfo == null ? { name } : textInfo, // props
+                    {
+                        strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
+                        fill: false, //是否填充
+                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
+                        globalAlpha: 0.5,
+                        lineWidth: 3,
+                        stroke: true,
+                    } // style
+                );
+                that.gFirstFeatureLayer.addFeature(rectFeature);
+            }
+            //多边形
+            else if (type === "POLYGON") {
+                const polygonFeature = new AILabel.Feature.Polygon(
+                    id, // id
+                    { points: data }, // shape
+                    {
+                        strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
+                        fill: true, //是否填充
+                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
+                        globalAlpha: 0.5,
+                        lineWidth: 3,
+                        stroke: true,
+                    } // style
+                );
+                that.gFirstFeatureLayer.addFeature(polygonFeature);
+            }
+            //点
+            else if (type == "POINT") {
+                const gFirstFeaturePoint = new AILabel.Feature.Point(
+                    id, // id
+                    { x: data.x, y: data.y, r: 5 }, // shape
+                    { name }, // props
+                    { fillStyle: this.rightclick ? "rgb(255,0,0)" : "rgb(0,255,0)", zIndex: 5, lineWidth: 255 } // style
+                );
+                that.gFirstFeatureLayer.addFeature(gFirstFeaturePoint);
+            }
+            //注记
+            else if (type == "MARKER") {
+                const gFirstMarker = new AILabel.Marker(
+                    id, // id
+                    {
+                        src: "http://ailabel.com.cn/public/ailabel/demo/marker.png",
+                        position: {
+                            // marker坐标位置
+                            x: data.x,
+                            y: data.y,
+                        },
+                        offset: {
+                            x: -16,
+                            y: 32,
+                        },
+                    }, // markerInfo
+                    { name: "第一个marker注记" } // props
+                );
+                that.gFirstFeatureLayer.addFeature(gFirstMarker);
+            }
+            //圆
+            else if (type == "CIRCLE") {
+                const gFirstFeatureCircle = new AILabel.Feature.Circle(
+                    id, // id
+                    { cx: data.cx, cy: data.cy, r: data.r }, // shape
+                    {
+                        fill: true, //是否填充
+                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
+                        strokeStyle: color === null ? "rgb(145,172,218)" : color,
+                        stroke: true,
+                        globalAlpha: 0.5,
+                        lineWidth: 2,
+                    } // style
+                );
+                that.gFirstFeatureLayer.addFeature(gFirstFeatureCircle);
+            }
+            //涂抹
+            else if (type == "DRAWMASK") {
+                const drawMaskAction = new AILabel.Mask.Draw(
+                    `${+new Date()}`, // id
+                    "铅笔",
+                    { points: data, width: 5 }, // shape
+                    { name: "港币", price: "1元" }, // props
+                    { strokeStyle: "#FF0000" } // style
+                );
+                that.gFirstFeatureLayer.addAction(drawMaskAction);
+            }
+            //擦除
+            else if (type == "CLEARMASK") {
+                const clearMaskAction = new AILabel.Mask.Clear(
+                    "first-action-clear", // id
+                    { points: data, width: 5 } // shape
+                );
+                that.gFirstMaskLayer.addAction(clearMaskAction);
+            }
+            this.getFeatures();
+
+        },
+        // 增加删除图标
+        addDeleteIcon(feature, shape) {
+            let gMap = this.gMap;
+            let that = this;
+            // 添加delete-icon
+            // let points = that.getPoints(feature);
+            console.log(shape, "shape");
+            this.vis = false
+            let position = {}
+            if (feature.type === "RECT") {
+                position.x = shape.x + shape.width
+                position.y = shape.y - 15
+            } else if (feature.type === "CIRCLE") {
+                position.x = shape.cx
+                position.y = shape.cy
+            } else if (feature.type === "POLYGON") {
+                position.x = shape.points[shape.points.length - 1].x
+                position.y = shape.points[shape.points.length - 1].y
+            } else if (feature.type === "POINT") {
+                position.x = shape.x
+                position.y = shape.y
+            } else if (feature.type === "POLYLINE") {
+                position.x = shape.points[shape.points.length - 1].x
+                position.y = shape.points[shape.points.length - 1].y
+            } else if (feature.type === "LINE") {
+                position.x = shape.end.x
+                position.y = shape.end.y
+            }
+            const gFirstMarker = new AILabel.Marker(
+                that.deleteIconId, // id
+                {
+                    src: "https://s1.aigei.com/src/img/png/45/45aabfc232a34e5b9bfaf75412973c08.png?|watermark/3/image/aHR0cHM6Ly9zMS5haWdlaS5jb20vd2F0ZXJtYXJrLzUwMC0xLnBuZz9lPTE3MzU0ODgwMDAmdG9rZW49UDdTMlhwemZ6MTF2QWtBU0xUa2ZITjdGdy1vT1pCZWNxZUpheHlwTDpjYWQ1NHVoRlhGUUViSGR3Vm02aXctVTJoWVE9/dissolve/40/gravity/NorthWest/dx/18/dy/21/ws/0.0/wst/0&e=1735488000&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:C11LKqsRLbAqQo2uVPETYDya0QU=",
+                    position: position, // 矩形右上角 根据图形动态调整
+                    offset: {
+                        x: -20,
+                        y: -4,
+                    },
+                }, // markerInfo
+                { name: "delete" } // props
+            );
+            gFirstMarker.events.on("click", (marker) => {
+                // 首先删除当前marker
+                gMap.markerLayer.removeMarkerById(marker.id);
+                // 删除对应text
+                // gFirstTextLayer.removeTextById(textId);
+                // 删除对应feature
+                that.gFirstFeatureLayer.removeFeatureById(feature.id);
+                this.nowpicdata = this.nowpicdata.filter(item => {
+                    return item.id !== feature.id
+                })
+                this.getText(feature.id)
+                this.tagtextLayer.removeTextById(feature.id + "-0")
+                this.selected = false
+                this.power = false
+            });
+            gMap.markerLayer.addMarker(gFirstMarker);
+
+            // that.gFirstFeatureLayer
+        },
+        // 删除 删除按钮
+        deIcon() {
+            this.gMap.markerLayer.removeAllMarkers();
+        },
+        // 增加事件
+        addEvent() {
+            let that = this;
+            let gMap = this.gMap;
+            gMap.events.on("drawDone", (type, data) => {
+                this.data2 = data
+                // that.addFeature(data, type);
+                if (type == "CLEARMASK" || type == "DRAWMASK") {
+                    that.addFeature(data, type);
+                } else {
+                    if (type === "RECT" && data.width > 10 && data.height > 10 && 500 - data.x - data.width > 0 && data.y + data.height < 375 && data.x > 0 && data.y > 0) {
+                        this.power = true
+                        let id = Date.now() + ""
+                        that.addFeature(data, type, id);
+                        this.storage.data = data
+                        this.storage.id = id
+                    } else if (type === "POLYGON") {
+                        let c = true
+                        data.forEach(item => {
+                            if (item.x < 0 || item.y < 0) {
+                                c = false
+                            }
+                        })
+                        if (!c) {
+                            return
+                        }
+                        this.power = true
+                        that.addFeature(data, type, Date.now() + "");
+                    } else if (type === "LINE" && data.start.x > 0 && data.start.y > 0 && data.end.x > 0 && data.end.y > 0) {
+                        this.power = true
+                        that.addFeature(data, type, Date.now() + "");
+                    }
+                    else if (type === "POINT" && data.x > 0 && data.y > 0) {
+                        let id = Date.now() + ""
+                        that.addFeature(data, type, id);
+                        this.power = true
+                    } else if (type === "POLYLINE") {
+                        let c = true
+                        data.forEach(item => {
+                            if (item.x < 0 || item.y < 0) {
+                                c = false
+                            }
+                        })
+                        if (!c) {
+                            return
+                        }
+                        this.power = true
+                        that.addFeature(data, type, Date.now() + "");
+                    } else if (type === "CIRCLE" && data.r > 10 && data.r + data.cx < 500 && data.r + data.cy < 375 && data.cx - data.r > 0 && data.cy - data.r > 0) {
+                        this.power = true
+                        that.addFeature(data, type, Date.now() + "");
+                    }
+                }
+            });
+            gMap.events.on("boundsChanged", (data) => {
+                console.log("--map boundsChanged--", data);
+                return "";
+            });
+            // 双击编辑 在绘制模式下双击feature触发选中
+            gMap.events.on("featureSelected", (feature) => {
+                console.log(1);
+                this.editId = feature.id;
+                this.selected = true
+                console.log("--map featureSelected--", feature, "双击编辑");
+                //设置编辑feature
+                gMap.setActiveFeature(feature);
+                if (feature.type != "POINT") {
+                    // 增加删除按钮
+                    that.addDeleteIcon(feature, feature.shape);
+                }
+                this.vis = false
+            });
+            //右键 目前只针对点双击选中右键触发
+            gMap.events.on("featureDeleted", (feature) => {
+                if (feature.type == "POINT") {
+                    // 根据id删除对应feature
+                    that.gFirstFeatureLayer.removeFeatureById(feature.id);
+                }
+            });
+            // 单机空白取消编辑
+            gMap.events.on("featureUnselected", () => {
+                console.log("unselected");
+                // 取消featureSelected
+                that.editId = "";
+                that.deIcon();
+                gMap.setActiveFeature(null);
+                let a = setTimeout(() => {
+                    this.selected = false
+                    clearTimeout(a)
+                }, 500)
+            });
+            // 更新完
+            gMap.events.on("featureUpdated", (feature, shape) => {
+                this.vis = false
+                let id = feature.id;
+                this.getText()
+                this.allText.forEach(item => {
+                    if (item.id.split("-")[0] === id) {
+                        switch (feature.type) {
+                            case "RECT": {
+                                let position = { x: shape.x, y: shape.y }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            case "CIRCLE": {
+                                let position = { x: shape.cx, y: shape.cy }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            case "POLYGON": {
+                                let maxx = 9999;
+                                let maxy = 9999
+                                let num
+                                shape.points.forEach((item, index) => {
+                                    if (item.x < maxx || item.x < maxx && item.y < maxy) {
+                                        maxx = item.x
+                                        maxy = item.y
+                                        num = index
+                                    }
+                                })
+                                let position = { x: shape.points[num].x, y: shape.points[num].y }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            case "POLYLINE": {
+                                let maxx = 9999;
+                                let maxy = 9999
+                                let num
+                                shape.points.forEach((item, index) => {
+                                    if (item.x < maxx || item.x < maxx && item.y < maxy) {
+                                        maxx = item.x
+                                        maxy = item.y
+                                        num = index
+                                    }
+                                })
+                                let position = { x: shape.points[num].x, y: shape.points[num].y }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            case "LINE": {
+                                let position = { x: shape.start.x, y: shape.start.y }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            case "POINT": {
+                                let position = { x: shape.x, y: shape.y }
+                                item.updatePosition(position)
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+
+                    }
+                })
+                this.getText()
+                // 更新或者移动需要重新设置删除图标
+                that.deIcon();
+                feature.updateShape(shape);
+                that.addDeleteIcon(feature, shape);
+                this.nowpicdata[this.nowpicdata.findIndex(item => item.id === id)].shape = shape
+                this.nowpicdata[this.nowpicdata.findIndex(item => item.id === id)].textInfo.position = { x: shape.x, y: shape.y }
+            });
+            // 删除
+            gMap.events.on("FeatureDeleted", () => {
+                console.log(2222222);
+                // that.gFirstFeatureLayer.removeFeatureById(that.editId);
+            });
+        },
+        // 获取坐标 需要自行添加
+        getPoints(feature) {
+            switch (feature.type) {
+                case "RECT":
+                    return feature.getPoints();
+                case "LINE":
+                    return [feature.shape.start, feature.shape.end];
+                case "POLYLINE":
+                    return feature.shape.points;
+                case "POLYGON":
+                    return feature.shape.points;
+                default:
+                    return [];
+            }
+        },
+        //填充事件
+        Fill() {
+            console.log("填充事件");
+            let fill = this.gFirstFeatureLayer.getFeatureById(this.editId);
+            console.log("--填充对象--", fill);
+            fill.style.fillStyle = "#FFDAB9";
+            fill.style.fill = true;
+            //刷新map
+            this.gMap.refresh();
+        },
+        //撤销
+        Revoke() {
+            if (this.allFeatures.length === 0) {
+                this.$message("页面无标注")
+            }
+            console.log("撤销");
+            this.getFeatures();
+            this.getText()
+            for (let i = this.allText.length - 1; i >= 0; i--) {
+                if (this.allText[i].id.split("-")[0] !== this.allFeatures[this.allFeatures.length - 1].id) {
+                    break;
+                } else {
+                    this.allText.pop()
+                }
+            }
+            this.allFeatures.pop();
+            //this.gMap.removeTextById(this.editId);
+            //刷新map
+            this.gMap.refresh();
+            this.vis = false
+        },
+        changepic(item) {
+            let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
-                mode: "PAN", // 绘制线段
+                mode: "POINT", // 绘制线段
                 //refreshDelayWhenZooming: false, // 缩放时是否允许刷新延时，性能更优
                 zoomWhenDrawing: true,
                 panWhenDrawing: true,
@@ -265,15 +961,16 @@ export default {
                 //drawZoom: false,
                 //autoPan: false,
             });
-            this.gMap = gMap;
-            this.chooselabel = item.label
+            that.gMap = gMap;
+            this.addEvent();
+            // 图片层添加
             const gFirstImageLayer = new AILabel.Layer.Image(
                 "first-layer-image", // id
                 {
                     id: "image",
                     src: item.url,
                     width: 500,
-                    height: 375,
+                    height: 374,
                     crossOrigin: true, // 如果跨域图片，需要设置为true
                     position: {
                         // 左上角相对中心点偏移量
@@ -288,29 +985,92 @@ export default {
             );
             // 添加到gMap对象
             gMap.addLayer(gFirstImageLayer);
-            if (item.label.length === 0) {
-                axios.post("http://home.itzyc.com:12349/img/", { url: item.url },{timeout:500000000000}).then(res => {
-                    console.log(res.data);
-                    this.chooselabel.push(res.data.label)
-                })
+            // 添加矢量图层
+            const gFirstFeatureLayer = new AILabel.Layer.Feature(
+                "first-layer-feature", // id
+                { name: "第一个矢量图层" }, // props
+                { zIndex: 10 } // style
+            );
+            this.gFirstFeatureLayer = gFirstFeatureLayer;
+            const tagtextLayer = new AILabel.Layer.Text("tagtext-layer", { name: "as" }, { zIndex: 10, opacity: 1 })
+            this.tagtextLayer = tagtextLayer;
+            gMap.addLayer(gFirstFeatureLayer);
+            gMap.addLayer(tagtextLayer)
+            this.nowpicdata = []
+            if (item.mark) {
+                console.log(item.mark);
+                axios.get(item.mark)
+                    .then(res => {
+                        this.nowpicdata = res.data
+                        this.keepdraw(res.data)
+                    }).catch(e => {
+                        console.log(e);
+                    })
             }
-            //this.chooselabel = item.label
+            this.rect.splice(0)
+            this.storage = {}
+            window.onresize = function () {
+                this.gMap && this.gMap.resize();
+            };
+            this.setMode("BAN")
+            /*if (item.data) {
+                axios.get(item.data).then(res => {
+                    item.mark = res.data
+                    this.keepdraw(res.data)
+                })
+            }*/
         },
-        zoomIn() {
-            this.gMap.zoomIn();
+        goBack() {
+            this.$router.push("/MakeMark")
         },
-        zoomOut() {
-            this.gMap.zoomOut();
-        },
+        getdata(page, num) {
+            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+                .then(res => {
+                    console.log(res.data);
+                    if (res.data.data.length === 0) {
+                        this.$message.warning("已经是最后一张了")
+                        return
+                    }
+                    this.showlist.splice(0)
+                    this.showlist = res.data.data;
+                    this.changepic(this.showlist[num == 1 ? 0 : 4])
+                    this.nowselect = num == 1 ? 0 : 4
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+            axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
+                .then(res => {
+                    this.seglabels = res.data.data
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+        }
     },
     mounted() {
         this.project = this.$route.query
-        /*请求图片*/
-        this.createLayer(this.imagelist[0])
+        this.getdata(1, 1)
     },
-}
+    beforeDestroy() {
+        this.gMap.destroy();
+    },
+};
 </script>
+   
+  <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.container {
+    width: 100%;
+    height: 643px;
+}
+
 .operation {
     display: flex;
     justify-content: space-between;
@@ -319,21 +1079,22 @@ export default {
 
 .teachcard {
     text-align: left;
-    margin-top: 5px;
+    margin-top: 25px;
 }
 
 /deep/.el-card__header {
-    padding: 15px;
+    padding: 0px;
 }
 
 /deep/.el-card__body {
-    padding: 5px;
+    padding: 0px;
 }
 
 .button-wrap {
     display: flex;
     padding-bottom: 5px;
     justify-content: left;
+    align-items: center;
     position: relative;
     z-index: 99;
 }
@@ -342,57 +1103,82 @@ export default {
     /* margin: 0 auto; */
     overflow: hidden;
     position: relative;
-    height: 360px;
-    width: 480px;
-    margin-top: 5px;
-    margin-left: 25px;
+    height: 540px;
+    width: 720px;
+    margin-top: 15px;
     border: 1px dashed #ccc;
 }
 
-.mapresult {
-    border: 1px solid #eee;
-    height: 485px;
-    width: 220px;
-    margin-top: 6px;
-    overflow-y: auto;
+.zoom-icon-wrapper {
+    position: absolute;
+    /* left: 20px; */
+    /* top: 20px; */
+    z-index: 1000;
 }
 
-.mapresult2 {
-    border: 1px solid #eee;
-    height: 562px;
-    width: 280px;
-    margin-top: 6px;
-    margin-left: 15px;
-}
-
-.mapresultheader {
-    font-size: 16px;
-    font-weight: 600;
-    word-break: break-all;
-    color: #666;
-    padding: 30px 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.mapresultheader2 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 10px;
-    border-bottom: 1px solid #eee;
-    line-height: 32px;
+.zoom-icon-plus {
+    width: 30px;
     height: 30px;
-    z-index: 1;
-}
-
-.button {
+    line-height: 20px;
+    text-align: center;
+    border: 3px solid #6495ed;
     font-size: 20px;
-    color: rgb(100, 100, 101);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    color: #ff8c00;
     cursor: pointer;
 }
 
-.button:hover {
-    color: rgb(36, 104, 242);
+.zoom-icon-plus:hover {
+    border-color: #4169e1;
+}
+
+.zoom-icon-minus {
+    margin-top: 6px;
+    width: 30px;
+    height: 30px;
+    line-height: 20px;
+    text-align: center;
+    border: 3px solid #6495ed;
+    font-size: 25px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    color: #ff8c00;
+    cursor: pointer;
+}
+
+.zoom-icon-minus:hover {
+    border-color: #4169e1;
+}
+
+/* 删除图标 */
+#delete01 {
+    width: 20px;
+    height: 20px;
+}
+
+.el-button {
+    margin-left: 0px;
+}
+
+.pop .popper__arrow::after {
+    border-bottom-color: transparent !important;
+}
+
+.pop .popper__arrow {
+    border-bottom-color: transparent !important;
+}
+
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 100%;
+    height: 5000px;
+    padding: 0;
+}
+
+.el-menu-vertical-demo {
+    width: 100%;
+    height: 500px;
+    padding: 0;
 }
 
 .toolblock {
@@ -402,11 +1188,11 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .toolblock:hover {
     background-color: rgb(209, 227, 250);
-    color: rgb(36, 104, 242);
 }
 
 .modeing {
@@ -452,127 +1238,33 @@ export default {
     padding: 10px;
 }
 
+.segment {
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.segment:hover {
+    color: rgb(36, 104, 242);
+    text-decoration: underline;
+}
+
 .labelblock {
     border: 1px solid rgb(221, 221, 221);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    height: 35px;
-    width: 160px;
+    height: 65px;
+    width: 190px;
     padding-left: 5px;
     cursor: pointer;
+    margin-bottom: 15px;
 }
 
 .labelblock:hover {
     border: 1px solid rgb(36, 104, 242);
 }
 
-.tip {
-    font-size: 12px;
-    text-align: center;
-    color: #999;
-    line-height: 17px;
-    margin-top: 10px;
-}
-
-.label {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    margin-top: 8px;
-    border: 1px solid #eee;
+.resultlist {
     padding: 8px;
-    width: 215px;
-}
-
-.label:hover {
-    border: 1px solid rgb(36, 104, 242);
-}
-
-.choose {
-    border: 1px solid rgb(36, 104, 242);
-}
-
-.input {
-    width: 70%;
-    height: 25px;
-    padding: 0;
-    font-size: 12px;
-}
-
-.labelicon {
-    margin-left: 12px;
-    cursor: pointer;
-}
-
-.labelicon:hover {
-    color: rgb(36, 104, 242);
-}
-
-@keyframes shake {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    10% {
-        transform: translate(-5px, -5px);
-    }
-
-    20% {
-        transform: translate(5px, 5px);
-    }
-
-    30% {
-        transform: translate(-5px, -5px);
-    }
-
-    40% {
-        transform: translate(5px, 5px);
-    }
-
-    50% {
-        transform: translate(-5px, -5px);
-    }
-
-    60% {
-        transform: translate(5px, 5px);
-    }
-
-    70% {
-        transform: translate(-5px, -5px);
-    }
-
-    80% {
-        transform: translate(5px, 5px);
-    }
-
-    90% {
-        transform: translate(-5px, -5px);
-    }
-
-    100% {
-        transform: translate(0, 0);
-    }
-}
-
-#repeattext {
-    animation: shake 0.8s 1 forwards;
-    color: red;
-    font-size: 12px;
-    text-align: left;
-}
-
-.suretext {
-    color: rgb(192, 196, 204);
-    font-size: 12px;
-    text-align: left;
-}
-
-.addok {
-    color: green;
-}
-
-.selected {
-    border: 2px solid rgb(36, 104, 242);
 }
 </style>

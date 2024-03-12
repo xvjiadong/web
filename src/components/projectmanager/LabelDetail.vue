@@ -145,7 +145,7 @@ export default {
                 })
                 a.labelId = this.labelgroup.id
                 a.labels.push(this.addlabel)
-                axios.put("http://192.168.224.150:10010/label/group", a).then(res => {
+                axios.put("http://120.26.142.114:10010/label/group", a).then(res => {
                     if (res.data.code === 200) {
                         this.addvisible = false
                         this.addlabel=""
@@ -178,7 +178,7 @@ export default {
                         a.labels.push(item.labels)
                     })
                     a.labelId = this.labelgroup.id
-                    axios.put("http://192.168.224.150:10010/label/group", a).then(res => {
+                    axios.put("http://120.26.142.114:10010/label/group", a).then(res => {
                         if (res.data.code === 200) {
                             this.getlabel()
                         }
@@ -218,7 +218,7 @@ export default {
             })
             a.labels = b
             console.log(a);
-            axios.put("http://192.168.224.150:10010/label/group", a).then(res => {
+            axios.put("http://120.26.142.114:10010/label/group", a).then(res => {
                 console.log(res.data);
                 if (res.data.code === 200) {
                     this.getlabel()
@@ -237,7 +237,7 @@ export default {
         },
         getlabel() {
             console.log(this.labelgroup.id);
-            axios.get("http://192.168.224.150:10010/label/group/" + this.labelgroup.id).then(res => {
+            axios.get("http://120.26.142.114:10010/label/group/" + this.labelgroup.id).then(res => {
                 this.labelgroup.label = res.data.data
                 this.refresh = !this.refresh
             })

@@ -519,15 +519,18 @@ export default {
 		this.project = this.$route.query;
 		//this.smartmark("抽取式阅读理解任务：阅读文章【谷歌公司首席执行官表示，他们计划在未来五年内全面实现碳中和，并将投资额翻倍用于太阳能和风能等清洁能源项目。同时，亚马逊也发布了雄心勃勃的计划，承诺在2030年前投资100亿美元用于推动可再生能源的创新和发展。】问题【谷歌公司的目标是什么】的答案是什么？")
 		if (this.$store.state.pdflist.length === this.$store.state.index) {
-			console.log();
-			axios.post("http://192.168.224.150:10010/dataset/task", { version: this.project.versionId, page: Math.floor(this.$store.state.index / 5) + 1, number: 5 }).then(res => {
+			this.$store.commit("setpdflist",{url:"https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.pdf",mark:"https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.json"})
+			this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
+			/*axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: Math.floor(this.$store.state.index / 5) + 1, number: 5 }).then(res => {
 				console.log(res.data);
 				res.data.data.map(item => {
 					this.$store.commit("setpdflist", item)
 				})
 				console.log(this.$store.state.pdflist[this.$store.state.index].mark);
 				this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
-			})
+			}).catch(e => {
+				console.log(e);
+			})*/
 		} else {
 			this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
 		}
@@ -540,7 +543,7 @@ export default {
 				setTimeout(() => {
 					this.pageheight = parseFloat(this.doc.contentDocument.getElementsByClassName("page")[0].style.height.split("*")[1].split("px")[0])
 					this.pagewidth = parseFloat(this.doc.contentDocument.getElementsByClassName("page")[0].style.width.split("*")[1].split("px")[0])
-				}, 2000)
+				}, 5000)
 
 			})
 			//console.log(this.markpage);
@@ -689,7 +692,7 @@ export default {
 			this.smarttask = ""
 		},
 		smartmark(item) {
-			axios.post("http://home.itzyc.com:12349/predict/", { text: item }).then(res => {
+			axios.post("http://192.168.224.19:3000/predict/", { text: item },{timeout:5000000000000000}).then(res => {
 				console.log(res.data);
 				const regex = /【(.*?)】/g;
 				const matches = [];
@@ -720,6 +723,8 @@ export default {
 				this.etarget = ""
 				this.id = ""
 				this.mode4cancel()
+			}).catch(e => {
+				console.log(e);
 			})
 		},
 		goBack() {
@@ -728,7 +733,7 @@ export default {
 			const blob = new Blob([a]);
 			file.set("file", blob, "data.json")
 			file.set("id", this.$store.state.pdflist[this.$store.state.index].id)
-			axios.put("http://192.168.224.150:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+			axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
 				console.log(res.data);
 				this.$router.push("/MakeMark")
 			})

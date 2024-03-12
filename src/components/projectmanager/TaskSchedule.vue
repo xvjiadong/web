@@ -14,16 +14,16 @@
             </div>
             <el-form ref="form1" :model="task" :rules="taskrule" label-width="100px" class="form" label-position="left">
                 <el-form-item prop="taskName" label="任务名称:" class="formitem">
-                    <el-input style="width: 60%;" size="mini" v-model="task.taskName" placeholder="限制50个字符以内,支持汉字、大小写英文、数字"
-                        maxlength="50" show-word-limit></el-input>
+                    <el-input style="width: 60%;" size="mini" v-model="task.taskName"
+                        placeholder="限制50个字符以内,支持汉字、大小写英文、数字" maxlength="50" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item prop="id" label="选择数据集:" class="formitem">
                     <el-select filterable="" v-model="task.id" size="mini" style="width: 25%;">
                         <el-option v-for="item in projectlist" :key="item.id" :value="item.id" :label="item.name">
                         </el-option>
                     </el-select>
-                    <el-select filterable v-model="task.versionId" size="mini" :disabled="task.id === ''"
-                        style="width: 22%;margin-left: 8px;">
+                    <el-select @change="textlabel($event)" filterable v-model="task.versionId" size="mini"
+                        :disabled="task.id === ''" style="width: 22%;margin-left: 8px;">
                         <el-option v-for="item in versionlist" :key="item.versionId" :value="item.versionId"
                             :label="`${item.verName}-${item.callType}`">
                         </el-option>
@@ -77,7 +77,8 @@
                                 style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;">
                                 <div style="display: flex;justify-content: left;align-items: center;">
                                     <select v-model="selectlabelgroup" class="input">
-                                        <option v-for="item in labelgroup" :key="item.id" :value="item.id" :label="item.name">
+                                        <option v-for="item in labelgroup" :key="item.id" :value="item.id"
+                                            :label="item.name">
                                         </option>
                                     </select>
                                     <i class="el-icon-check labelicon" @click="surelabelgroupselect"></i>
@@ -138,7 +139,8 @@
                 <el-page-header @back="goBack" content="人员选择">
                 </el-page-header>
             </div>
-            <el-form ref="form2" :model="task" :rules="taskrule2" label-width="110px" class="form" label-position="left">
+            <el-form ref="form2" :model="task" :rules="taskrule2" label-width="110px" class="form"
+                label-position="left">
                 <el-form-item label="团队成员" prop="userId" class="formitem">
                     <el-select :disabled="true" filterable size="mini" multiple v-model="task.userId" style="width:60%"
                         placeholder="请选择团队成员">
@@ -153,8 +155,8 @@
                             </div>
                         </el-option>
                     </el-select>
-                    <el-input suffix-icon="el-icon-search" placeholder="请输入数据标注员id或用户名" size="mini" v-model="memberfilter"
-                        style="width:28%;margin-left:10px"></el-input>
+                    <el-input suffix-icon="el-icon-search" placeholder="请输入数据标注员id或用户名" size="mini"
+                        v-model="memberfilter" style="width:28%;margin-left:10px"></el-input>
                     <el-tooltip content="查看全部标注员，请将计数器调至-1" placement="top-start">
                         <el-input size="mini" style="width: 10%;" v-model="accpettasknumber" type="number"
                             :min="-1"></el-input>
@@ -187,6 +189,7 @@
         </el-card>
     </div>
 </template>
+
 <script>
 import axios from 'axios'
 export default {
@@ -299,7 +302,7 @@ export default {
                     return item.id == this.task.id
                 })
                 return a[0].versions.filter(item => {
-                    return item.userVOList.length ===0
+                    return item.userVOList.length === 0
                 })
             }
             return []
@@ -311,6 +314,27 @@ export default {
         }
     },
     methods: {
+        textlabel(version_id) {
+            this.task.selectlabel = []
+            let a = this.versionlist.filter(item => {
+                return version_id ==item.versionId
+            })
+            let type = a[0].callType
+            console.log(type);
+            if (type !== '情感分析' && type !== '新闻分类'&& type !== '文本分类'&& type !== '意图识别'&& type !== '实体识别' && type !== '自然语言推理') {
+                return
+            }
+            axios.get("http://120.26.142.114:10010/task/label/" + version_id)
+                .then(res => {
+                    res.data.data.forEach(item => {
+                        this.task.selectlabel.push(item.label)
+                    })
+                    
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+        },
         editlabel(id) {
             this.setlabel.push(id)
             this.$nextTick(() => {
@@ -364,11 +388,11 @@ export default {
                     a.userId = this.task.userId
                     a.endTime = this.task.endTime
                     a.taskName = this.task.taskName
-                    axios.post("http://192.168.224.150:10010/items/version", a).then(res => {
+                    axios.post("http://120.26.142.114:10010/items/version", a).then(res => {
                         console.log(res.data);
                         if (res.data.code === 200) {
                             let b = { labels: this.task.selectlabel, versionId: this.task.versionId }
-                            axios.post("http://192.168.224.150:10010/task/label", b).then(res => {
+                            axios.post("http://120.26.142.114:10010/task/label", b).then(res => {
                                 console.log(res.data);
                                 if (res.data.code === 200) {
                                     this.$message.success("分配成功")
@@ -425,9 +449,10 @@ export default {
                 this.labelerror = "请选择标签组"
                 this.emptylabel = true
             } else {
-                axios.get("http://192.168.224.150:10010/label/group/" + this.selectlabelgroup).then(res => {
+                axios.get("http://120.26.142.114:10010/label/group/" + this.selectlabelgroup).then(res => {
                     let data = res.data.data
                     let a = []
+                    console.log(data);
                     data.map(item => {
                         if (this.task.selectlabel.includes(item.labels)) {
                             a.push(item.labels)
@@ -468,20 +493,20 @@ export default {
             return formattedDateString
         },
         getproject() {
-            axios.get("http://192.168.224.150:10010/items").then((res) => {
+            axios.get("http://120.26.142.114:10010/items").then((res) => {
                 console.log(res.data.data);
                 this.projectlist = res.data.data
             })
         },
         getmember() {
-            axios.get("http://192.168.224.150:10010/users").then(res => {
-                //console.log(res.data);
+            axios.get("http://120.26.142.114:10010/users").then(res => {
+                console.log(res.data);
                 this.members = res.data.data;
             })
         },
         getlabelgroup() {
-            axios.get("http://192.168.224.150:10010/label").then(res => {
-                //console.log(res.data);
+            axios.get("http://120.26.142.114:10010/label").then(res => {
+                console.log(res.data);
                 this.labelgroup = res.data.data
             })
         }
@@ -494,10 +519,26 @@ export default {
         if (this.$route.query.id) {
             this.task.id = this.$route.query.id
             this.task.versionId = this.$route.query.version
+            let type=this.$route.query.callType
+            if (type !== '情感分析' && type !== '新闻分类'&& type !== '文本分类'&& type !== '意图识别'&& type !== '实体识别' && type !== '自然语言推理') {
+                return
+            }
+            axios.get("http://120.26.142.114:10010/task/label/" +this.task.versionId )
+                .then(res => {
+                    res.data.data.forEach(item => {
+                        this.task.selectlabel.push(item.label)
+                    })
+                    this.task.selectlabel
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         }
+
     },
 }
 </script>
+
 <style scoped>
 @import url('../../../node_modules/animate.css/animate.min.css');
 

@@ -24,7 +24,7 @@
             layout="sizes, prev, pager, next, jumper" :total="list.length" @current-change="handleCurrentChange"
             @size-change="handleSizeChange" />
         <el-dialog title="提示" :visible.sync="dialogVisible" width="40%" :before-close="handleClose">
-            <embed ref="a" :src="`http://120.55.63.197:3000/images/1.pdf`" height="430" width="100%">
+            <embed ref="a" :src="`http://120.26.142.114:3000/images/1.pdf`" height="430" width="100%">
         </el-dialog>
     </div>
 </template>

@@ -121,54 +121,54 @@ export default {
             labelvalue: "",
             imagelist: [
                 {
-                    url: "http://120.55.63.197:3000/images/1.pdf",
+                    url: "http://120.26.142.114:3000/images/1.pdf",
                     label: ["告示", "法规"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/2.pdf",
+                    url: "http://120.26.142.114:3000/images/2.pdf",
                     label: ["条款","合同"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
+                    url: "http://120.26.142.114:3000/images/2021计算机科学与技术.pdf",
                     label: ["条款","合同"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
+                    url: "http://120.26.142.114:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
                     label: ["解释"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
+                    url: "http://120.26.142.114:3000/images/徐家栋(2023-2024-1)课表.pdf",
                     label: ["原因","通知"],
                     access: false
                 },
             ],
             imagelist2: [
                 {
-                    url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
+                    url: "http://120.26.142.114:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
                     label: ["统计","汇总"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/1.pdf",
+                    url: "http://120.26.142.114:3000/images/1.pdf",
                     label: ["解释","条件"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
+                    url: "http://120.26.142.114:3000/images/2021计算机科学与技术.pdf",
                     label: ["财务"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/2.pdf",
+                    url: "http://120.26.142.114:3000/images/2.pdf",
                     label: ["报表"],
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
+                    url: "http://120.26.142.114:3000/images/徐家栋(2023-2024-1)课表.pdf",
                     label: ["汇总"],
                     access: false
                 },

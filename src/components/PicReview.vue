@@ -158,7 +158,7 @@ export default {
     data() {
         return {
             imglist: [],
-            imgUrl: "http://120.55.63.197:3000/images/test3.jpg",
+            imgUrl: "http://120.26.142.114:3000/images/test3.jpg",
             drawingStyle: {},
             mode: "",
             itemName: "",
@@ -217,7 +217,7 @@ export default {
             ],
             imagelist3: [
                 {
-                    url: "http://120.55.63.197:3000/images/中国节日.jpg", mark: [{
+                    url: "http://120.26.142.114:3000/images/中国节日.jpg", mark: [{
                         "id": "1699412607806",
                         "type": "RECT",
                         "shape": { "x": 53.75, "y": 190.125, "width": 35.625, "height": 27.5 },
@@ -226,7 +226,7 @@ export default {
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/中秋.jpg", mark: [{
+                    url: "http://120.26.142.114:3000/images/中秋.jpg", mark: [{
                         "id": "65756",
                         "type": "POINT",
                         "shape": { "x": 111.25, "y": 80.125, "r": 3 },
@@ -235,7 +235,7 @@ export default {
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/重阳节.jpg", mark: [{
+                    url: "http://120.26.142.114:3000/images/重阳节.jpg", mark: [{
                         "id": "1699375246644",
                         "type": "LINE",
                         "shape": {
@@ -248,7 +248,7 @@ export default {
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/总.jpg", mark: [{
+                    url: "http://120.26.142.114:3000/images/总.jpg", mark: [{
                         "id": "1699375117322",
                         "type": "POLYLINE",
                         "shape": [
@@ -262,7 +262,7 @@ export default {
                     access: false
                 },
                 {
-                    url: "http://120.55.63.197:3000/images/中国.webp.jpg", mark: [{
+                    url: "http://120.26.142.114:3000/images/中国.webp.jpg", mark: [{
                         "id": "1699374713865",
                         "type": "CIRCLE",
                         "shape": { "cx": 370.625, "cy": 63.25, "r": 45.573601185335356 },

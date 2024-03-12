@@ -89,8 +89,10 @@
                     <el-table-column width="150" prop="endTime" label="截止时间"></el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <span size="mini" class="tableplay" v-if="scope.row.taskprocess!=='100%'" @click="push(scope.row)">标注</span>
-                            <span size="mini" class="tableplay" v-if="scope.row.taskprocess ==='100%'" @click="review(scope.row)">提交审核</span>
+                            <span size="mini" class="tableplay" v-if="scope.row.taskprocess !== '100%'"
+                                @click="push(scope.row)">标注</span>
+                            <span size="mini" class="tableplay" v-if="scope.row.taskprocess === '100%'"
+                                @click="review(scope.row)">提交审核</span>
                             <span size="mini" class="tableplay" @click="turn(scope.row)">转让</span>
                         </template>
                     </el-table-column>
@@ -110,7 +112,7 @@ export default {
         return {
             hideintroduction: false,
             accepttask: [
-                
+
             ],
         }
     },
@@ -120,15 +122,31 @@ export default {
     methods: {
         push(row) {
             console.log(row);
+            if (row.pre === 'ing') {
+                this.$message.error("正在进行一键标注，请不要进入标注界面")
+                return
+            }
             let router
             if (row.callType === "图像文本标注") {
-                router="/"+"PicView"
+                router = "/PicView"
             } else if (row.callType === "信息抽取标注") {
-                router="/"+"PdfView"
-            } else if (row.callType === "图片分类标注") {
-                router="/"+"ImageClassification"
-            } else if (row.callType === "文本分类标注") {
-                router="/"+"TextClassification"
+                router = "/PdfView"
+            } else if (row.callType.includes("图片分类标注")) {
+                router = "/ImageClassification"
+            } else if (row.callType === "文本分类" || row.callType === "新闻分类" || row.callType === "情感分析" || row.callType === "意图识别") {
+                router = "/TextClassification"
+            } else if (row.callType === "分割标注") {
+                router = "/segment"
+            } else if (row.callType === "物体检测") {
+                router = "/detect"
+            } else if (row.callType === "实体识别") {
+                router = "/entity"
+            } else if (row.callType === "关键词抽取" || row.callType === "生成式摘要") {
+                router = "/keyandsummary"
+            } else if (row.callType === "自然语言推理") {
+                router = "/languageinference"
+            } else if (row.callType === "抽取式阅读理解") {
+                router = "/readview"
             }
             this.$router.push({
                 path: router,
@@ -145,9 +163,9 @@ export default {
             console.log(item);
         },
         gettask() {
-            axios.get("http://192.168.224.150:10010/task/user").then((res) => {
+            axios.get("http://120.26.142.114:10010/task/user").then((res) => {
                 console.log(res.data);
-                this.accepttask=res.data.data
+                this.accepttask = res.data.data
             })
         }
     },

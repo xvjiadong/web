@@ -1,7 +1,8 @@
 <template>
-    <el-header :class="{elHeader:$store.state.islight,elHeader2:!$store.state.islight}">
+    <el-header :class="{ elHeader: $store.state.islight, elHeader2: !$store.state.islight }">
         <div class="left">
-            <div :class='{menuiconnotcollapse:!$store.state.iscollapse,menuiconcollapse:$store.state.iscollapse}' @click="changemenu">
+            <div :class='{ menuiconnotcollapse: !$store.state.iscollapse, menuiconcollapse: $store.state.iscollapse }'
+                @click="changemenu">
                 <i class="el-icon-d-arrow-left" v-if="!$store.state.iscollapse" style="font-size: 3.5vh;"></i>
                 <i class="el-icon-category" v-if="$store.state.iscollapse" style="font-size: 3.5vh;"></i>
                 <span style="font-size: 100%;">{{ $store.state.iscollapse ? "" : "数据标注平台" }} </span>
@@ -24,7 +25,8 @@
                 </li>
                 <li>
                     <el-dropdown>
-                        <span class="el-dropdown-link" :class="{text1:$store.state.islight,text2:!$store.state.islight}">
+                        <span class="el-dropdown-link"
+                            :class="{ text1: $store.state.islight, text2: !$store.state.islight }">
                             文档<i class="el-icon-arrow-down el-icon--right"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
@@ -68,7 +70,7 @@ export default {
         },
         light(value) {
             console.log(value);
-            this.$store.commit("changeislight",value)
+            this.$store.commit("changeislight", value)
         }
     },
     mounted() {
@@ -88,8 +90,9 @@ export default {
     justify-content: space-between;
     align-items: center;
 }
+
 .elHeader2 {
-    background-color: rgb(39,46,62);
+    background-color: rgb(39, 46, 62);
     color: white;
     width: 100%;
     line-height: 60px;
@@ -99,6 +102,7 @@ export default {
     justify-content: space-between;
     align-items: center;
 }
+
 .menuiconnotcollapse {
     height: 100%;
     width: 20%;
@@ -108,6 +112,7 @@ export default {
     display: flex;
     align-items: center;
 }
+
 .menuiconcollapse {
     height: 100%;
     width: 8.4%;
@@ -118,6 +123,7 @@ export default {
     justify-content: center;
     align-items: center;
 }
+
 .menuicon:hover {
     background-color: rgb(3, 50, 143);
 }
@@ -145,7 +151,7 @@ export default {
 .rightmenu {
     list-style: none;
     display: flex;
-    justify-content: right;
+    justify-content: flex-end;
     height: 100%;
     margin: 0;
 }
@@ -164,10 +170,12 @@ export default {
     color: rgb(36, 104, 242);
     cursor: pointer;
 }
-.text1{
+
+.text1 {
     font-size: 12px;
 }
-.text2{
+
+.text2 {
     font-size: 12px;
     color: white;
 }

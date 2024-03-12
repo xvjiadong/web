@@ -10,40 +10,28 @@
                 <el-card class="teachcard" style="width: 1050px;">
                     <div slot="header" class="operation">
                         <div class="button-wrap">
+                            <i @click="save(nowselect - 1)" class="el-icon-back"
+                                style="cursor: pointer;font-size: 20px;"></i>
                             <el-tooltip content="保存" placement="top-end">
                                 <div class="toolblock">
-                                    <el-button @click="save((page - 1) * 5 + nowselect)" type="text"
+                                    <el-button @click="save(nowselect)" type="text"
                                         class="el-icon-suitcase button"></el-button>
                                 </div>
                             </el-tooltip>
                         </div>
-                        <div style="display: flex;align-items: center;margin-right: 8px;">
-                            <i @click="save(nowselect - 1)" style="cursor: pointer;font-size: 12px;"
-                                class="el-icon-arrow-left toparrow"></i>
-                            <span style="font-size: 12px;">第{{ nowselect + 1 }}张/一共30张</span>
-                            <i @click="save(nowselect + 1)" style="cursor: pointer;font-size: 12px;"
-                                class="el-icon-arrow-right toparrow"></i>
-                        </div>
+                        <i @click="save(nowselect + 1)" class="el-icon-right"
+                            style="cursor: pointer;font-size: 20px;"></i>
                     </div>
                     <div style="display: flex;justify-content: space-around;align-items: flex-start;">
                         <div
                             style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;">
-                            <div style="width: 830px;height: 480px;">{{ showtext }}</div>
-                            <div style="display: flex;justify-content: center;align-items: center;">
-                            </div>
+                            <div v-if="textdata.length > 0" style="width: 830px;height: 480px;">{{
+                    textdata[nowselect].text }}</div>
                         </div>
                         <div class="mapresult">
                             <div class="mapresultheader">标注结果</div>
-                            <div v-if="chooselabel.length > 0">
-                                <div v-for="(item, index) in chooselabel" :key="index"
-                                    style="display: flex;justify-content: left;align-items: center;margin-top: 8px;margin-left: 8px;">
-                                    <div style="margin-left: 15px;display: flex;justify-content: left;align-items: center;">
-                                        <div class="labelblock" :id="`labeldiv${index + 1}`">
-                                            <span>{{ item }}</span>
-                                            <i class="el-icon-error" style="margin-right: 5px;" @click="pop(index)"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div v-if="textdata.length > 0">
+                                <div>{{ textdata[nowselect].result }}</div>
                             </div>
                             <div v-else>
                                 <el-empty description="请在右侧选择标签"></el-empty>
@@ -53,53 +41,25 @@
                 </el-card>
                 <div class="mapresult2">
                     <div>
-                        <div v-if="!addlabelvisible" class="mapresultheader2">
-                            <span
-                                style="font-size: 16px;color: #000;letter-spacing: 0;text-align: left;line-height: 22px;flex: 1;">
-                                标签栏
-                            </span>
-                            <el-button style="background-color: rgb(36,104,242);font-size: 12px;color: white;" size="mini"
-                                @click="addlabelvisible = true">
-                                <i class="el-icon-price-tag"></i>
-                                添加标签
-                            </el-button>
-                        </div>
-                        <div v-else
-                            style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;padding: 10px 10px;border-bottom: 1px solid #eee;line-height: 32px;">
-                            <div style="display: flex;justify-content: left;align-items: center;">
-                                <input class="input" size="mini" v-model="labelvalue" placeholder="请输入标签名称，不支持重复标签">
-                                <el-tooltip content="确认添加标签" placement="top-start">
-                                    <i class="el-icon-check labelicon" @click="surelabelinput"></i>
-                                </el-tooltip>
-                                <el-tooltip content="取消添加" placement="top-start">
-                                    <i class="el-icon-close labelicon" @click="closelabelinput"></i>
-                                </el-tooltip>
-                            </div>
-                            <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
-                                {{ labelerror }}
-                            </span>
-                            <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
-                                {{ labelsure }}
-                            </span>
+                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
+                            <span>分类标签</span>
                         </div>
                     </div>
-                    <div style="padding: 15px;border-bottom: 1px solid #eee;text-align: center;">
-                        <el-input suffix-icon="el-icon-search" v-model="search" placeholder="请输入标签名称"
-                            size="medium"></el-input>
-                        <div class="tip">根据文本内容，选择标签<br>标注员临时定义的标签无法保存</div>
+                    <div
+                        style="height: 400px;overflow-x:auto;overflow-y: auto;margin-left: 15px;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
+                        <div @click="choose(item)" v-for="item in label" :key="item.label" class="labelblock">
+                            <div :style="'backgroundColor:' + item.color" style="width: 25px;height: 25px;"></div>
+                            <span style="margin-left: 15px;">{{ item.label }}</span>
+                        </div>
                     </div>
-                    <el-checkbox-group v-model="chooselabel" style="overflow-y: auto;height: 380px;">
-                        <el-checkbox v-for="(item, index) in showlabel" :key="index" class="label"
-                            :class="{ choose: chooselabel.includes(item) }" :label="item">
-                            {{ item }}
-                        </el-checkbox>
-                    </el-checkbox-group>
                 </div>
             </div>
         </el-card>
     </div>
 </template>
+
 <script>
+import axios from 'axios'
 export default {
     name: "TextClassification",
     components: {
@@ -107,139 +67,52 @@ export default {
     },
     data() {
         return {
-            project: { projectid: "fdsafd", projectname: "dsa", version: "v1", marktype: "文本分类标注" },
+            project: {},
             gMap: null,
             mode: "",
             chooselabel: [],
             search: "",
-            label: ["告示","法规","条款","合同","金额","解释","条件","原因","通知","财务","报表","统计","汇总"],
+            label: [],
             addlabelvisible: false,
             emptylabel: false,
             labelerror: "",
             labelsure: "待添加",
             labelvalue: "",
-            imagelist: [
-                {
-                    url: "http://120.55.63.197:3000/images/1.pdf",
-                    label: ["告示", "法规"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/2.pdf",
-                    label: ["条款","合同"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-                    label: ["条款","合同"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-                    label: ["解释"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-                    label: ["原因","通知"]
-                },
-            ],
-            imagelist2: [
-                {
-                    url: "http://120.55.63.197:3000/images/博时安盈债券型证券投资基金基金合同.pdf",
-                    label: ["统计","汇总"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/1.pdf",
-                    label: ["解释","条件"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/2021计算机科学与技术.pdf",
-                    label: ["财务"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/2.pdf",
-                    label: ["报表"]
-                },
-                {
-                    url: "http://120.55.63.197:3000/images/徐家栋(2023-2024-1)课表.pdf",
-                    label: ["汇总"]
-                },
-            ],
             nowselect: 0,
-            page: 1
+            page: 1,
+            textdata: []
         }
     },
     computed: {
-        showlabel() {
-            return this.label.filter(item => {
-                return item.includes(this.search) || this.search === ""
-            })
-        },
-        showtext() {
-            if (this.nowselect === 0) {
-                return "基金认购份额具体的计算方法在招募说明书中列示。"
-            } else if (this.nowselect === 1) {
-                return "认购份额的计算保留到小数点后两位，小数点两位以后的部分四舍五入，由此误差产生的收益或损失由基金财产承担。"
-            } else if (this.nowselect === 2) {
-                return "有效认购款项在募集期间产生的利息将折算为基金份额归基金份额持有人所有，其中利息转份额以登记机构的记录为准。"
-            } else if (this.nowselect === 3) {
-                return "基金认购份额具体的计算方法在招募说明书中列示。"
-            } else if (this.nowselect === 4) {
-                return "认购份额的计算保留到小数点后两位，小数点两位以后的部分四舍五入，由此误差产生的收益或损失由基金财产承担。"
-            } else if (this.nowselect === 5) {
-                return "基金销售机构对认购申请的受理并不代表该申请一定成功，而仅代表销售机构确实接收到认购申请。认购的确认以登记机构或基金管理人的确认结果为准。"
-            } else if (this.nowselect === 6) {
-                return "亲自出席会议者持有基金份额的凭证、受托出席会议者出具的委托人持有基金份额的凭证及委托人的代理投票授权委托证明符合法律法规、《基金合同》和会议通知的规定，并且持有基金份额的凭证与基金管理人持有的登记资料相符；"
-            } else if (this.nowselect === 7) {
-                return "经核对，汇总到会者出示的在权益登记日持有基金份额的凭证显示，有效的基金份额不少于本基金在权益登记日基金总份额的 50%（含 50%）。"
-            } else if (this.nowselect === 8) {
-                return "通讯开会。通讯开会系指基金份额持有人将其对表决事项的投票以书面形式在表决截至日以前送达至召集人指定的地址。通讯开会应以书面方式进行表决。"
-            } else if (this.nowselect === 9) {
-                return "会议召集人按《基金合同》约定公布会议通知后，在 2 个工作日内连续公布相关提示性公告；"
-            } else if (this.nowselect === 10) {
-                return "本人直接出具书面意见或授权他人代表出具书面意见的，基金份额持有人所持有的基金份额不小于在权益登记日基金总份额的 50%（含 50%）；"
-            }
-            return ""
-        }
+
     },
     methods: {
         save(index) {
-            this.imagelist[this.nowselect].label = this.chooselabel
-            if (index === -1) {
-                this.$message.warning("已经是第一张图片了")
-                return
-            } else if (index === this.imagelist.length) {
-                if (index === 10) {
-                    this.$message.warning("已经是最后一份文档了")
-                    return
+            let jsondata = JSON.stringify([this.textdata[this.nowselect]])
+            let file = new FormData()
+            const blob = new Blob([jsondata]);
+            file.set("file", blob, "data.json")
+            file.set("id", this.textdata[this.nowselect].id)
+            axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                console.log(res.data);
+                if (res.data.code == 200) {
+                    this.$message.success("保存成功")
                 } else {
-                    this.imagelist2.map(item => {
-                        this.imagelist.push(item)
-                    })
+                    this.$message.error("保存失败")
                 }
-            }
-            this.nowselect = index
-            this.chooselabel = this.imagelist[this.nowselect].label
-            this.page = Math.floor(this.nowselect / 5 + 1)
-            //console.log(Math.floor(this.nowselect / 5 + 1));
-        },
-        closelabelinput() {
-            this.labelvalue = ""
-            this.emptylabel = false
-            this.addlabelvisible = false
-            this.labelsure = "待添加"
-        },
-        surelabelinput() {
-            if (this.labelvalue && !this.label.includes(this.labelvalue)) {
-                this.label.push(this.labelvalue)
-                this.labelvalue = ""
-                this.labelsure = "添加成功"
-                this.emptylabel = false
+            })
+            if (this.page === 1 && index === -1) {
+                this.$message.warning("已经是第一张了")
                 return
-            } else if (this.labelvalue === "") {
-                this.labelerror = "标签名称不能为空"
-                this.emptylabel = true
+            } else if (index === this.textdata.length || index == -1) {
+                this.page = index == -1 ? this.page - 1 : this.page + 1
+                this.getdata(this.page, index == -1 ? 0 : 1)
             } else {
-                this.labelerror = "标签名称重复"
-                this.emptylabel = true
+                this.nowselect = index
             }
+        },
+        choose(item) {
+            this.textdata[this.nowselect].result = item.label
         },
         goBack() {
             this.$router.push("/MakeMark")
@@ -248,20 +121,55 @@ export default {
             console.log(index);
             this.chooselabel.splice(index, 1)
         },
-        zoomIn() {
-            this.gMap.zoomIn();
+        getdata(page, num) {
+            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+                .then(res => {
+                    console.log(res.data);
+                    this.textdata.splice(0)
+                    res.data.data.forEach(item => {
+                        if (item.mark) {
+                            axios.get(item.mark)
+                                .then(res2 => {
+                                    this.textdata = this.textdata.concat(res2.data)
+                                })
+                                .catch(e2 => {
+                                    console.log(e2);
+                                })
+                        } else {
+                            axios.get(item.url)
+                                .then(res2 => {
+                                    this.textdata = this.textdata.concat([{id:item.id,text:res2.data,result:""}])
+                                })
+                                .catch(e2 => {
+                                    console.log(e2);
+                                })
+                        }
+                    })
+                    this.nowselect = num == 1 ? 0 : 4
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         },
-        zoomOut() {
-            this.gMap.zoomOut();
-        },
+        getlabel() {
+            axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
+                .then(res => {
+                    this.label = res.data.data
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+        }
     },
     mounted() {
         console.log(this.$route.query);
-        this.project=this.$route.query
-        this.chooselabel = this.imagelist[0].label
+        this.project = this.$route.query
+        this.getdata(this.page, 1)
+        this.getlabel()
     },
 }
 </script>
+
 <style scoped>
 .operation {
     display: flex;
@@ -526,5 +434,39 @@ export default {
 
 .selected {
     border: 2px solid rgb(36, 104, 242);
+}
+
+.labelblock {
+    border: 1px solid rgb(221, 221, 221);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 65px;
+    width: 190px;
+    padding-left: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.labelblock:hover {
+    border: 1px solid rgb(36, 104, 242);
+}
+
+.button-wrap {
+    display: flex;
+    padding-bottom: 5px;
+    justify-content: left;
+    align-items: center;
+    position: relative;
+    z-index: 99;
+}
+
+.operation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.notify{
+    height: 10%;
 }
 </style>

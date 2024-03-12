@@ -314,7 +314,7 @@ export default {
     },
     methods: {
         getproject() {
-            axios.get("http://192.168.224.150:10010/items").then((res) => {
+            axios.get("http://120.26.142.114:10010/items").then((res) => {
                 this.project = res.data.data;
                 console.log(this.project);                
             })
@@ -339,7 +339,7 @@ export default {
                 a.markType = this.addnewversion.marktype
                 a.verAttributes = this.addnewversion.descript
                 a.version = this.addnewversion.versionname
-                axios.post("http://192.168.224.150:10010/items/version/add", a).then(res => {
+                axios.post("http://120.26.142.114:10010/items/version/add", a).then(res => {
                     console.log(res.data);
                 })
                 this.refresh()
@@ -386,7 +386,7 @@ export default {
                     form = { id: this.project.id, versionId: this.multipleSelection }
                 }
             }
-            axios.post('http://192.168.224.150:10010/items/delete', form).then((res) => {
+            axios.post('http://120.26.142.114:10010/items/delete', form).then((res) => {
                 if (res.data.code === 200) {
                     this.$message({ type: "success", message: "删除完毕" })
                     this.chooseitem=""

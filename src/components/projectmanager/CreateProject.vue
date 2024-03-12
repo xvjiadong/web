@@ -15,8 +15,8 @@
             <el-form ref="form1" :model="dataset" :rules="datasetrule" label-width="100px" class="form"
                 label-position="left">
                 <el-form-item prop="name" label="数据集名称:" class="formitem">
-                    <el-input style="width: 60%;" size="mini" v-model="dataset.name" placeholder="限制50个字符以内,支持汉字、大小写英文、数字"
-                        maxlength="50" show-word-limit></el-input>
+                    <el-input style="width: 60%;" size="mini" v-model="dataset.name"
+                        placeholder="限制50个字符以内,支持汉字、大小写英文、数字" maxlength="50" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item prop="datatype" label="数据类型:" class="formitem">
                     <el-radio-group v-model="dataset.datatype" size="small">
@@ -26,12 +26,14 @@
                 </el-form-item>
                 <el-form-item prop="version" label="数据集版本:" class="formitem version">
                     <span :style="$store.state.islight ? { color: 'black' } : { color: 'rgb(96,98,102)' }">{{
-                        dataset.version
-                    }}</span>
+                    dataset.version
+                }}</span>
                 </el-form-item>
                 <el-form-item prop="marktype" label="标注类型" class="formitem">
-                    <el-select filterable="" v-model="dataset.marktype" size="small" :disabled="dataset.datatype === ''">
-                        <el-option v-for="item in marktypelist" :key="item.value" :value="item.value" :label="item.label">
+                    <el-select filterable="" v-model="dataset.marktype" size="small"
+                        :disabled="dataset.datatype === ''">
+                        <el-option v-for="item in marktypelist" :key="item.value" :value="item.value"
+                            :label="item.label">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -58,7 +60,8 @@
                         <el-option v-for="item in input" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
-                    <el-select v-if="dataset.inputway === '本地导入'" filterable="" v-model="dataset.inputway2" size="small">
+                    <el-select v-if="dataset.inputway === '本地导入'" filterable="" v-model="dataset.inputway2"
+                        size="small">
                         <el-option v-for="item in uploadway" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
@@ -79,14 +82,26 @@
                     </el-upload>
                     <el-progress v-if="uploadProgress >= 0" :percentage="uploadProgress" :format="format"></el-progress>
                 </el-form-item>
-                <el-form-item v-if="dataset.inputway === '分享链接导入' || dataset.inputway === '平台已有数据集'" :label="uploadlabel"
-                    class="formitem" prop="link">
-                    <el-input style="width: 60%;" v-if="dataset.inputway === '分享链接导入'" size="small" v-model="dataset.link"
-                        placeholder="请输入分享链接"></el-input>
+                <el-form-item v-if="dataset.inputway === '分享链接导入' || dataset.inputway === '平台已有数据集'"
+                    :label="uploadlabel" class="formitem" prop="link">
+                    <el-input style="width: 60%;" v-if="dataset.inputway === '分享链接导入'" size="small"
+                        v-model="dataset.link" placeholder="请输入分享链接"></el-input>
                     <el-select v-if="dataset.inputway === '平台已有数据集'" size="small" v-model="dataset.link"
                         placeholder="请选择数据集">
                         <el-option v-for="item in addlink" :key="item.value" :value="item.value"></el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item
+                    v-if="(dataset.marktype === '文本分类' || dataset.marktype === '情感分析' || dataset.marktype === '新闻分类' || dataset.marktype === '意图识别' || dataset.marktype === '实体识别' || dataset.marktype === '关键词抽取' || dataset.marktype === '生成式摘要') && dataset.inputway"
+                    class="formitem">
+                    <el-radio-group v-model="splistchar">
+                        <el-radio :label="'\n'">换行符</el-radio>
+                        <el-radio :label="','">半角逗号</el-radio>
+                        <el-radio :label="'.'">点</el-radio>
+                        <el-radio :label="' '">空格</el-radio>
+                        <el-radio :label="''">自定义</el-radio>
+                    </el-radio-group>
+                    <el-input size="mini" v-if="!splistchar" v-model="splistchar2"></el-input>
                 </el-form-item>
                 <el-form-item class="formitem" :class="{ pic: listType === 'picture-card' }">
                     <el-button size="small" type="primary" @click="complete2">导入数据集</el-button>
@@ -96,6 +111,7 @@
         </el-card>
     </div>
 </template>
+
 <script>
 import axios from 'axios'
 export default {
@@ -213,13 +229,32 @@ export default {
                 ]
             },
             input: [{ value: "本地导入", label: "本地导入" }, { value: "平台已有数据集", label: "平台已有数据集" }, { value: "分享链接导入", label: "分享链接导入" }],
-            addlink: [{ value: "9878", }]
+            addlink: [{ value: "9878", }],
+            splistchar: "\n",
+            splistchar2: ""
         }
     },
     computed: {
         marktypelist() {
-            let a = [{ value: "图像文本标注", label: "图像文本标注" },{ value: "图片分类标注", label: "图片分类标注" }, { value: "多边形标注", label: "多边形标注" }, { value: "文本检测", label: "文本检测" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
-            let b = [{ value: "关系抽取", label: "关系抽取" }, { value: "证据划选", label: "证据划选" }, { value: "实体抽取", label: "实体抽取" }, { value: "混合标注", label: "混合标注" }, { value: "文本分类标注", label: "文本分类标注" }, { value: "信息抽取标注", label: "信息抽取标注" }]
+            let a = [{ value: "分割标注", label: "分割标注" }, { value: "物体检测", label: "物体检测" }, { value: "图像文本标注", label: "图像文本标注" }, { value: "图片分类标注/单标签", label: "图片分类标注/单标签" }, { value: "图片分类标注/多标签", label: "图片分类标注/多标签" }, { value: "多边形标注", label: "多边形标注" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
+            let b = [
+                { value: "情感分析", label: "情感分析" },
+                { value: "新闻分类", label: "新闻分类" },
+                { value: "文本分类", label: "文本分类" },
+                { value: "意图识别", label: "意图识别" },
+                { value: "自然语言推理", label: "自然语言推理" },
+                { value: "多项选择", label: "多项选择" },
+                { value: "指代消解", label: "指代消解" },
+                { value: "抽取式阅读理解", label: "抽取式阅读理解" },
+                { value: "实体识别", label: "实体识别" },
+                { value: "关键词抽取", label: "关键词抽取" },
+                { value: "生成式摘要", label: "生成式摘要" },
+                { value: "关系抽取", label: "关系抽取" },
+                { value: "证据划选", label: "证据划选" },
+                { value: "实体抽取", label: "实体抽取" },
+                { value: "混合标注", label: "混合标注" },
+                { value: "信息抽取标注", label: "信息抽取标注" }
+            ]
             if (this.dataset.datatype === "图像") {
                 return a
             } else if (this.dataset.datatype === "文本") {
@@ -228,7 +263,7 @@ export default {
             return []
         },
         uploadway() {
-            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }, { value: "上传txt", label: "上传txt" }]
+            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }, { value: "上传txt", label: "上传txt" },{ value: "上传Excel", label: "上传Excel" }]
             let b = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传图片", label: "上传图片" }]
             if (this.dataset.datatype === "文本") {
                 return a
@@ -255,6 +290,8 @@ export default {
                 return "上传图片:"
             } else if (this.dataset.inputway2 === "上传txt") {
                 return "上传txt:"
+            } else if (this.dataset.inputway2 === "上传Excel") {
+                return "上传Excel:"
             }
             return ""
         },
@@ -269,6 +306,8 @@ export default {
                 return ".bmp,.jpg,.jpeg,.png"
             } else if (this.uploadlabel === "上传txt:") {
                 return ".txt"
+            } else if (this.uploadlabel === "上传Excel:") {
+                return ".xlsx"
             }
             return ""
         },
@@ -340,8 +379,10 @@ export default {
             })
         },
         complete2() {
+           
             this.$refs.form2.validate((result) => {
                 console.log(result);
+                console.log(this.dataset)
                 let uploadform = {}
                 uploadform.name = this.dataset.name
                 uploadform.dataType = this.dataset.datatype
@@ -355,7 +396,7 @@ export default {
                 } else {
                     uploadform.set("file", this.dataset.link)
                 }*/
-                axios.post("http://192.168.224.150:10010/items", uploadform).then((res) => {
+                axios.post("http://120.26.142.114:10010/items", uploadform).then((res) => {
                     console.log(res.data);
                     if (res.data.code === 200) {
                         let file = new FormData()
@@ -368,8 +409,9 @@ export default {
                         }
                         file.append("version", this.dataset.version)
                         file.append("id", res.data.data)
+                        file.append("symbol", this.splistchar?this.splistchar:this.splistchar2)
                         if (this.dataset.inputway2 === "上传图片") {
-                            axios.post("http://192.168.224.150:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -384,7 +426,7 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传docx") {
-                            axios.post("http://192.168.224.150:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -399,7 +441,7 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传PDF") {
-                            axios.post("http://192.168.224.150:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            axios.post("http://120.26.142.114:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -414,7 +456,22 @@ export default {
                                 }, 1000);
                             })
                         } else if (this.dataset.inputway2 === "上传txt") {
-                            axios.post("http://192.168.224.150:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }, {
+                            if (this.splistchar || this.splitchar2) {
+                                axios.post("http://120.26.142.114:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } })
+                                    .then((res2) => {
+                                        console.log(res2.data);
+                                        this.$message({ type: 'success', message: "创建项目成功" })
+                                        setTimeout(() => {
+                                            this.active += 1
+                                            this.$router.push("/Projectlist")
+                                        }, 1000);
+                                    })
+                            } else {
+                                this.$message({ type: "error", message: "请选择分隔符" })
+                            }
+                        } else if (this.dataset.inputway2 === "上传Excel") {
+                            file.append("myType", this.dataset.marktype=="抽取式阅读理解"?1:2)
+                            axios.post("http://120.26.142.114:10010/items/excel", file, { headers: { "Content-Type": "multipart/form-data" } }, {
                                 onUploadProgress: progress => {
                                     this.uploadProgress = Number(
                                         ((progress.loaded / progress.total) * 100).toFixed(2)
@@ -428,7 +485,7 @@ export default {
                                     this.$router.push("/Projectlist")
                                 }, 1000);
                             })
-                        }
+                        } 
                     } else {
                         this.$message({ type: "error", message: "创建失败" })
                     }
@@ -447,7 +504,7 @@ export default {
             } else {
                 //console.log(file.raw);
                 this.dataset.file.push(file)
-                //console.log(this.dataset.file);
+                console.log(this.dataset.file);
             }
         },
         uploadsuccess() {
@@ -470,6 +527,7 @@ export default {
     },
 }
 </script>
+
 <style scoped>
 .step {
     width: 100%;
@@ -481,7 +539,7 @@ export default {
 .boxCard1 {
     width: 100%;
     margin-left: 1%;
-    height: 560px;
+    height: auto;
     background-color: #fff;
 }
 

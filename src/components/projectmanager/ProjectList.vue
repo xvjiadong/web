@@ -116,7 +116,7 @@
                                     <div style="text-align:center" v-if="scope.row.userVOList">
                                         <el-table :data="scope.row.userVOList">
                                             <el-table-column prop="dataNumber" label="任务数量"></el-table-column>
-                                            <el-table-column prop="userId" label="任务承办人"></el-table-column>
+                                            <el-table-column prop="username" label="任务承办人"></el-table-column>
                                             <el-table-column prop="startTime" label="创建时间"></el-table-column>
                                             <el-table-column prop="endTime" label="截止时间"></el-table-column>
                                             <el-table-column label="数据类型">
@@ -126,6 +126,7 @@
                                             </el-table-column>
                                             <el-table-column prop="personalProgress" label="任务进度"></el-table-column>
                                             <el-table-column label="操作">
+
                                                 <template slot-scope="scope">
                                                     <el-button size="mini"
                                                         @click="handleTaskLook(item, scope.row)">查看</el-button>
@@ -148,6 +149,7 @@
                             <el-table-column width="150" prop="verName" label="版本"></el-table-column>
                             <el-table-column width="150" prop="dataNumber" label="数据量"></el-table-column>
                             <el-table-column width="150" label="数据类型">
+
                                 <template slot-scope="scope">
                                     <span @click="a(scope)">{{ item.dataType }}</span>
                                 </template>
@@ -158,7 +160,15 @@
                                 <template slot-scope="scope">
                                     <span class="tableplay" @click="handleinput(item, scope.row)">导入</span>
                                     <span class="tableplay" @click="handlepredict(item, scope.row)"
-                                        v-if="item.dataType === '图像'">预标注</span>
+                                        v-if="scope.row.pre === 'false'">智能标注</span>
+                                    <el-tooltip content="至少标注20份，已使用的标签至少使用过10次才能启用" placement="top-start">
+                                        <span class="tableplay" @click="mid_predict(item, scope.row)">自动标注</span>
+                                    </el-tooltip>
+                                    <el-tooltip v-if="scope.row.pre === 'error'" content="产生错误，已停止自动标注，请重新设置自动标注任务"
+                                        placement="top-start">
+                                        <span class="tableplay" @click="handlepredict(item, scope.row)">智能标注</span>
+                                    </el-tooltip>
+                                    <span class="tableplay" v-if="scope.row.pre.includes('ing')">标注中</span>
                                     <span v-if="!scope.row.task" class="tableplay"
                                         @click="handleSchedule(item, scope.row)">调度</span>
                                     <span class="tableplay" @click="handleDelete(item, scope.row)">删除</span>
@@ -174,8 +184,8 @@
         <el-pagination v-if="projectlist.length !== 0" :current-page="currentPage" :page-sizes="[3, 4, 6, 8]"
             :page-size="pageSize" background layout="sizes, prev, pager, next, jumper" :total="showlist.length"
             @current-change="handleCurrentChange" @size-change="handleSizeChange" />
-        <el-dialog title="新增项目版本" :visible.sync="centerDialogVisible" width="40%" :center="false" :destroy-on-close="true"
-            :show-close="false" :close-on-click-modal="false">
+        <el-dialog title="新增项目版本" :visible.sync="centerDialogVisible" width="40%" :center="false"
+            :destroy-on-close="true" :show-close="false" :close-on-click-modal="false">
             <el-form ref="add" :model="addnewversion" label-width="110px" class="form" label-position="left">
                 <el-form-item label="数据集版本" v-model="addnewversion.versionname" class="formitem">
                     {{ addnewversion.versionname }}
@@ -218,23 +228,144 @@
         </el-dialog>
         <el-dialog width="24%" top="15%" title="预测标签添加" :visible.sync="predictvisible" :destroy-on-close="true"
             :show-close="false" :close-on-click-modal="false">
-            <div style="display: flex;flex-direction: column;align-items: flex-start;" v-if="chooseitem.callType==='图片分类'">
+            <div style="display: flex;flex-direction: column;align-items: flex-start;"
+                v-if="chooseitem.callType === '图片分类'">
                 <el-input v-model="predictvalue" size="mini" placeholder="请在版本标签基础上新增预定义标签"></el-input>
                 <span style="font-size: 12px;color: #84868c;">请以，分隔不同标签</span>
                 <span style="font-size: 12px;color: #84868c;">支持为标签添加注释，例如【基金】合同，【第一条】法案</span>
             </div>
             <div v-else>
-                 确定进行图像文本预标注吗
+                确定进行图像文本预标注吗
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button size="mini" type="primary" @click="predictok">确 定</el-button>
                 <el-button size="mini" @click="predictcancel">取 消</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="请选择处理对象" :visible.sync="segvis" width="24%" top="15%" :destroy-on-close="true"
+            :show-close="false" :close-on-click-modal="false">
+            <div v-if="chooseitem.callType == '分割标注' || chooseitem.callType == '物体检测'"
+                style="display: flex;justify-content: space-around;width: 100%;height: 100%;">
+                <el-checkbox-group v-model="segclass" style="width:40%;height:250px;overflow-y: scroll;">
+                    <el-checkbox v-for="(item, index) in labeldata" :label="index" :key="index" style="float: left;">
+                        <span style="font: 0.8em sans-serif;">{{ item.name }}</span>
+                    </el-checkbox>
+                </el-checkbox-group>
+                <div
+                    style="width: 40%;height: 250px;overflow-y: scroll;display: flex;flex-direction: column;align-items: flex-start;">
+                    <el-input v-model="predicttext" type='textarea'
+                        placeholder="如果没有希望分割的选项，请再此输入分割或检测对象，不同对象之间以空格隔开"></el-input>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-tooltip
+                    v-if="segclass.length == 0 && (chooseitem.callType == '分割标注' || chooseitem.callType == '物体检测')"
+                    content="未选择类别，将自动处理所有对象" placement="top-start"><el-button size="mini" type="primary"
+                        @click="predictok">确
+                        定</el-button></el-tooltip>
+                <el-button v-else size="mini" type="primary" @click="predictok">确 定</el-button>
+                <el-button size="mini" @click="predictcancel">取 消</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="确定要进行文本智能标注吗？" :visible.sync="textvis" width="24%" top="15%" :destroy-on-close="true"
+            :show-close="false" :close-on-click-modal="false">
+            <el-card
+                v-if="!(chooseitem.callType === '关键词抽取' || chooseitem.callType === '生成式摘要' || chooseitem.callType === '抽取式阅读理解')"
+                style="width: 100%;">
+                <div slot="header">
+                    <div v-if="!addlabelvisible && !addlabelgroupvisible"
+                        style="display: flex;justify-content: space-between;">
+                        <div>
+                            <el-button style="background-color: rgb(36,104,242);font-size: 12px;color: white;"
+                                size="mini" @click="addlabelvisible = true">
+                                <i class="el-icon-price-tag"></i>
+                                添加标签
+                            </el-button>
+                            <el-button style="background-color: rgb(36,104,242);font-size: 12px;color: white;"
+                                size="mini" @click="addlabelgroupvisible = true">
+                                <i class="el-icon-guide"></i>
+                                添加标签组
+                            </el-button>
+                        </div>
+                    </div>
+                    <div v-if="addlabelvisible"
+                        style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;">
+                        <div style="display: flex;justify-content: left;align-items: center;">
+                            <input class="input" size="mini" v-model="labelvalue" placeholder="请输入标签名称，不支持重复标签">
+                            <i class="el-icon-check labelicon" @click="surelabelinput"></i>
+                            <i class="el-icon-close labelicon" @click="closelabelinput"></i>
+                        </div>
+                        <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
+                            {{ labelerror }}
+                        </span>
+                        <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
+                            {{ labelsure }}
+                        </span>
+                    </div>
+                    <div v-if="addlabelgroupvisible"
+                        style="display: flex;flex-direction: column;align-items: left;justify-content:flex-start;">
+                        <div style="display: flex;justify-content: left;align-items: center;">
+                            <select v-model="selectlabelgroup" class="input">
+                                <option v-for="item in labelgroup" :key="item.id" :value="item.id" :label="item.name">
+                                </option>
+                            </select>
+                            <i class="el-icon-check labelicon" @click="surelabelgroupselect"></i>
+                            <i class="el-icon-close labelicon" @click="closelabelgroupselect"></i>
+                        </div>
+                        <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
+                            {{ labelerror }}
+                        </span>
+                        <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
+                            {{ labelsure }}
+                        </span>
+                    </div>
+                </div>
+                <div style="display: flex;justify-content: left;">
+                    <span>序号</span>
+                    <span style="margin-left: 15px;">标签名</span>
+                </div>
+                <div style="height: 160px;overflow-y: scroll;">
+                    <div v-for="(item, index) in chooselabel" :key="index" style="display: flex;justify-content: left;">
+                        <div>
+                            {{ index + 1 }}
+                        </div>
+                        <div v-if="!setlabel.includes(index + 1)"
+                            style="margin-left: 25px;display: flex;justify-content: left;align-items: center;">
+                            <div class="labelblock" :id="`labeldiv${index + 1}`">{{ item }}</div>
+                            <el-tooltip content="编辑标签" placement="top-start">
+                                <i class="el-icon-edit labelicon" @click="editlabel(index + 1)"></i>
+                            </el-tooltip>
+                            <el-tooltip content="删除标签" placement="top-end">
+                                <i class="el-icon-delete labelicon" @click="deletelabel(index + 1)"></i>
+                            </el-tooltip>
+
+                        </div>
+                        <div v-else style="margin-left: 25px;display: flex;justify-content: left;align-items: center;">
+                            <input :value="task.selectlabel[index]" class="inputlabel" :id="`labelinput${index + 1}`">
+                            <el-tooltip content="保存编辑" placement="top-start">
+                                <i class="el-icon-check labelicon" @click="editsure(index + 1)"></i>
+                            </el-tooltip>
+                            <el-tooltip content="取消编辑" placement="top-end">
+                                <i class="el-icon-close labelicon" @click="canceledit(index + 1)"></i>
+                            </el-tooltip>
+                        </div>
+                    </div>
+                </div>
+            </el-card>
+            <span slot="footer" class="dialog-footer">
+                <el-button
+                    :disabled="chooselabel.length == 0 && !(chooseitem.callType === '关键词抽取' || chooseitem.callType === '生成式摘要' || chooseitem.callType === '抽取式阅读理解')"
+                    size="mini" type="primary" @click="predictok">确
+                    定</el-button>
+                <el-button size="mini" @click="predictcancel">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
+
 <script>
 import axios from 'axios'
+import labeldata from '../../assets/final_label.json'
 //import Project from '../../../public/project.json'
 export default {
     name: "ProjectList",
@@ -251,21 +382,7 @@ export default {
             select: [{ label: "全部", value: "全部" }, { value: "图像", label: "图像" }, { value: "文本", label: "文本" }],
             showprojecttype: "全部",
             inputvalue: "",
-            projectlist: [{
-                "id": 25,
-                "name": "牛尾花",
-                "dataNumber": null,
-                "dataType": "图像",
-                "versions": [
-                    {
-                        "verName": "V1",
-                        "progress": null,
-                        "callType": "点标注",
-                        "dataNumber": null,
-                        "userVOList": []
-                    }
-                ]
-            },],
+            projectlist: [],
             multipleSelection: [],
             addnewversion: {
                 versionname: "",
@@ -277,7 +394,22 @@ export default {
             selectrow: "",
             fresh: false,
             predictvalue: "",
-            predictvisible: false
+            predictvisible: false,
+            segclass: [],
+            segvis: false,
+            labeldata: [],
+            predicttext: "",
+            textvis: false,
+            chooselabel: [],
+            addlabelvisible: false,
+            addlabelgroupvisible: false,
+            emptylabel: false,
+            labelerror: "",
+            labelsure: "待添加",
+            labelgroup: [],
+            selectlabelgroup: "",
+            inputvalue2: "",
+            setlabel: [],
         }
     },
     computed: {
@@ -287,7 +419,7 @@ export default {
             })
         },
         marktypelist() {
-            let a = [{ value: "图像分类", label: "图像分类" }, { value: "多边形标注", label: "多边形标注" }, { value: "文本检测", label: "文本检测" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
+            let a = [{ value: "分割标注", label: "分割标注" }, { value: "物体检测", label: "物体检测" }, { value: "图像文本标注", label: "图像文本标注" }, { value: "图片分类标注/单标签", label: "图片分类标注/单标签" }, { value: "图片分类标注/多标签", label: "图片分类标注/多标签" }, { value: "多边形标注", label: "多边形标注" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
             let b = [{ value: "关系抽取", label: "关系抽取" }, { value: "证据划选", label: "证据划选" }, { value: "实体抽取", label: "实体抽取" }, { value: "混合标注", label: "混合标注" }]
             if (this.chooseitem.dataType === "图像") {
                 return a
@@ -310,29 +442,239 @@ export default {
         }
     },
     methods: {
+        editlabel(id) {
+            this.setlabel.push(id)
+            this.$nextTick(() => {
+                document.getElementById("labelinput" + id).focus()
+            })
+        },
+        editsure(id) {
+            if (document.getElementById("labelinput" + id).value === "") {
+                document.getElementById("labelinput" + id).value = "标签名称不能为空"
+                document.getElementById("labelinput" + id).classList.add("repeatlabel")
+                setTimeout(() => {
+                    document.getElementById("labelinput" + id).classList.remove("repeatlabel")
+                    document.getElementById("labelinput" + id).value = this.chooselabel[id - 1]
+                }, 800);
+            } else if (!this.chooselabel.includes(document.getElementById("labelinput" + id).value) || this.chooselabel[id - 1] === document.getElementById("labelinput" + id).value) {
+                this.chooselabel[id - 1] = document.getElementById("labelinput" + id).value
+                this.setlabel = this.setlabel.filter((item) => {
+                    return item !== id
+                })
+            } else {
+                document.getElementById("labelinput" + id).value = "标签名称重复"
+                document.getElementById("labelinput" + id).classList.add("repeatlabel")
+                setTimeout(() => {
+                    document.getElementById("labelinput" + id).classList.remove("repeatlabel")
+                    document.getElementById("labelinput" + id).value = this.chooselabel[id - 1]
+                }, 800);
+            }
+        },
+        deletelabel(id) {
+            this.chooselabel.splice(id - 1, 1)
+        },
+        canceledit(id) {
+            this.setlabel = this.setlabel.filter((item) => {
+                return item !== id
+            })
+        },
+        surelabelinput() {
+            if (this.labelvalue && !this.chooselabel.includes(this.labelvalue)) {
+                this.chooselabel.push(this.labelvalue)
+                this.labelvalue = ""
+                this.labelsure = "添加成功"
+                this.emptylabel = false
+                return
+            } else if (this.labelvalue === "") {
+                this.labelerror = "标签名称不能为空"
+                this.emptylabel = true
+            } else {
+                this.labelerror = "标签名称重复"
+                this.emptylabel = true
+            }
+        },
+        closelabelinput() {
+            this.labelvalue = ""
+            this.emptylabel = false
+            this.addlabelvisible = false
+        },
+        surelabelgroupselect() {
+            if (this.selectlabelgroup === "") {
+                this.labelerror = "请选择标签组"
+                this.emptylabel = true
+            } else {
+                axios.get("http://120.26.142.114:10010/label/group/" + this.selectlabelgroup).then(res => {
+                    let data = res.data.data
+                    let a = []
+                    data.map(item => {
+                        if (this.chooselabel.includes(item.labels)) {
+                            a.push(item.labels)
+                        } else {
+                            this.chooselabel.push(item.labels)
+                        }
+                    })
+                    if (a.length > 0) {
+                        this.labelerror = "以下标签名称重复："
+                        a.forEach(item => {
+                            this.labelerror += item + "  "
+                        })
+                        this.emptylabel = true
+                    } else {
+                        this.labelsure = "添加成功"
+                        this.emptylabel = false
+                    }
+                })
+            }
+        },
+        closelabelgroupselect() {
+            this.selectlabelgroup = ""
+            this.addlabelgroupvisible = false
+            this.emptylabel = false
+        },
+        mid_predict(item, row) {
+            if (row.callType === '物体检测') {
+                axios.post("http://localhost:5000/api/train_detect", { id: row.versionId })
+                    .then(res => {
+                        console.log(res.data);
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                        this.$message.error("标注失败")
+                    })
+            } else if (item.callType === '分割标注') {
+                axios.post("http://localhost:5000/api/segment_predict", { id: item.id, class: this.segclass, text: this.predicttext })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === '图片分类标注/单标签' || item.callType === '图片分类标注/多标签') {
+                axios.post("http://localhost:5000/api/image_classification", { id: item.id, class: this.segclass })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === '图像文本标注') {
+                axios.post("http://localhost:5000/api/image_ocr", { id: item.id })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        } else {
+                            this.$message.error("标注出现问题，请重新开始智能标注")
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            }
+            this.predictcancel()
+        },
+        handlepredict(item, row) {
+            console.log(item);
+            console.log(row);
+            this.chooseitem = { id: row.versionId, verName: row.verName, callType: row.callType }
+            if (row.callType === '分割标注' || row.callType === '物体检测' || row.callType.includes('图片分类标注') || row.callType === '图像文本标注') {
+                this.segvis = true
+            } else {
+                this.textvis = true
+            }
+        },
         predictok() {
-            /*axios.get("http://192.168.224.150:10010/xxx/" + {id:this.chooseitem.id,verName:this.chooseitem.verName}).then(res => {
-                内含版本标签组和标注数据url
-                let data = res.data.data.ossPath
-                data.label = res.data.data.labels.join(",") + this.predictvalue
-                向python后台发送请求标注
-                if(this.chooseitem.callType ===图片分类){
-
-                }else{
-                    
-                }
-                获取数据后保存文件发到后台 
-            })*/
-
-            setTimeout(() => {
-                this.$message.success("预标注完成")
-            },2000)
+            let item = this.chooseitem
+            console.log(item);
+            if (item.callType === '物体检测') {
+                axios.post("http://localhost:5000/api/detect_predict", { id: item.id, class: this.segclass, text: this.predicttext })
+                    .then(res => {
+                        console.log(res.data);
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === '分割标注') {
+                axios.post("http://localhost:5000/api/segment_predict", { id: item.id, class: this.segclass, text: this.predicttext })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType.includes('图片分类标注')) {
+                axios.post("http://localhost:5000/api/image_classification", { id: item.id, class: this.segclass })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === '图像文本标注') {
+                axios.post("http://localhost:5000/api/image_ocr", { id: item.id })
+                    .then(res => {
+                        if (res.data === 'ok') {
+                            this.getproject()
+                        } else {
+                            this.$message.error("标注出现问题，请重新开始智能标注")
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === "文本分类" || item.callType === "新闻分类" || item.callType === "情感分析" || item.callType === "意图识别" || item.callType === "自然语言推理") {
+                axios.post("http://120.26.142.114:10010/task/label", { labels: this.chooselabel, versionId: item.id })
+                    .then(res => {
+                        console.log(res.data);
+                        if (res.data.code === 200) {
+                            axios.post('http://localhost:5000/api/text_process', { id: item.id, task: item.callType })
+                                .then(res => {
+                                    if (res.data == 'ok') {
+                                        this.getproject()
+                                    }
+                                }).catch(e => {
+                                    console.log(e);
+                                })
+                        }
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+            } else if (item.callType === '生成式摘要' || item.callType === '关键词抽取'|| item.callType === '抽取式阅读理解') {
+                axios.post('http://localhost:5000/api/text_process', { id: item.id, task: item.callType })
+                    .then(res => {
+                        if (res.data == 'ok') {
+                            this.getproject()
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    })
+            }
             this.predictcancel()
         },
         predictcancel() {
             this.chooseitem = ""
             this.predictvalue = ""
             this.predictvisible = false
+            this.segvis = false
+            this.segclass = []
+            this.predicttext = ""
+            this.textvis = false
+            this.chooselabel = []
+            this.addlabelvisible = false
+            this.addlabelgroupvisible = false
+            this.emptylabel = false
+            this.labelerror = ""
+            this.labelsure = "待添加"
+            this.labelgroup = []
+            this.selectlabelgroup = ""
+            this.inputvalue2 = ""
+            this.setlabel = []
         },
         addcancel() {
             this.centerDialogVisible = false
@@ -354,7 +696,7 @@ export default {
                 a.markType = this.addnewversion.marktype
                 a.verAttributes = this.addnewversion.descript
                 a.version = this.addnewversion.versionname
-                axios.post("http://192.168.224.150:10010/items/version/add", a).then(res => {
+                axios.post("http://120.26.142.114:10010/items/version/add", a).then(res => {
                     console.log(res.data);
                 })
                 this.fresh = !this.fresh
@@ -423,8 +765,8 @@ export default {
                     this[`multipleSelection${item.id}`] = []
                 })
             })
-            
-            axios.post('http://192.168.224.150:10010/items/delete', form).then((res) => {
+
+            axios.post('http://120.26.142.114:10010/items/delete', form).then((res) => {
                 console.log(res.data);
                 if (res.data.code === 200) {
                     this.$message({ type: "success", message: "删除完毕" })
@@ -458,7 +800,7 @@ export default {
             })
         },
         getproject() {
-            axios.get("http://192.168.224.150:10010/items").then((res) => {
+            axios.get("http://120.26.142.114:10010/items").then((res) => {
                 this.projectlist = res.data.data;
                 console.log(this.projectlist);
                 this.projectlist.forEach(item => {
@@ -481,12 +823,6 @@ export default {
         create() {
             this.$router.push("/CreateProject")
         },
-        handlepredict(item, row) {
-            console.log(item, row);
-            this.chooseitem = { id: item.id, verName: row.verName,callType:row.callType }
-            this.predictvisible = true
-
-        },
         handleSelectionChange(val, item) {
             let a = []
             val.map(item => {
@@ -505,7 +841,7 @@ export default {
             this.del(item)
         },
         handleSchedule(item, row) {
-            this.$router.push({ path: "/TaskSchedule/", query: { id: item.id, version: row.versionId } })
+            this.$router.push({ path: "/TaskSchedule/", query: { id: item.id, version: row.versionId,callType:row.callType } })
         },
         a(item) {
             console.log(item);
@@ -530,16 +866,25 @@ export default {
         },
         getrowkey(row) {
             return row.verName || row.userId
+        },
+        getlabelgroup() {
+            axios.get("http://120.26.142.114:10010/label").then(res => {
+                //console.log(res.data);
+                this.labelgroup = res.data.data
+            })
         }
     },
     mounted() {
         this.getproject()
-
-        console.log(axios);
+        this.getlabelgroup()
+        this.labeldata = labeldata;
     },
 }
 </script>
+
 <style scoped>
+@import url('../../../node_modules/animate.css/animate.min.css');
+
 .container {
     width: 100%;
     height: 643px;

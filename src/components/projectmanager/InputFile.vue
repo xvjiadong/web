@@ -412,7 +412,7 @@ export default {
             file.append("version", this.dataset.verName)
             console.log(file.getAll("file"), file.get("id"));
             if (this.dataset.inputway2 === "上传图片") {
-                axios.post("http://192.168.224.150:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                axios.post("http://120.26.142.114:10010/items/image", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
                     console.log(res2.data);
                     setTimeout(() => {
                         this.active += 1
@@ -420,7 +420,7 @@ export default {
                     }, 1000);
                 })
             } else if (this.dataset.inputway2 === "上传docx") {
-                axios.post("http://192.168.224.150:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                axios.post("http://120.26.142.114:10010/items/docx", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
                     console.log(res2.data);
                     setTimeout(() => {
                         this.active += 1
@@ -428,7 +428,7 @@ export default {
                     }, 1000);
                 })
             } else if (this.dataset.inputway2 === "上传PDF") {
-                axios.post("http://192.168.224.150:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                axios.post("http://120.26.142.114:10010/items/pdf", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
                     console.log(res2.data);
                     setTimeout(() => {
                         this.active += 1
@@ -436,7 +436,7 @@ export default {
                     }, 1000);
                 })
             } else if (this.dataset.inputway2 === "上传txt") {
-                axios.post("http://192.168.224.150:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
+                axios.post("http://120.26.142.114:10010/items/txt", file, { headers: { "Content-Type": "multipart/form-data" } }).then((res2) => {
                     console.log(res2.data);
                     this.$message({ type: 'success', message: "创建项目成功" })
                     setTimeout(() => {
@@ -480,7 +480,7 @@ export default {
         console.log(this.$route.query);
         let a = this.$route.query
 
-        axios.get("http://192.168.224.150:10010/items").then((res) => {
+        axios.get("http://120.26.142.114:10010/items").then((res) => {
             this.projectlist = res.data.data;
             console.log(this.projectlist);
             this.dataset.dataType = a.dataType

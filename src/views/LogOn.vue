@@ -11,7 +11,8 @@
             style="width: 30%;height: 100%;display: flex;justify-content: center;align-items: center;flex-direction: column;">
             <span style="color: rgb(39,46,62);font-weight: 600;font-size: 24px;">欢迎注册平台账号</span>
             <div style="width: 65%;"><el-divider></el-divider></div>
-            <div style="color: rgb(36,104,242);cursor: pointer;margin-bottom: 15px;font-size: 12px;" @click="$router.push('/')">立即登录</div>
+            <div style="color: rgb(36,104,242);cursor: pointer;margin-bottom: 15px;font-size: 12px;"
+                @click="$router.push('/')">立即登录</div>
             <div class="block">
                 <el-form :model="user" :rules="userrules" status-icon ref="userform" class="userform">
                     <el-form-item prop="name">
@@ -49,7 +50,7 @@
                         style="height: 80%;width: 90%;font-size: 20px;display: flex;justify-content: center;align-items: center;"
                         type="primary" @click="logon">注册</el-button></div>
             </div>
-            <el-dialog  top="15%" title="注册协议" :visible.sync="noticevisible">
+            <el-dialog top="15%" title="注册协议" :visible.sync="noticevisible">
                 <div style="height: 200px;overflow-y: auto;word-break: keep-all;text-align: left;">
                     数据标注平台的数据协议
 
@@ -67,7 +68,7 @@
 
                     数据备份：数据标注平台应定期对数据进行备份，以防止数据丢失或损坏。
 
-                    合作终止：当双方合作结束时，数据标注平台应将所有数据和相关信息交还给数据提供方，并删除或销毁与数据提供方相关的数据副本。
+                    合作终止：当双 方合作结束时，数据标注平台应将所有数据和相关信息交还给数据提供方，并删除或销毁与数据提供方相关的数据副本。
 
                     违约责任：如果数据标注平台违反协议约定，导致数据提供方遭受损失，数据标注平台应承担相应的法律责任。
 
@@ -164,7 +165,7 @@ export default {
                 console.log(result);
                 if (result) {
                     /*注册请求发送*/
-                    axios.post("http://192.168.224.150:10010/users/logon", this.user).then((res) => {
+                    axios.post("http://120.26.142.114:10010/users/logon", this.user).then((res) => {
                         if (res.data.code === 200) {
                             this.$message({ message: "注册成功", type: "success" })
                             setTimeout(() => {
