@@ -37,11 +37,14 @@
 
                         <div class="mapresult">
                             <div class="mapresultheader">标注结果</div>
+                            <div>
+                                {{ textdata[0].result[nowselect].question }}
+                            </div>
                             <div v-if="textdata.length > 0">
-                                <div @dblclick="inputshow" v-if="!inputvis">{{ textdata[0].result[nowselect].answer }}</div>
+                                <div @dblclick="inputshow" v-if="!inputvis">{{ textdata[0].result[nowselect].answer }}
+                                </div>
                                 <div v-else>
-                                    <el-input size="mini" :placeholder="project.callType === '关键词抽取' ? '关键词' : '摘要'"
-                                        v-model="inputstr"></el-input>
+                                    <el-input size="mini" :placeholder="'请输入问题解答'" v-model="inputstr"></el-input>
                                     <i @click="inputok" style="font-size: 20px;cursor: pointer;"
                                         class="el-icon-check"></i>
                                     <i @click="inputcancel" style="font-size: 20px;cursor: pointer;"
@@ -49,26 +52,11 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <el-empty
-                                    :description="'请在文章中选择答案或者双击当前标注结果以修改'"></el-empty>
+                                <el-empty :description="'请在文章中选择答案或者双击当前标注结果以修改'"></el-empty>
                             </div>
                         </div>
                     </div>
                 </el-card>
-                <div class="mapresult2">
-                    <div>
-                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
-                            <span>逻辑标签</span>
-                        </div>
-                    </div>
-                    <div
-                        style="height: 400px;overflow-x:auto;overflow-y: auto;margin-left: 15px;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
-                        <div @click="choose(item)" v-for="item in label" :key="item.label" class="labelblock">
-                            <div :style="'backgroundColor:' + item.color" style="width: 25px;height: 25px;"></div>
-                            <span style="margin-left: 15px;">{{ item.label }}</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </el-card>
     </div>

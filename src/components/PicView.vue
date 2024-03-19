@@ -57,11 +57,6 @@
                                 <el-button type="text" class="el-icon-orange button" @click="setMode('CIRCLE')"></el-button>
                             </div>
                         </el-tooltip>
-                        <el-tooltip content="多边形标注" placement="top-end">
-                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
-                                <el-button type="text" class="el-icon-house button" @click="setMode('POLYGON')"></el-button>
-                            </div>
-                        </el-tooltip>
                         <el-tooltip content="撤销" placement="top-end">
                             <div class="toolblock">
                                 <el-button type="text" class="el-icon-refresh-left button" @click="Revoke()"></el-button>
@@ -74,10 +69,28 @@
                                     @click="setMode('RECT')"></el-button>
                             </div>
                         </el-tooltip>
+                        <el-tooltip content="多边形标注" placement="top-end">
+                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
+                                <el-button type="text" class="el-icon-house button"
+                                    @click="setMode('POLYGON')"></el-button>
+                            </div>
+                        </el-tooltip>
                         <el-tooltip content="保存" placement="top-end">
                             <div class="toolblock">
                                 <el-button type="text" class="el-icon-suitcase button"
                                     @click="together(nowselect)"></el-button>
+                            </div>
+                        </el-tooltip>
+                    </div>
+                    <div class="button-wrap">
+                        <el-tooltip content="辅助模式,选中后自动识别文字，人工判断" placement="top-start">
+                            <div class="toolblock" :class="{ ocrtype: ocrtype === 0 }">
+                                <el-button type="text" class="el-icon-coordinate" @click="ocrtype = 0"></el-button>
+                            </div>
+                        </el-tooltip>
+                        <el-tooltip content="多选模式，自动为选区添加标注" placement="top-start">
+                            <div class="toolblock" :class="{ ocrtype: ocrtype === 1 }">
+                                <el-button type="text" class="el-icon-receiving" @click="ocrtype = 1"></el-button>
                             </div>
                         </el-tooltip>
                     </div>
@@ -116,7 +129,7 @@
             <el-collapse v-model="colitem">
                 <el-collapse-item name="results">
                     <template slot="title">
-                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
+                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 380px;">
                             <span>标注结果</span>
                         </div>
                     </template>
@@ -144,7 +157,9 @@
                                         <i @click="delmask(item)" style="cursor: pointer;font-size: 20px;"
                                             class="el-icon-close"></i>
                                     </div>
-                                    <div :style="'width:150px;height:150px;backgroundImage:url(data:image/jpg;base64,'+item.base64str+');backgroundSize:100% 100%;backgroundRepeat:no-repeat'"></div>
+                                    <div
+                                        :style="'width:280px;height:150px;backgroundImage:url(data:image/gif;base64,' + item.base64str + ');backgroundSize:100% 100%;backgroundRepeat:no-repeat'">
+                                    </div>
                                 </el-card>
                             </div>
                         </div>
@@ -158,6 +173,8 @@
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
+import { v4 } from 'uuid'
+import time from '../util/time'
 //import FileSaver from "file-saver";
 //import PicDoc from '../../public/PicDoc.json'
 //import data from '../../public/data (1).json'
@@ -202,7 +219,10 @@ export default {
             newlabel: "",
             segpop: [],
             storage: {},
-            nowpicdata: []
+            nowpicdata: [],
+            ocrtype: 1,
+            now: new Date(),
+            history: []
         };
     },
     watch: {
@@ -261,47 +281,56 @@ export default {
         //汇总框选向后台提交//
         together(num) {
             let jsondata = JSON.stringify(this.nowpicdata)
+            let historyindex = this.history.findIndex(item => item.pageid === this.nowselect)
+            if (historyindex == -1) {
+                this.history.push({ data: this.nowpicdata, id: this.nowselect })
+            } else {
+                this.history[historyindex].data = this.nowpicdata
+            }
             let file = new FormData()
             const blob = new Blob([jsondata]);
             file.set("file", blob, "data.json")
             file.set("id", this.showlist[this.nowselect].id)
             axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
                 console.log(res.data);
+                if (res.data.code === 200) {
+                    this.showlist[this.nowselect].mark = res.data.data
+                }
+                let a = (this.colitem.findIndex(item => item === 'results'))
+                this.colitem.splice(a, 1)
+                if (this.page === 1 && num === -1) {
+                    this.$message.warning("已经是第一张了")
+                    return
+                } else if (num === this.showlist.length || num == -1) {
+                    this.gMap.destroy()
+                    this.page = num == -1 ? this.page - 1 : this.page + 1
+                    this.getdata(this.page, num == -1 ? 0 : 1)
+                } else {
+                    this.gMap.destroy()
+                    this.changepic(this.showlist[num], num)
+                    this.nowselect = num
+                }
             })
-            let a = (this.colitem.findIndex(item => item === 'results'))
-            this.colitem.splice(a, 1)
-            if (this.page === 1 && num === -1) {
-                this.$message.warning("已经是第一张了")
-                return
-            } else if (num === this.showlist.length || num == -1) {
-                this.gMap.destroy()
-                this.page = num == -1 ? this.page - 1 : this.page + 1
-                this.getdata(this.page, num == -1 ? 0 : 1)
-            } else {
-                this.gMap.destroy()
-                this.changepic(this.showlist[num])
-                this.nowselect = num
-            }
         },
         ok() {
             this.power = false
             if (this.Recognizetextcontent === "") {
                 return
             }
-            if (this.type === "RECT") {
+            if (this.type === "RECT" || this.type == 'POLYGON') {
                 this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-                this.addFeature(this.storage.data, "RECT", this.storage.id)
-                axios.post("http://localhost:5000/api/image_indices", { shape: this.storage.data, url: this.showlist[this.nowselect].url })
+                this.addFeature(this.storage.data, this.type, this.storage.id)
+                axios.post("http://localhost:5000/api/image_indices", { type: this.type, shape: this.storage.data, url: this.showlist[this.nowselect].url })
                     .then(res => {
                         this.nowpicdata.push({
                             id: this.storage.id,
-                            type: "RECT",
+                            type: this.type,
                             vis: true,
                             shape: this.storage.data,
                             textid: this.storage.id + "-0",
                             edit: false,
-                            textInfo: { text: this.Recognizetextcontent, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 1 } },
-                            base64str:res.data
+                            textInfo: { text: this.Recognizetextcontent, position: { x: this.type == "RECT" ? this.storage.data.x : this.storage.data[0].x, y: this.type == "RECT" ? this.storage.data.y : this.storage.data[0].y }, offset: { x: 0, y: 1 } },
+                            base64str: res.data
                         })
                     })
                     .catch(e => {
@@ -346,7 +375,7 @@ export default {
                     clearTimeout(a)
                 }, 200)
             } else {
-                if (this.selected || !this.power) {
+                if (this.selected || !this.power || this.ocrtype) {
                     return
                 }
                 if (this.type === "POINT" || this.type === "RECT" || this.type === "CIRCLE" || (this.type === "LINE")) {
@@ -506,10 +535,8 @@ export default {
                     break;
             }
         },
-
         // 添加图形
-        addFeature(data, type, id, color = null, textInfo = null, isappear = false) {
-            console.log(isappear);
+        addFeature(data, type, id, color = null, textInfo = null) {
             let that = this;
             let drawingStyle = this.drawingStyle;
             //线
@@ -558,10 +585,11 @@ export default {
                 const polygonFeature = new AILabel.Feature.Polygon(
                     id, // id
                     { points: data }, // shape
+                    { name: "name" },
                     {
-                        strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
-                        fill: true, //是否填充
-                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
+                        strokeStyle: "rgb(36,104,242)", //边框颜色
+                        //fill: true, //是否填充
+                        //fillStyle: "#2468f2", //填充色
                         globalAlpha: 0.5,
                         lineWidth: 3,
                         stroke: true,
@@ -711,11 +739,41 @@ export default {
                     that.addFeature(data, type);
                 } else {
                     if (type === "RECT" && data.width > 10 && data.height > 10 && 500 - data.x - data.width > 0 && data.y + data.height < 375 && data.x > 0 && data.y > 0) {
+                        console.log(time.getNowTime());
                         this.power = true
-                        let id = Date.now() + ""
+                        let id = v4()
                         that.addFeature(data, type, id);
                         this.storage.data = data
                         this.storage.id = id
+                        axios.post("http://localhost:10010//api/auxiliary_ocr", { url: this.showlist[this.nowselect].url, shape: data, type: this.ocrtype })
+                            .then(res => {
+                                if (this.ocrtype === 0) {
+                                    this.Recognizetextcontent = res.data
+                                } else {
+                                    this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                                    res.data.forEach(item => {
+                                        let id = v4()
+                                        this.addFeature(item.shape, 'POLYGON', id)
+                                        let textid = id + "-0"
+                                        const recttext = new AILabel.Text(textid, { text: item.text, position: { x: item.shape[0].x, y: item.shape[0].y }, offset: { x: 0, y: 1 } })
+                                        this.tagtextLayer.addText(recttext)
+                                        this.nowpicdata.push({
+                                            base64str: item.base64str,
+                                            id: id,
+                                            type: "POLYGON",
+                                            vis: true,
+                                            shape: item.shape,
+                                            textid: id + "-0",
+                                            edit: false,
+                                            textInfo: { text: item.text, position: { x: item.shape[0].x, y: item.shape[0].y }, offset: { x: 0, y: 1 } },
+                                        })
+                                    })
+                                }
+                                console.log(time.getNowTime());
+                            })
+                            .catch(e => {
+                                console.log(e);
+                            })
                     } else if (type === "POLYGON") {
                         let c = true
                         data.forEach(item => {
@@ -727,7 +785,9 @@ export default {
                             return
                         }
                         this.power = true
-                        that.addFeature(data, type, Date.now() + "");
+                        let id = v4()
+                        this.storage = { id: id, data: data }
+                        that.addFeature(data, type, id);
                     } else if (type === "LINE" && data.start.x > 0 && data.start.y > 0 && data.end.x > 0 && data.end.y > 0) {
                         this.power = true
                         that.addFeature(data, type, Date.now() + "");
@@ -915,12 +975,12 @@ export default {
             this.gMap.refresh();
             this.vis = false
         },
-        changepic(item) {
+        changepic(item, num) {
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
-                mode: "POINT", // 绘制线段
+                mode: "RECT", // 绘制线段
                 //refreshDelayWhenZooming: false, // 缩放时是否允许刷新延时，性能更优
                 zoomWhenDrawing: true,
                 panWhenDrawing: true,
@@ -966,8 +1026,18 @@ export default {
             gMap.addLayer(gFirstFeatureLayer);
             gMap.addLayer(tagtextLayer)
             this.nowpicdata = []
-            if (item.mark) {
-                console.log(item.mark);
+            this.rect.splice(0)
+            this.storage = {}
+            window.onresize = function () {
+                this.gMap && this.gMap.resize();
+            };
+            this.type = "RECT"
+            this.setMode("RECT")
+            let historyid = this.history.findIndex(item => item.id === num)
+            if (historyid != -1) {
+                this.nowpicdata = this.history[historyid].data
+                this.keepdraw(this.nowpicdata)
+            } else if (item.mark) {
                 axios.get(item.mark)
                     .then(res => {
                         this.nowpicdata = res.data
@@ -976,13 +1046,6 @@ export default {
                         console.log(e);
                     })
             }
-            this.rect.splice(0)
-            this.storage = {}
-            window.onresize = function () {
-                this.gMap && this.gMap.resize();
-            };
-            this.type = "RECT"
-            this.setMode("RECT")
             /*if (item.data) {
                 axios.get(item.data).then(res => {
                     item.mark = res.data
@@ -994,16 +1057,16 @@ export default {
             this.$router.push("/MakeMark")
         },
         getdata(page, num) {
+            this.history = []
             axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
                 .then(res => {
-                    console.log(res.data);
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
                     this.showlist.splice(0)
                     this.showlist = res.data.data;
-                    this.changepic(this.showlist[num == 1 ? 0 : 4])
+                    this.changepic(this.showlist[num == 1 ? 0 : 4], num == 1 ? 0 : 4)
                     this.nowselect = num == 1 ? 0 : 4
                 })
                 .catch(e => {
@@ -1016,7 +1079,7 @@ export default {
                 .catch(e => {
                     console.log(e);
                 })
-        }
+        },
     },
     mounted() {
         this.project = this.$route.query
@@ -1237,5 +1300,9 @@ export default {
 
 .resultlist {
     padding: 8px;
+}
+
+.ocrtype {
+    background-color: rgb(168, 208, 225);
 }
 </style>

@@ -7,7 +7,8 @@
             <span
                 style="color: rgb(120,127,142);font-size: 18px;font-weight: 600;letter-spacing: 6px;padding-left: 50px;">为数字化转型提供安全、稳定、灵活的额数字化底座，为智能化审计提供领先的创新技术和平台，助力数字化转型和智能化升级一步到位</span>
         </div>
-        <div style="width: 30%;height: 100%;display: flex;justify-content: center;align-items: center;flex-direction: column;">
+        <div
+            style="width: 30%;height: 100%;display: flex;justify-content: center;align-items: center;flex-direction: column;">
             <span style="color: rgb(39,46,62);font-weight: 600;font-size: 24px;">欢迎登陆平台</span>
             <div style="width: 65%;"><el-divider></el-divider></div>
             <div class="block">
@@ -24,9 +25,13 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <div style="width: 60%;"><el-button round type="primary" style="color:white;width: 100%;font-size: 18px;height: 80%;display: flex;justify-content: center;align-items: center;" @click="SubForm('userform')">登录</el-button> </div>
+            <div style="width: 60%;"><el-button round type="primary"
+                    style="color:white;width: 100%;font-size: 18px;height: 80%;display: flex;justify-content: center;align-items: center;"
+                    @click="SubForm('userform')">登录</el-button> </div>
             <div style="width: 65%;"><el-divider></el-divider></div>
-            <div style="width: 65%; display: flex;justify-content: space-around;color: rgb(215,216,217);"><span style="cursor: pointer;color: rgb(100,100,101);">忘记密码</span><span style="cursor: pointer;color: rgb(100,100,101);" @click="logon">注册账号</span></div>
+            <div style="width: 65%; display: flex;justify-content: space-around;color: rgb(215,216,217);"><span
+                    style="cursor: pointer;color: rgb(100,100,101);">忘记密码</span><span
+                    style="cursor: pointer;color: rgb(100,100,101);" @click="logon">注册账号</span></div>
         </div>
     </div>
 </template>
@@ -125,6 +130,7 @@ export default {
     padding: 15px;
     padding-bottom: 0;
 }
+
 /deep/.el-divider--horizontal {
     display: block;
     height: 1px;

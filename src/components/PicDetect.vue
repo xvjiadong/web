@@ -81,6 +81,29 @@
                             </div>
                         </el-tooltip>
                     </div>
+                    <div style="display: flex;align-items: center;width: 50%;">
+                        <el-input :disabled="textpromptdisable" style="width: 80%;" placeholder="请输入希望检测的对象，不同对象之间空格分隔"
+                            size="mini" v-model="textprompt"></el-input>
+                        <span v-if="!textpromptdisable" @click="text_to_detect(showlist[nowselect].url)"
+                            class="segment">执行检测</span>
+                        <span v-else class="segment">检测中</span>
+                    </div>
+                    <el-popover placement="bottom" title="一键模式配置" width="300" trigger="click">
+                        <el-select v-model="detect_object" :multiple="true" :size="'mini'" clearable collapse-tags>
+                            <el-option v-for="(label, index) in label_data" :key="label.name" :label="label.name"
+                                :value="index">
+                            </el-option>
+                        </el-select>
+                        <el-button @click="clony_mode = !clony_mode"
+                            :disabled="detect_object.length == 0 && !clony_mode">
+                            {{ clony_mode ? '取消' : '启动' }}
+                        </el-button>
+                        <el-tooltip slot="reference" content="一键模式,划选区域自动检测" placement="top-start">
+                            <div class="toolblock">
+                                <el-button type="text" class="el-icon-s-grid"></el-button>
+                            </div>
+                        </el-tooltip>
+                    </el-popover>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
@@ -108,8 +131,8 @@
                 </div>
                 <div
                     style="display: flex;flex-direction: column;justify-content: flex-start;height: 540px;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
-                    <div style="width: 120px;height: 120px;margin-top: 15px;padding: 5px;" v-for="(item, index) in showlist"
-                        :key="item.url">
+                    <div style="width: 120px;height: 120px;margin-top: 15px;padding: 5px;"
+                        v-for="(item, index) in showlist" :key="item.url">
                         <img @click="together(index)" :src="item.url" :class="{ select: index === nowselect % 5 }"
                             style="width: 120px;height: 75px;cursor: pointer;">
                     </div>
@@ -133,11 +156,11 @@
                                 <el-card>
                                     <div slot="header" style="display: flex;justify-content: space-between;">
                                         <span style="font-size: 20px;">
-                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-view" v-if="item.vis"
-                                                @click="hidefeature(item, index)"></i>
+                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-view"
+                                                v-if="item.vis" @click="hidefeature(item, index)"></i>
                                             <i style="cursor: pointer;font-size: 20px;" class="el-icon-hide" v-else
                                                 @click="appearfeature(item, index)"></i>
-                                            <span v-if="!item.edit" @dblclick='changevis(item,index)'>
+                                            <span v-if="!item.edit" @dblclick='changevis(item, index)'>
                                                 {{ item.textInfo.text }}
                                             </span>
                                             <span v-else>
@@ -180,6 +203,8 @@
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
+import io from 'socket.io-client'
+import labeldata from '../assets/final_label.json'
 //import FileSaver from "file-saver";
 //import PicDoc from '../../public/PicDoc.json'
 //import data from '../../public/data (1).json'
@@ -224,7 +249,14 @@ export default {
             newlabel: "",
             segpop: [],
             storage: {},
-            nowpicdata: []
+            nowpicdata: [],
+            textprompt: "",
+            textpromptdisable: false,
+            socket: "",
+            clony_mode: false,
+            clonyvis: false,
+            detect_object: [],
+            label_data: []
         };
     },
     watch: {
@@ -239,7 +271,14 @@ export default {
     computed: {
     },
     methods: {
-        changevis(item,index) {
+        clony_detect(url, data) {
+            this.socket.emit('detect_clony', { detect_object: this.detect_object, url: url, label: this.seglabels, x: data.x, y: data.y, width: data.width, height: data.height })
+        },
+        text_to_detect(url) {
+            this.socket.emit('textprompt_to_detect', { url: url, label: this.seglabels, text: this.textprompt })
+            this.textpromptdisable = true
+        },
+        changevis(item, index) {
             this.nowpicdata[index].edit = true;
             if (!this.nowpicdata[index].vis) {
                 this.appearfeature(item, index)
@@ -360,6 +399,9 @@ export default {
             this.vis = false
         },
         la(e) {
+            if (this.clony_mode) {
+                return
+            }
             if (this.type === "POINT") {
                 let a = setTimeout(() => {
                     if (this.selected || !this.power) {
@@ -712,7 +754,7 @@ export default {
             const gFirstMarker = new AILabel.Marker(
                 that.deleteIconId, // id
                 {
-                    src: "https://s1.aigei.com/src/img/png/45/45aabfc232a34e5b9bfaf75412973c08.png?|watermark/3/image/aHR0cHM6Ly9zMS5haWdlaS5jb20vd2F0ZXJtYXJrLzUwMC0xLnBuZz9lPTE3MzU0ODgwMDAmdG9rZW49UDdTMlhwemZ6MTF2QWtBU0xUa2ZITjdGdy1vT1pCZWNxZUpheHlwTDpjYWQ1NHVoRlhGUUViSGR3Vm02aXctVTJoWVE9/dissolve/40/gravity/NorthWest/dx/18/dy/21/ws/0.0/wst/0&e=1735488000&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:C11LKqsRLbAqQo2uVPETYDya0QU=",
+                    src: "../../delete.png",
                     position: position, // 矩形右上角 根据图形动态调整
                     offset: {
                         x: -20,
@@ -760,6 +802,7 @@ export default {
                         that.addFeature(data, type, id);
                         this.storage.data = data
                         this.storage.id = id
+                        this.clony_detect(this.showlist[this.nowselect].url, data)
                     } else if (type === "POLYGON") {
                         let c = true
                         data.forEach(item => {
@@ -1065,14 +1108,36 @@ export default {
     mounted() {
         this.project = this.$route.query
         this.getdata(1, 1)
+        this.label_data = labeldata
+        this.socket = io('http://localhost:5000')
+        this.socket.on("textprompt_to_detect", (data) => {
+            this.addFeature(data.shape, 'RECT', data.id, data.color, data.textInfo, 5)
+            this.nowpicdata.push(data)
+            const polygontext = new AILabel.Text(data.textid, data.textInfo)
+            this.tagtextLayer.addText(polygontext)
+        })
+        this.socket.on('textprompt_ok', () => {
+            this.textpromptdisable = false
+        })
+        this.socket.on('detect_clony', (data) => {
+            this.addFeature(data.shape, 'RECT', data.id, data.color, data.textInfo, 5)
+            this.nowpicdata.push(data)
+            const polygontext = new AILabel.Text(data.textid, data.textInfo)
+            this.tagtextLayer.addText(polygontext)
+        })
+        this.socket.on('clony_ok', () => {
+            this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+            this.power = false
+            this.storage = {}
+        })
     },
     beforeDestroy() {
         this.gMap.destroy();
     },
 };
 </script>
-   
-  <!-- Add "scoped" attribute to limit CSS to this component only -->
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .main {
     display: flex;

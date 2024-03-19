@@ -19,6 +19,12 @@ VueRouter.prototype.replace = function push(location, onResolve, onReject) {
 };
 const routes = [
   {
+    path: "/55",
+    name: "tryspeed",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/TrySpeed.vue"),
+  },
+  {
     path: "/",
     name: "login",
     component: () =>
@@ -99,7 +105,7 @@ router.beforeEach((to, from, next) => {
           to.name === "PdfReview" ||
           to.name === "TextPartReview" ||
           to.name === "PicPartReview" ||
-          to.name==='PicSegment'
+          to.name === 'PicSegment'
         ) {
           next()
           /*if (

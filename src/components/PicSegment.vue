@@ -79,6 +79,14 @@
                         <div v-if="segvis"><span class="segment" @click="segok">确认分割</span></div>
                         <div v-if="!segvis && type == 'POINT'"><span class="segment" @click="pointok">确认分割</span></div>
                     </div>
+                    <div style="display: flex;align-items: center;width: 50%;">
+                        <el-input :disabled="textpromptdisable" style="width: 80%;" placeholder="请输入希望分割的对象，不同对象之间空格分隔"
+                            size="mini" v-model="textprompt"></el-input>
+                        <span v-if="!textpromptdisable"
+                            @click="text_to_segment(showlist[nowselect].url, project.versionId)"
+                            class="segment">执行分割</span>
+                        <span v-else class="segment">分割中</span>
+                    </div>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
@@ -136,9 +144,8 @@
                                             <i style="cursor: pointer;font-size: 20px;" class="el-icon-hide" v-else
                                                 @click="appearfeature(item, index)"></i>
                                             <span v-if="!item.edit"
-                                                @dblclick="item.edit = true; if (!item.vis) { appearfeature(item, index) }">{{
-                item.textInfo.text
-            }}</span>
+                                                @dblclick="item.edit = true; if (!item.vis) appearfeature(item, index)">
+                                                {{ item.textInfo.text }}</span>
                                             <span v-else>
                                                 <el-input v-model="item.textInfo.text" size="mini"
                                                     style="width:60%"></el-input>
@@ -181,6 +188,8 @@
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
+//import time from '../util/time'
+import io from 'socket.io-client'
 //import FileSaver from "file-saver";
 //import PicDoc from '../../public/PicDoc.json'
 //import data from '../../public/data (1).json'
@@ -225,7 +234,10 @@ export default {
             newlabel: "",
             segpop: [],
             storage: "",
-            nowpicdata: []
+            nowpicdata: [],
+            textprompt: "",
+            textpromptdisable: false,
+            socket: null
         };
     },
     watch: {
@@ -240,6 +252,14 @@ export default {
     computed: {
     },
     methods: {
+        text_to_segment(url) {
+            if (this.textprompt) {
+                this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
+                this.textpromptdisable = true
+            } else {
+                this.$message.error("请填写分割信息")
+            }
+        },
         changelabel(item, index) {
             let a = this.seglabels.find(ele => item.text == ele.label)
             if (a !== undefined) {
@@ -396,6 +416,7 @@ export default {
             file.set("id", this.showlist[this.nowselect].id)
             axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
                 if (res.data.code === 200) {
+                    console.log(res.data.data);
                     this.showlist[this.nowselect].mark = res.data.data
                     let a = (this.colitem.findIndex(item => item === 'results'))
                     this.colitem.splice(a, 1)
@@ -712,7 +733,7 @@ export default {
         },
 
         // 添加图形
-        addFeature(data, type, id, color = null, rlecode = null, textInfo = null, isappear = false) {
+        addFeature(data, type, id, color = null, rlecode = null, textInfo = null, isappear = false, base64str = null) {
             let that = this;
             let drawingStyle = this.drawingStyle;
             //线
@@ -845,7 +866,7 @@ export default {
                 );
                 that.gFirstMaskLayer.addAction(clearMaskAction);
             }
-            if (rlecode !== null && textInfo !== null && !isappear) {
+            if (rlecode !== null && textInfo !== null && !isappear & base64str == null) {
                 axios.post("http://localhost:5000/api/matting", { url: this.showlist[this.nowselect].url, mattinglist: [{ code: rlecode, id: id }] })
                     .then(res => {
                         this.nowpicdata.push({
@@ -857,7 +878,8 @@ export default {
                             type: type,
                             textid: res.data[0].id + "-0",
                             textInfo: textInfo,
-                            vis: true
+                            vis: true,
+                            edit: false
                         })
                     })
                     .catch(e => {
@@ -897,7 +919,7 @@ export default {
             const gFirstMarker = new AILabel.Marker(
                 that.deleteIconId, // id
                 {
-                    src: "https://s1.aigei.com/src/img/png/45/45aabfc232a34e5b9bfaf75412973c08.png?|watermark/3/image/aHR0cHM6Ly9zMS5haWdlaS5jb20vd2F0ZXJtYXJrLzUwMC0xLnBuZz9lPTE3MzU0ODgwMDAmdG9rZW49UDdTMlhwemZ6MTF2QWtBU0xUa2ZITjdGdy1vT1pCZWNxZUpheHlwTDpjYWQ1NHVoRlhGUUViSGR3Vm02aXctVTJoWVE9/dissolve/40/gravity/NorthWest/dx/18/dy/21/ws/0.0/wst/0&e=1735488000&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:C11LKqsRLbAqQo2uVPETYDya0QU=",
+                    src: "../../delete.png",
                     position: position, // 矩形右上角 根据图形动态调整
                     offset: {
                         x: -20,
@@ -1145,6 +1167,7 @@ export default {
             //刷新map
             this.gMap.refresh();
             this.vis = false
+            this.segvis = false
         },
         changepic(item) {
             let that = this
@@ -1232,7 +1255,6 @@ export default {
         getdata(page, num) {
             axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
                 .then(res => {
-                    console.log(res.data);
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
@@ -1254,9 +1276,12 @@ export default {
                 })
         }
     },
+    connect: function (data) {
+        console.log(data)
+    },
     mounted() {
         this.project = this.$route.query
-        console.log(this.project);
+        this.project.verisonId -= 0
         this.getdata(1, 1)
         let map = document.getElementById("map")
         map.addEventListener("contextmenu", () => {
@@ -1265,8 +1290,19 @@ export default {
             }
         })
         this.type = "POINT"
+        this.socket = io('http://localhost:5000')
+        this.socket.on("textprompt_to_segment", (data) => {
+            this.addFeature(data.shape, 'POLYGON', data.id, data.color, data.rlecode, data.textInfo, 5)
+            this.nowpicdata.push(data)
+            const polygontext = new AILabel.Text(data.textid, data.textInfo)
+            this.tagtextLayer.addText(polygontext)
+        })
+        this.socket.on('textprompt_ok', () => {
+            this.textpromptdisable = false
+        })
     },
     beforeDestroy() {
+        this.socket.disconnect()
         this.gMap.destroy();
     },
 };

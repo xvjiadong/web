@@ -84,9 +84,8 @@
                     <el-button size="mini"><i class="el-icon-refresh" style="font-size: 15px;"></i>转让项目</el-button>
                 </div>
             </div>
-            <div>
-                <div v-for="item in showlist.slice((currentPage - 1) * pageSize, pageSize * currentPage)" :key="item.id"
-                    class="projectlist">
+            <div v-loading="loading">
+                <div v-for="item in projectlist" :key="item.id" class="projectlist">
                     <el-card>
                         <div slot="header" style="display: flex;justify-content: space-between;align-items: center;">
                             <div>
@@ -181,9 +180,9 @@
                 </div>
             </div>
         </el-card>
-        <el-pagination v-if="projectlist.length !== 0" :current-page="currentPage" :page-sizes="[3, 4, 6, 8]"
-            :page-size="pageSize" background layout="sizes, prev, pager, next, jumper" :total="showlist.length"
-            @current-change="handleCurrentChange" @size-change="handleSizeChange" />
+        <el-pagination v-if="projectlist.length !== 0" :hide-on-single-page="true" :current-page="currentPage"
+            :page-sizes="[5]" :page-size="5" background layout="sizes, prev, pager, next, jumper" :total="total"
+            @current-change="handleCurrentChange" />
         <el-dialog title="新增项目版本" :visible.sync="centerDialogVisible" width="40%" :center="false"
             :destroy-on-close="true" :show-close="false" :close-on-click-modal="false">
             <el-form ref="add" :model="addnewversion" label-width="110px" class="form" label-position="left">
@@ -374,10 +373,12 @@ export default {
     },
     data() {
         return {
+            loading: false,
+            total: 0,
             delvisible: false,
             centerDialogVisible: false,
             currentPage: 1,
-            pageSize: 3,
+            pageSize: 5,
             hideintroduction: false,
             select: [{ label: "全部", value: "全部" }, { value: "图像", label: "图像" }, { value: "文本", label: "文本" }],
             showprojecttype: "全部",
@@ -413,11 +414,6 @@ export default {
         }
     },
     computed: {
-        showlist() {
-            return this.projectlist.filter(item => {
-                return (item.name.includes(this.inputvalue)) && (this.showprojecttype === "全部" || item.datatype === this.showprojecttype)
-            })
-        },
         marktypelist() {
             let a = [{ value: "分割标注", label: "分割标注" }, { value: "物体检测", label: "物体检测" }, { value: "图像文本标注", label: "图像文本标注" }, { value: "图片分类标注/单标签", label: "图片分类标注/单标签" }, { value: "图片分类标注/多标签", label: "图片分类标注/多标签" }, { value: "多边形标注", label: "多边形标注" }, { value: "点标注", label: "点标注" }, { value: "线标注", label: "线标注" }, { value: "混合标注", label: "混合标注" }]
             let b = [{ value: "关系抽取", label: "关系抽取" }, { value: "证据划选", label: "证据划选" }, { value: "实体抽取", label: "实体抽取" }, { value: "混合标注", label: "混合标注" }]
@@ -645,7 +641,7 @@ export default {
                     .catch(e => {
                         console.log(e);
                     })
-            } else if (item.callType === '生成式摘要' || item.callType === '关键词抽取'|| item.callType === '抽取式阅读理解') {
+            } else if (item.callType === '生成式摘要' || item.callType === '关键词抽取' || item.callType === '抽取式阅读理解') {
                 axios.post('http://localhost:5000/api/text_process', { id: item.id, task: item.callType })
                     .then(res => {
                         if (res.data == 'ok') {
@@ -799,23 +795,34 @@ export default {
                 this.delvisible = true
             })
         },
-        getproject() {
-            axios.get("http://120.26.142.114:10010/items").then((res) => {
-                this.projectlist = res.data.data;
-                console.log(this.projectlist);
-                this.projectlist.forEach(item => {
-                    this[`multipleSelection${item.id}`] = []
+        getproject(page) {
+            this.loading = true
+            axios.get("http://120.26.142.114:10010/items?current=" + page + '&pageSize=' + 5)
+                .then((res) => {
+                    if (res.data.code === 200) {
+                        if (res.data.data.length > 0) {
+                            this.$message.warning("已经是最后一页了")
+                            return
+                        }
+                        this.total = res.data.data.total
+                        this.projectlist = res.data.data.list;
+                        this.projectlist.forEach(item => {
+                            this[`multipleSelection${item.id}`] = []
+                        })
+                        this.currentPage = page
+                        this.loading = false
+                    }
                 })
-            })
+                .catch(e => {
+                    console.log(e);
+                })
         },
         refresh() {
             this.getproject()
         },
-        handleSizeChange(val) {
-            this.pageSize = val
-        },
         handleCurrentChange(val) {
-            this.currentPage = val
+            console.log(val);
+            this.getproject(val)
         },
         hide() {
             this.hideintroduction = !this.hideintroduction
@@ -841,7 +848,7 @@ export default {
             this.del(item)
         },
         handleSchedule(item, row) {
-            this.$router.push({ path: "/TaskSchedule/", query: { id: item.id, version: row.versionId,callType:row.callType } })
+            this.$router.push({ path: "/TaskSchedule/", query: { id: item.id, version: row.versionId, callType: row.callType } })
         },
         a(item) {
             console.log(item);
@@ -875,7 +882,7 @@ export default {
         }
     },
     mounted() {
-        this.getproject()
+        this.getproject(this.currentPage)
         this.getlabelgroup()
         this.labeldata = labeldata;
     },

@@ -27,7 +27,8 @@
                         <el-option v-for="item in input" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
-                    <el-select v-if="dataset.inputway === '本地导入'" filterable="" v-model="dataset.inputway2" size="small">
+                    <el-select v-if="dataset.inputway === '本地导入'" filterable="" v-model="dataset.inputway2"
+                        size="small">
                         <el-option v-for="item in uploadway" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
@@ -47,10 +48,10 @@
                         <div class="el-upload__tip" slot="tip">文件大小限制在14MB内，请确保文件格式正确</div>
                     </el-upload>
                 </el-form-item>
-                <el-form-item v-if="dataset.inputway === '分享链接导入' || dataset.inputway === '平台已有数据集'" :label="uploadlabel"
-                    class="formitem" prop="link">
-                    <el-input style="width: 60%;" v-if="dataset.inputway === '分享链接导入'" size="small" v-model="dataset.link"
-                        placeholder="请输入分享链接"></el-input>
+                <el-form-item v-if="dataset.inputway === '分享链接导入' || dataset.inputway === '平台已有数据集'"
+                    :label="uploadlabel" class="formitem" prop="link">
+                    <el-input style="width: 60%;" v-if="dataset.inputway === '分享链接导入'" size="small"
+                        v-model="dataset.link" placeholder="请输入分享链接"></el-input>
                     <el-select v-if="dataset.inputway === '平台已有数据集'" size="small" v-model="dataset.link"
                         placeholder="请选择数据集">
                         <el-option v-for="item in addlink" :key="item.value" :value="item.value"></el-option>
@@ -314,7 +315,7 @@ export default {
             return []
         },
         uploadway() {
-            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" },{ value: "上传txt", label: "上传txt" }]
+            let a = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传PDF", label: "上传PDF" }, { value: "上传docx", label: "上传docx" }, { value: "上传txt", label: "上传txt" }]
             let b = [{ value: "上传压缩包", label: "上传压缩包" }, { value: "上传图片", label: "上传图片" }]
             if (this.dataset.dataType === "文本") {
                 return a
@@ -480,8 +481,8 @@ export default {
         console.log(this.$route.query);
         let a = this.$route.query
 
-        axios.get("http://120.26.142.114:10010/items").then((res) => {
-            this.projectlist = res.data.data;
+        axios.get("http://120.26.142.114:10010/items?current=1&pageSize=49").then((res) => {
+            this.projectlist = res.data.data.list;
             console.log(this.projectlist);
             this.dataset.dataType = a.dataType
             this.dataset.id = a.id

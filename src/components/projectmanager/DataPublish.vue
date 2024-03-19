@@ -76,7 +76,8 @@
                 </el-table-column>
             </el-table>
         </el-card>
-        <el-pagination :current-page="page" background layout="prev, pager, next" :page-size="5" :page-count="total">
+        <el-pagination @current-change="getpublish" :hide-on-single-page="true" :current-page="page" background
+            layout="prev, pager, next" :page-size="5" :total="total">
         </el-pagination>
     </div>
 </template>
@@ -100,21 +101,16 @@ export default {
     },
     methods: {
         pagechange(i) {
-            if (!(this.page + i)) {
-                this.$message.warning("已经是第一页了")
-            } else {
-                this.getpublish(this.page + i)
-            }
+            this.getpublish(this.page + i)
         },
         publish(item, row) {
-            console.log(row);
             this.$router.push({
                 path: "/publishdetail",
                 query: {
                     id: item.id,
                     name: item.name,
                     versionId: row.versionId,
-                    verName: item.verName
+                    verName: row.verName
                 }
             })
         },
@@ -124,7 +120,6 @@ export default {
                     console.log(res.data)
                     if (res.data.data.list.length > 0) {
                         this.publishlist = res.data.data.list
-                        this.page = page
                         this.total = res.data.data.total
                     } else {
                         this.$message.warning("已经是最后一页了")

@@ -31,15 +31,6 @@
                     <span style="font-size: 12px; color: rgb(36,104,242);cursor: pointer;margin-left: 8px;"
                         @click="jump('/CreateProject')">创建项目</span>
                 </el-form-item>
-                <el-form-item label="标注任务样例" prop="modelfile">
-                    <el-upload ref="upload" accept=".pdf" action="" :file-list="task.modelfile" :limit="1"
-                        v-model="task.modelfile" draggable style="text-align: left;" :auto-upload="false"
-                        :on-change="uploadchange" :on-remove="uploadremove">
-                        <el-button size="mini" style="border: 1px solid rgb(36,104,242);color: rgb(36,104,242);">
-                            <i class="el-icon-upload"></i>点击上传</el-button>
-                        <span slot="tip" class="el-upload__tip" style="margin-left: 8px;">(支持20M以内的pdf文件)</span>
-                    </el-upload>
-                </el-form-item>
                 <el-form-item label="设置标签" prop="selectlabel" v-if="task.projectversion !== ''">
                     <el-card style="width: 37%;">
                         <div slot="header">
@@ -317,11 +308,11 @@ export default {
         textlabel(version_id) {
             this.task.selectlabel = []
             let a = this.versionlist.filter(item => {
-                return version_id ==item.versionId
+                return version_id == item.versionId
             })
             let type = a[0].callType
             console.log(type);
-            if (type !== '情感分析' && type !== '新闻分类'&& type !== '文本分类'&& type !== '意图识别'&& type !== '实体识别' && type !== '自然语言推理') {
+            if (type !== '情感分析' && type !== '新闻分类' && type !== '文本分类' && type !== '意图识别' && type !== '实体识别' && type !== '自然语言推理') {
                 return
             }
             axios.get("http://120.26.142.114:10010/task/label/" + version_id)
@@ -329,7 +320,7 @@ export default {
                     res.data.data.forEach(item => {
                         this.task.selectlabel.push(item.label)
                     })
-                    
+
                 })
                 .catch(e => {
                     console.log(e);
@@ -493,10 +484,15 @@ export default {
             return formattedDateString
         },
         getproject() {
-            axios.get("http://120.26.142.114:10010/items").then((res) => {
-                console.log(res.data.data);
-                this.projectlist = res.data.data
-            })
+            axios.get("http://120.26.142.114:10010/items?current=" + 1 + '&pageSize=' + 99)
+                .then((res) => {
+                    if (res.data.code === 200) {
+                        this.projectlist = res.data.data.list;
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         },
         getmember() {
             axios.get("http://120.26.142.114:10010/users").then(res => {
@@ -519,11 +515,11 @@ export default {
         if (this.$route.query.id) {
             this.task.id = this.$route.query.id
             this.task.versionId = this.$route.query.version
-            let type=this.$route.query.callType
-            if (type !== '情感分析' && type !== '新闻分类'&& type !== '文本分类'&& type !== '意图识别'&& type !== '实体识别' && type !== '自然语言推理') {
+            let type = this.$route.query.callType
+            if (type !== '情感分析' && type !== '新闻分类' && type !== '文本分类' && type !== '意图识别' && type !== '实体识别' && type !== '自然语言推理') {
                 return
             }
-            axios.get("http://120.26.142.114:10010/task/label/" +this.task.versionId )
+            axios.get("http://120.26.142.114:10010/task/label/" + this.task.versionId)
                 .then(res => {
                     res.data.data.forEach(item => {
                         this.task.selectlabel.push(item.label)
