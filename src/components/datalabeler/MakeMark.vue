@@ -147,6 +147,10 @@ export default {
                 router = "/languageinference"
             } else if (row.callType === "抽取式阅读理解") {
                 router = "/readview"
+            } else if (row.callType === "线标注") {
+                router = "/polyline"
+            } else if (row.callType === "点标注") {
+                router = "/pointview"
             }
             this.$router.push({
                 path: router,

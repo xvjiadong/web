@@ -237,7 +237,7 @@ export default {
             nowpicdata: [],
             textprompt: "",
             textpromptdisable: false,
-            socket: null
+            socket: null,
         };
     },
     watch: {
@@ -252,6 +252,7 @@ export default {
     computed: {
     },
     methods: {
+
         text_to_segment(url) {
             if (this.textprompt) {
                 this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
@@ -409,12 +410,15 @@ export default {
         },
         //汇总框选向后台提交//
         together(num) {
+            if (this.generate_manual)
+                return
             let jsondata = JSON.stringify(this.nowpicdata)
             let file = new FormData()
             const blob = new Blob([jsondata]);
             file.set("file", blob, "data.json")
             file.set("id", this.showlist[this.nowselect].id)
             axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                console.log(res.data);
                 if (res.data.code === 200) {
                     console.log(res.data.data);
                     this.showlist[this.nowselect].mark = res.data.data

@@ -125,7 +125,6 @@
                                             </el-table-column>
                                             <el-table-column prop="personalProgress" label="任务进度"></el-table-column>
                                             <el-table-column label="操作">
-
                                                 <template slot-scope="scope">
                                                     <el-button size="mini"
                                                         @click="handleTaskLook(item, scope.row)">查看</el-button>
@@ -167,6 +166,8 @@
                                         placement="top-start">
                                         <span class="tableplay" @click="handlepredict(item, scope.row)">智能标注</span>
                                     </el-tooltip>
+                                    <span v-if="scope.row.callType === '分割标注'" @click="picedit(scope.row)"
+                                        class="tableplay">编辑</span>
                                     <span class="tableplay" v-if="scope.row.pre.includes('ing')">标注中</span>
                                     <span v-if="!scope.row.task" class="tableplay"
                                         @click="handleSchedule(item, scope.row)">调度</span>
@@ -359,6 +360,20 @@
                 <el-button size="mini" @click="predictcancel">取 消</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="请选择删除主体" :visible.sync="delete_entity_vis" width="24%" top="15%">
+            <el-select v-model="delete_attribute.delete_entity" size="mini" placeholder="请从已标注的标签中选择">
+                <el-option v-for="item in delete_entity_label" :key="item.id + '-' + item.label" :value="item.label">
+                </el-option>
+            </el-select>
+            <div slot="footer">
+                <div style="width: 100%;display: flex;justify-content: space-around;">
+                    <el-button type="primary" @click="delete_entity_ok">确定</el-button>
+                    <el-button @click="delete_entity_cancel">取消</el-button>
+                </div>
+                <span @click="gotoedit"
+                    style="font-size: 12px;color: rgb(64,184,255);text-decoration: underline;cursor: pointer;">详细编辑请点击此处跳转</span>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -411,6 +426,12 @@ export default {
             selectlabelgroup: "",
             inputvalue2: "",
             setlabel: [],
+            delete_entity_label: [],
+            delete_entity_vis: false,
+            delete_attribute: {
+                delete_version: "",
+                delete_entity: "",
+            },
         }
     },
     computed: {
@@ -438,6 +459,40 @@ export default {
         }
     },
     methods: {
+        gotoedit() {
+            console.log(this.delete_attribute);
+            this.$router.push({ path: "/EditPic", query: { versionId: this.delete_attribute.delete_version } })
+        },
+        delete_entity_ok() {
+            axios.post('http://10.99.212.243:8000/remove/all', this.delete_attribute)
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.$message.success("删除完毕")
+                    }
+                }).catch(e => {
+                    console.log(e);
+                    this.$message.error("删除失败")
+                })
+            this.delete_entity_cancel()
+        },
+        delete_entity_cancel() {
+            this.detete_entity_vis = false
+            this.delete_entity_label = []
+            this.delete_attribute = {
+                detele_version: "",
+                delete_entity: ""
+            }
+        },
+        picedit(row) {
+            axios.get('http://120.26.142.114:10010/task/label/' + row.versionId)
+                .then(res => {
+                    this.delete_entity_label = res.data.data
+                    this.delete_entity_vis = true
+                    this.delete_attribute.delete_version = row.versionId
+                }).catch(e => {
+                    console.log(e);
+                })
+        },
         editlabel(id) {
             this.setlabel.push(id)
             this.$nextTick(() => {

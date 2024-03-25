@@ -2,8 +2,8 @@
     <div class="main">
         <div
             style="height: 100%;width: 70%;background-image: url('登录.jpg');text-align: left;display: flex;flex-direction: column;">
-            <span
-                style="color: rgb(39,46,62);font-size: 28px;font-weight: 600;letter-spacing: 8px;padding: 50px;">数据标注平台</span>
+            <span @click="$router.push('/')"
+                style="cursor: pointer;color: rgb(39,46,62);font-size: 28px;font-weight: 600;letter-spacing: 8px;padding:50px;">数据标注平台</span>
             <span
                 style="color: rgb(120,127,142);font-size: 18px;font-weight: 600;letter-spacing: 6px;padding-left: 50px;">为数字化转型提供安全、稳定、灵活的额数字化底座，为智能化审计提供领先的创新技术和平台，助力数字化转型和智能化升级一步到位</span>
         </div>
@@ -29,9 +29,12 @@
                     style="color:white;width: 100%;font-size: 18px;height: 80%;display: flex;justify-content: center;align-items: center;"
                     @click="SubForm('userform')">登录</el-button> </div>
             <div style="width: 65%;"><el-divider></el-divider></div>
-            <div style="width: 65%; display: flex;justify-content: space-around;color: rgb(215,216,217);"><span
-                    style="cursor: pointer;color: rgb(100,100,101);">忘记密码</span><span
-                    style="cursor: pointer;color: rgb(100,100,101);" @click="logon">注册账号</span></div>
+            <div style="width: 65%; display: flex;justify-content: space-around;color: rgb(215,216,217);">
+                <span style="cursor: pointer;color: rgb(100,100,101);">忘记密码</span>
+                <span style="cursor: pointer;color: rgb(100,100,101);" @click="logon">注册账号</span>
+                <span style="cursor: pointer;color: rgb(100,100,101);"
+                    @click="$router.push('/company_enter')">公司入驻</span>
+            </div>
         </div>
     </div>
 </template>

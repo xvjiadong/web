@@ -14,7 +14,6 @@
                                 <el-button type="text" class="el-icon-thumb" @click="setMode('PAN')"></el-button>
                             </div>
                         </el-tooltip>
-
                         <el-tooltip content="点标注" placement="top-start">
                             <div class="toolblock" :class="{ modeing: mode === 'POINT' }">
                                 <el-button type="text" class="el-icon-more-outline"
@@ -59,11 +58,6 @@
                                 <el-button type="text" class="el-icon-orange button" @click="setMode('CIRCLE')"></el-button>
                             </div>
                         </el-tooltip>
-                        <el-tooltip content="多边形标注" placement="top-end">
-                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
-                                <el-button type="text" class="el-icon-house button" @click="setMode('POLYGON')"></el-button>
-                            </div>
-                        </el-tooltip>
                         <el-tooltip content="撤销" placement="top-end">
                             <div class="toolblock">
                                 <el-button type="text" class="el-icon-refresh-left button" @click="Revoke()"></el-button>
@@ -75,8 +69,13 @@
                                     @click="setMode('RECT')"></el-button>
                             </div>
                         </el-tooltip>
+                        <el-tooltip content="多边形标注" placement="top-end">
+                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
+                                <el-button type="text" class="el-icon-house button"
+                                    @click="setMode('POLYGON')"></el-button>
+                            </div>
+                        </el-tooltip>
                         -->
-
                         <el-tooltip content="保存" placement="top-end">
                             <div class="toolblock">
                                 <el-button type="text" class="el-icon-suitcase button"
@@ -126,24 +125,28 @@
                 <el-collapse-item name="results">
                     <template slot="title">
                         <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
-                            <span>分类结果</span>
+                            <span>标注结果</span>
                         </div>
                     </template>
                     <el-card class="teachcard">
                         <div
-                            style="height:450px;overflow-y: auto;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
-                            <div v-for="(item) in nowpicdata" :key="item.id" class="resultlist">
+                            style="height:500px;overflow-y: auto;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
+                            <div v-for="(item, index) in nowpicdata" :key="item.id" class="resultlist">
                                 <el-card>
                                     <div slot="header" style="display: flex;justify-content: space-between;">
                                         <span style="font-size: 20px;">
-                                            <span v-if="!item.edit" @dblclick="item.edit = true">{{
-                item.textInfo.text
-            }}</span>
+                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-view"
+                                                v-if="item.vis" @click="hidefeature(item, index)"></i>
+                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-hide" v-else
+                                                @click="appearfeature(item, index)"></i>
+                                            <span v-if="!item.edit" @dblclick='changevis(item, index)'>
+                                                {{ item.textInfo.text }}
+                                            </span>
                                             <span v-else>
                                                 <el-input v-model="item.textInfo.text" size="mini"
                                                     style="width:60%"></el-input>
                                                 <i style="cursor: pointer;font-size: 20px;" class="el-icon-check"
-                                                    @click="item.edit = false"></i>
+                                                    @click="changelabel(item, index)"></i>
                                             </span>
                                         </span>
                                         <i @click="delmask(item)" style="cursor: pointer;font-size: 20px;"
@@ -157,16 +160,12 @@
                 <el-collapse-item name="labels">
                     <template slot="title">
                         <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
-                            <span>分类标签</span>
+                            <span>标注标签</span>
                         </div>
                     </template>
-                    <div style="display: flex;justify-content: flex-start;justify-content: center;padding: 8px;">
-                        <el-input placeholder="新增标签" size="mini" v-model="newlabel"></el-input>
-                        <i @click="addlabel" style="font-size: 20px;cursor: pointer;" class="el-icon-check"></i>
-                    </div>
                     <div
                         style="height: 400px;overflow-x:auto;overflow-y: auto;margin-left: 15px;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
-                        <div @click="choose(item)" v-for="item in seglabels" :key="item.label" class="labelblock">
+                        <div v-for="item in seglabels" :key="item.label" class="labelblock">
                             <div :style="'backgroundColor:' + item.color" style="width: 25px;height: 25px;"></div>
                             <span style="margin-left: 15px;">{{ item.label }}</span>
                         </div>
@@ -176,9 +175,12 @@
         </div>
     </el-card>
 </template>
+
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
+import { v4 } from 'uuid'
+import time from '../util/time'
 //import FileSaver from "file-saver";
 //import PicDoc from '../../public/PicDoc.json'
 //import data from '../../public/data (1).json'
@@ -223,7 +225,10 @@ export default {
             newlabel: "",
             segpop: [],
             storage: {},
-            nowpicdata: []
+            nowpicdata: [],
+            ocrtype: 1,
+            now: new Date(),
+            history: []
         };
     },
     watch: {
@@ -238,113 +243,103 @@ export default {
     computed: {
     },
     methods: {
-        delmask(item) {
-            this.nowpicdata = this.nowpicdata.filter(item2 => {
-                return item2.textid !== item.textid
+        changevis(item, index) {
+            this.nowpicdata[index].edit = true;
+            if (!this.nowpicdata[index].vis) {
+                this.appearfeature(item, index)
+            }
+        },
+        changelabel(item, index) {
+            this.tagtextLayer.removeTextById(item.textid)
+            const polygontext = new AILabel.Text(item.textid, { text: item.textInfo.text, position: item.textInfo.position, offset: item.textInfo.offset })
+            this.tagtextLayer.addText(polygontext)
+            this.nowpicdata[index].edit = false
+        },
+        appearfeature(item, index) {
+            this.addFeature(item.shape, item.type, item.id, item.color, item.textInfo, true)
+            const polygontext = new AILabel.Text(item.textid, item.textInfo)
+            this.tagtextLayer.addText(polygontext)
+            this.nowpicdata[index].vis = true
+        },
+        hidefeature(item, index) {
+            console.log(item);
+            this.gFirstFeatureLayer.removeFeatureById(item.id)
+            this.tagtextLayer.removeTextById(item.textid)
+            this.nowpicdata[index].vis = false
+        },
+        delmask(mask) {
+            this.gFirstFeatureLayer.removeFeatureById(mask.id)
+            this.tagtextLayer.removeTextById(mask.textid)
+            this.nowpicdata = this.nowpicdata.filter(item => {
+                return item.id !== mask.id
             })
-        },
-        choose(item) {
-            if (this.project.callType.includes("单标签") && this.nowpicdata.length > 0) {
-                this.nowpicdata[0].textInfo.text = item.label
-                this.nowpicdata[0].color = item.color
-            } else if (this.project.callType.includes("单标签") && this.nowpicdata.length === 0) {
-                this.nowpicdata.push({
-                    filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
-                    textid: Date.now() + "-0",
-                    textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
-                    color: item.color
-                })
-            } else if (this.project.callType.includes("多标签")) {
-                let a = this.nowpicdata.findIndex(ele => ele.textInfo.text === item.label)
-                if (a === -1) {
-                    this.nowpicdata.push({
-                        filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
-                        textid: Date.now() + "-0",
-                        textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
-                        color: item.color
-                    })
-                }
-            }
-        },
-        addlabel() {
-            if (this.seglabels.includes(this.newlabel) || this.newlabel === "") {
-                this.$notify.error({
-                    title: '添加失败',
-                    message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
-                    duration: 3000
-                });
-            } else {
-                this.$notify.success({
-                    title: '',
-                    message: '添加成功',
-                    duration: 3000
-                });
-                this.seglabels.push({ label: this.newlabel, color: 'rgb(' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ')' })
-            }
-            this.newlabel = ""
         },
         /*切图片时把已标注数据标上 */
         keepdraw(markdata) {
-            markdata.forEach((item, index) => {
-                let a = this.seglabels.findIndex(item2 => item2.label == item.label)
-                if (a !== -1) {
-                    this.nowpicdata[index].color = this.seglabels[a].color
-                } else {
-                    this.seglabels.push({ label: item.label, color: item.color })
+            markdata.forEach((item) => {
+                if (item.vis) {
+                    this.addFeature(item.shape, item.type, item.id)
+                    let text = new AILabel.Text(item.textid, item.textInfo)
+                    this.tagtextLayer.addText(text)
                 }
-                let text = new AILabel.Text(item.textid, item.textInfo, { name }, { FontColor: item.color, FontSize: '20px' })
-                this.tagtextLayer.addText(text)
             })
         },
         //汇总框选向后台提交//
         together(num) {
             let jsondata = JSON.stringify(this.nowpicdata)
+            let historyindex = this.history.findIndex(item => item.pageid === this.nowselect)
+            if (historyindex == -1) {
+                this.history.push({ data: this.nowpicdata, id: this.nowselect })
+            } else {
+                this.history[historyindex].data = this.nowpicdata
+            }
             let file = new FormData()
             const blob = new Blob([jsondata]);
             file.set("file", blob, "data.json")
             file.set("id", this.showlist[this.nowselect].id)
             axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
                 console.log(res.data);
+                if (res.data.code === 200) {
+                    this.showlist[this.nowselect].mark = res.data.data
+                }
+                let a = (this.colitem.findIndex(item => item === 'results'))
+                this.colitem.splice(a, 1)
+                if (this.page === 1 && num === -1) {
+                    this.$message.warning("已经是第一张了")
+                    return
+                } else if (num === this.showlist.length || num == -1) {
+                    this.gMap.destroy()
+                    this.page = num == -1 ? this.page - 1 : this.page + 1
+                    this.getdata(this.page, num == -1 ? 0 : 1)
+                } else {
+                    this.gMap.destroy()
+                    this.changepic(this.showlist[num], num)
+                    this.nowselect = num
+                }
             })
-            let a = (this.colitem.findIndex(item => item === 'results'))
-            this.colitem.splice(a, 1)
-            if (this.page === 1 && num === -1) {
-                this.$message.warning("已经是第一张了")
-                return
-            } else if (num === this.showlist.length || num == -1) {
-                this.gMap.destroy()
-                this.page = num == -1 ? this.page - 1 : this.page + 1
-                this.getdata(this.page, num == -1 ? 0 : 1)
-            } else {
-                this.gMap.destroy()
-                this.changepic(this.showlist[num])
-                this.nowselect = num
-            }
         },
         ok() {
             this.power = false
             if (this.Recognizetextcontent === "") {
                 return
             }
-            if (this.type === "RECT") {
-                this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-                this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
-                this.nowpicdata.push({
-                    id: this.storage.id,
-                    type: "RECT",
-                    vis: true,
-                    color: this.seglabels[this.Recognizetextcontent].color,
-                    shape: this.storage.data,
-                    textid: this.storage.id + "-0",
-                    edit: false,
-                    textInfo: { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
-                })
-                let textid = this.storage.id + "-0"
-                const recttext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } })
-                this.tagtextLayer.addText(recttext)
-                this.Recognizetextcontent = ""
-                //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-            }
+            this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+            let textInfo = { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.shape.x, y: this.storage.shape.y }, offset: { x: 0, y: 1 } }
+            this.addFeature(this.storage.shape, 'POINT', this.storage.id, this.seglabels[this.Recognizetextcontent].color, textInfo)
+            let textid = this.storage.id + "-0"
+            const recttext = new AILabel.Text(textid, textInfo)
+            this.tagtextLayer.addText(recttext)
+            this.nowpicdata.push({
+                id: this.storage.id,
+                vis: true,
+                edit: false,
+                shape: this.storage.shape,
+                textid: this.storage.id + '-0',
+                textInfo: textInfo,
+                type: "POINT"
+            })
+            this.Recognizetextcontent = ""
+            //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             this.vis = false
         },
         la(e) {
@@ -356,7 +351,7 @@ export default {
                     if (this.type === "LINE") {
                         this.linenumber += 1
                     }
-                    if (this.type === 'RECT' || this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
+                    if (this.type === 'POINT' || this.type === 'RECT' || this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
                         if (!this.vis) {
                             const popover = this.$refs.popover;
                             let timer = setTimeout(() => {
@@ -378,7 +373,7 @@ export default {
                     clearTimeout(a)
                 }, 200)
             } else {
-                if (this.selected || !this.power) {
+                if (this.selected || !this.power || this.ocrtype) {
                     return
                 }
                 if (this.type === "POINT" || this.type === "RECT" || this.type === "CIRCLE" || (this.type === "LINE")) {
@@ -538,10 +533,8 @@ export default {
                     break;
             }
         },
-
         // 添加图形
-        addFeature(data, type, id, color = null, textInfo = null, isappear = false) {
-            console.log(isappear);
+        addFeature(data, type, id, color = null, textInfo = null) {
             let that = this;
             let drawingStyle = this.drawingStyle;
             //线
@@ -590,10 +583,11 @@ export default {
                 const polygonFeature = new AILabel.Feature.Polygon(
                     id, // id
                     { points: data }, // shape
+                    { name: "name" },
                     {
-                        strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
-                        fill: true, //是否填充
-                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
+                        strokeStyle: "rgb(36,104,242)", //边框颜色
+                        //fill: true, //是否填充
+                        //fillStyle: "#2468f2", //填充色
                         globalAlpha: 0.5,
                         lineWidth: 3,
                         stroke: true,
@@ -606,8 +600,8 @@ export default {
                 const gFirstFeaturePoint = new AILabel.Feature.Point(
                     id, // id
                     { x: data.x, y: data.y, r: 5 }, // shape
-                    { name }, // props
-                    { fillStyle: this.rightclick ? "rgb(255,0,0)" : "rgb(0,255,0)", zIndex: 5, lineWidth: 255 } // style
+                    textInfo != null ? textInfo : { name }, // props
+                    { fillStyle: color == null ? "rgb(255,0,0)" : color, zIndex: 5, lineWidth: 15 } // style
                 );
                 that.gFirstFeatureLayer.addFeature(gFirstFeaturePoint);
             }
@@ -743,8 +737,9 @@ export default {
                     that.addFeature(data, type);
                 } else {
                     if (type === "RECT" && data.width > 10 && data.height > 10 && 500 - data.x - data.width > 0 && data.y + data.height < 375 && data.x > 0 && data.y > 0) {
+                        console.log(time.getNowTime());
                         this.power = true
-                        let id = Date.now() + ""
+                        let id = v4()
                         that.addFeature(data, type, id);
                         this.storage.data = data
                         this.storage.id = id
@@ -759,7 +754,9 @@ export default {
                             return
                         }
                         this.power = true
-                        that.addFeature(data, type, Date.now() + "");
+                        let id = v4()
+                        this.storage = { id: id, data: data }
+                        that.addFeature(data, type, id);
                     } else if (type === "LINE" && data.start.x > 0 && data.start.y > 0 && data.end.x > 0 && data.end.y > 0) {
                         this.power = true
                         that.addFeature(data, type, Date.now() + "");
@@ -767,6 +764,8 @@ export default {
                     else if (type === "POINT" && data.x > 0 && data.y > 0) {
                         let id = Date.now() + ""
                         that.addFeature(data, type, id);
+                        this.storage.id = id
+                        this.storage.shape = data
                         this.power = true
                     } else if (type === "POLYLINE") {
                         let c = true
@@ -947,12 +946,12 @@ export default {
             this.gMap.refresh();
             this.vis = false
         },
-        changepic(item) {
+        changepic(item, num) {
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
-                mode: "POINT", // 绘制线段
+                mode: "RECT", // 绘制线段
                 //refreshDelayWhenZooming: false, // 缩放时是否允许刷新延时，性能更优
                 zoomWhenDrawing: true,
                 panWhenDrawing: true,
@@ -998,8 +997,18 @@ export default {
             gMap.addLayer(gFirstFeatureLayer);
             gMap.addLayer(tagtextLayer)
             this.nowpicdata = []
-            if (item.mark) {
-                console.log(item.mark);
+            this.rect.splice(0)
+            this.storage = {}
+            window.onresize = function () {
+                this.gMap && this.gMap.resize();
+            };
+            this.type = "POINT"
+            this.setMode("POINT")
+            let historyid = this.history.findIndex(item => item.id === num)
+            if (historyid != -1) {
+                this.nowpicdata = this.history[historyid].data
+                this.keepdraw(this.nowpicdata)
+            } else if (item.mark) {
                 axios.get(item.mark)
                     .then(res => {
                         this.nowpicdata = res.data
@@ -1008,12 +1017,6 @@ export default {
                         console.log(e);
                     })
             }
-            this.rect.splice(0)
-            this.storage = {}
-            window.onresize = function () {
-                this.gMap && this.gMap.resize();
-            };
-            this.setMode("BAN")
             /*if (item.data) {
                 axios.get(item.data).then(res => {
                     item.mark = res.data
@@ -1025,16 +1028,16 @@ export default {
             this.$router.push("/MakeMark")
         },
         getdata(page, num) {
+            this.history = []
             axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
                 .then(res => {
-                    console.log(res.data);
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
                     this.showlist.splice(0)
                     this.showlist = res.data.data;
-                    this.changepic(this.showlist[num == 1 ? 0 : 4])
+                    this.changepic(this.showlist[num == 1 ? 0 : 4], num == 1 ? 0 : 4)
                     this.nowselect = num == 1 ? 0 : 4
                 })
                 .catch(e => {
@@ -1047,7 +1050,7 @@ export default {
                 .catch(e => {
                     console.log(e);
                 })
-        }
+        },
     },
     mounted() {
         this.project = this.$route.query
@@ -1060,6 +1063,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
 .main {
     display: flex;
@@ -1267,5 +1271,9 @@ export default {
 
 .resultlist {
     padding: 8px;
+}
+
+.ocrtype {
+    background-color: rgb(168, 208, 225);
 }
 </style>

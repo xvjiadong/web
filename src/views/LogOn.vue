@@ -1,7 +1,7 @@
 <template>
     <div class="main">
         <div
-            style="height: 100%;width: 70%;background-image: url('注册.jpg');text-align: left;display: flex;flex-direction: column;">
+            style="height: 100%;width: 70%;background-image: url('登录.jpg');text-align: left;display: flex;flex-direction: column;">
             <span
                 style="color: rgb(39,46,62);font-size: 28px;font-weight: 600;letter-spacing: 8px;padding: 50px;">数据标注平台</span>
             <span
@@ -12,7 +12,7 @@
             <span style="color: rgb(39,46,62);font-weight: 600;font-size: 24px;">欢迎注册平台账号</span>
             <div style="width: 65%;"><el-divider></el-divider></div>
             <div style="color: rgb(36,104,242);cursor: pointer;margin-bottom: 15px;font-size: 12px;"
-                @click="$router.push('/')">立即登录</div>
+                @click="$router.push('/login')">立即登录</div>
             <div class="block">
                 <el-form :model="user" :rules="userrules" status-icon ref="userform" class="userform">
                     <el-form-item prop="name">

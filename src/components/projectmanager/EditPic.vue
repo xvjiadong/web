@@ -1,109 +1,17 @@
 <template>
     <el-card>
-        <div slot="header" style="display: flex;justify-content: left;align-items: center;">
-            <el-page-header @back="goBack" :content="project.name">
+        <div slot="header" style="display: flex;justify-content: flex-start;align-items: center;">
+            <el-page-header @back="goBack">
             </el-page-header>
-            <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
+            <span>编辑配置</span>
         </div>
         <div class="main">
             <el-card class="teachcard">
-                <div slot="header" class="operation">
-                    <div class="button-wrap">
-                        <el-tooltip content="平移" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'PAN' }">
-                                <el-button type="text" class="el-icon-thumb" @click="setMode('PAN')"></el-button>
-                            </div>
-                        </el-tooltip>
-
-                        <el-tooltip content="点标注" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'POINT' }">
-                                <el-button type="text" class="el-icon-more-outline"
-                                    @click="setMode('POINT')"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <!--
-                        <el-tooltip content="线标注" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'LINE' }">
-                                <el-button type="text" class="el-icon-minus button" @click="setMode('LINE')"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="多段线标注" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'POLYLINE' }">
-                                <el-button type="text" class="el-icon-share button"
-                                    @click="setMode('POLYLINE')"></el-button>
-                            </div>
-                        </el-tooltip>
-                                                <el-tooltip content="放大" placement="top-end">
-                            <div class="toolblock">
-                                <el-button type="text" class="el-icon-plus button" @click="zoomIn"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="缩小" placement="top-end">
-                            <div class="toolblock">
-                                <el-button type="text" class="el-icon-minus button" @click="zoomOut"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="保存" placement="top-end">
-                            <div class="toolblock">
-                                <el-button type="text" class="el-icon-suitcase button"
-                                    @click="together(nowselect)"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="填充" placement="top-end">
-                            <div class="toolblock" :class="{ modeing: mode === 'FILL' }">
-                                <el-button type="text" class="el-icon-magic-stick button" @click="Fill()"></el-button>
-                            </div>
-                        </el-tooltip>
-                         <el-tooltip content="圆标注" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'CIRCLE' }">
-                                <el-button type="text" class="el-icon-orange button" @click="setMode('CIRCLE')"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="多边形标注" placement="top-end">
-                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
-                                <el-button type="text" class="el-icon-house button" @click="setMode('POLYGON')"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="撤销" placement="top-end">
-                            <div class="toolblock">
-                                <el-button type="text" class="el-icon-refresh-left button" @click="Revoke()"></el-button>
-                            </div>
-                        </el-tooltip>
-                        <el-tooltip content="矩形标注" placement="top-start">
-                            <div class="toolblock" :class="{ modeing: mode === 'RECT' }">
-                                <el-button type="text" class="el-icon-full-screen button"
-                                    @click="setMode('RECT')"></el-button>
-                            </div>
-                        </el-tooltip>
-                        -->
-
-                        <el-tooltip content="保存" placement="top-end">
-                            <div class="toolblock">
-                                <el-button type="text" class="el-icon-suitcase button"
-                                    @click="together(nowselect)"></el-button>
-                            </div>
-                        </el-tooltip>
-                    </div>
+                <div slot="header" style="text-align: right">
+                    <span @click="gotogenerate"
+                        style="color: rgb(36,104,242);text-decoration: underline;cursor: pointer;">前往生成图片区-></span>
                 </div>
-                <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
-                    <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
-                        <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
-                            <div style="display: flex;justify-content: space-between;align-items: center;">
-                                <div :style="'backgroundColor:' + item.color" style="width: 15px;height: 15px;"></div>
-                                <span>{{ item.label }}</span>
-                            </div>
-                        </el-option>
-                    </el-select>
-                    <div style="display: flex;justify-content: space-around;margin-top: 5px;">
-                        <el-button size="mini" type="primary" @click="ok">
-                            确定
-                        </el-button>
-                        <el-button size="mini" @click="Revoke">
-                            取消
-                        </el-button>
-                    </div>
-                    <div id="map" slot="reference" @click="la" @dblclick="la2"></div>
-                </el-popover>
+                <div id="map"></div>
             </el-card>
             <el-card class="teachcard">
                 <div slot="header" style="text-align: center;">
@@ -113,7 +21,7 @@
                     style="display: flex;flex-direction: column;justify-content: flex-start;height: 540px;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
                     <div style="width: 120px;height: 120px;margin-top: 15px;padding: 5px;"
                         v-for="(item, index) in showlist" :key="item.url">
-                        <img @click="together(index)" :src="item.url" :class="{ select: index === nowselect % 5 }"
+                        <img @click="together(index)" :src="item.ossPath" :class="{ select: index === nowselect % 5 }"
                             style="width: 120px;height: 75px;cursor: pointer;">
                     </div>
                 </div>
@@ -126,64 +34,63 @@
                 <el-collapse-item name="results">
                     <template slot="title">
                         <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
-                            <span>分类结果</span>
+                            <span>标注结果</span>
                         </div>
                     </template>
                     <el-card class="teachcard">
                         <div
                             style="height:450px;overflow-y: auto;padding-left: 20px;padding-right: 20px;padding-top: 0;padding-bottom: 0;">
-                            <div v-for="(item) in nowpicdata" :key="item.id" class="resultlist">
+                            <div v-for="(item, index) in nowpicdata" :key="item.id" class="resultlist">
                                 <el-card>
                                     <div slot="header" style="display: flex;justify-content: space-between;">
                                         <span style="font-size: 20px;">
-                                            <span v-if="!item.edit" @dblclick="item.edit = true">{{
-                item.textInfo.text
-            }}</span>
-                                            <span v-else>
-                                                <el-input v-model="item.textInfo.text" size="mini"
-                                                    style="width:60%"></el-input>
-                                                <i style="cursor: pointer;font-size: 20px;" class="el-icon-check"
-                                                    @click="item.edit = false"></i>
-                                            </span>
+                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-view"
+                                                v-if="item.vis" @click="hidefeature(item, index)"></i>
+                                            <i style="cursor: pointer;font-size: 20px;" class="el-icon-hide" v-else
+                                                @click="appearfeature(item, index)"></i>
+                                            <span>{{ item.textInfo.text }}</span>
                                         </span>
-                                        <i @click="delmask(item)" style="cursor: pointer;font-size: 20px;"
-                                            class="el-icon-close"></i>
+                                        <span>
+                                            <el-tooltip placement="top-start" content="删除该主体">
+                                                <i @click="entity_delete(index)"
+                                                    style="cursor: pointer;font-size: 20px;" class="el-icon-minus"></i>
+                                            </el-tooltip>
+                                            <el-tooltip placement="top-start" content="替换该主体">
+                                                <i @click='entity_replace(index)'
+                                                    style="cursor: pointer;font-size: 20px;"
+                                                    class="el-icon-refresh"></i>
+                                            </el-tooltip>
+                                        </span>
                                     </div>
+                                    <img style="width: 160px;height: 120px;" v-if="item.base64str"
+                                        :src="'data:image/gif;base64,' + item.base64str">
                                 </el-card>
                             </div>
                         </div>
                     </el-card>
                 </el-collapse-item>
-                <el-collapse-item name="labels">
-                    <template slot="title">
-                        <div style="color: #666;font-size: 20px;padding: 5px;font-weight: 600;width: 195px;">
-                            <span>分类标签</span>
-                        </div>
-                    </template>
-                    <div style="display: flex;justify-content: flex-start;justify-content: center;padding: 8px;">
-                        <el-input placeholder="新增标签" size="mini" v-model="newlabel"></el-input>
-                        <i @click="addlabel" style="font-size: 20px;cursor: pointer;" class="el-icon-check"></i>
-                    </div>
-                    <div
-                        style="height: 400px;overflow-x:auto;overflow-y: auto;margin-left: 15px;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;">
-                        <div @click="choose(item)" v-for="item in seglabels" :key="item.label" class="labelblock">
-                            <div :style="'backgroundColor:' + item.color" style="width: 25px;height: 25px;"></div>
-                            <span style="margin-left: 15px;">{{ item.label }}</span>
-                        </div>
-                    </div>
-                </el-collapse-item>
             </el-collapse>
         </div>
+        <el-dialog title="替换配置" :visible.sync="replacevis" width="24%" top="15%">
+            <span>替换生成图像数量</span>
+            <el-input-number :step-strictly="true" :min="1" size="small"
+                v-model="replaceform.generate"></el-input-number>
+            <el-input v-model="replaceform.prompt" size="small" placeholder="请输入替换描述"></el-input>
+            <div slot="footer">
+                <div style="width: 100%;display: flex;justify-content: space-around;">
+                    <el-button :disabled="!replaceform.prompt" type="primary" @click="replace_ok">确定</el-button>
+                    <el-button @click="replace_cancel">取消</el-button>
+                </div>
+            </div>
+        </el-dialog>
     </el-card>
 </template>
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
+//import time from '../util/time'
+//import io from 'socket.io-client'
 //import FileSaver from "file-saver";
-//import PicDoc from '../../public/PicDoc.json'
-//import data from '../../public/data (1).json'
-//import example from "../../public/示例.json"
-//import * as cv from 'opencv.js'
 export default {
     data() {
         return {
@@ -222,8 +129,18 @@ export default {
             seglabels: [],
             newlabel: "",
             segpop: [],
-            storage: {},
-            nowpicdata: []
+            storage: "",
+            nowpicdata: [],
+            textprompt: "",
+            textpromptdisable: false,
+            socket: null,
+            replacevis: false,
+            replaceform: {
+                prompt: "",
+                generate: 0,
+                number: 0,
+                id: 0
+            }
         };
     },
     watch: {
@@ -238,35 +155,85 @@ export default {
     computed: {
     },
     methods: {
-        delmask(item) {
-            this.nowpicdata = this.nowpicdata.filter(item2 => {
-                return item2.textid !== item.textid
+        gotogenerate() {
+            console.log(1);
+            this.$router.push({
+                path: "/RemainPic",
+                query: { versionId: this.project.versionId }
             })
         },
-        choose(item) {
-            if (this.project.callType.includes("单标签") && this.nowpicdata.length > 0) {
-                this.nowpicdata[0].textInfo.text = item.label
-                this.nowpicdata[0].color = item.color
-            } else if (this.project.callType.includes("单标签") && this.nowpicdata.length === 0) {
-                this.nowpicdata.push({
-                    filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
-                    textid: Date.now() + "-0",
-                    textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
-                    color: item.color
+        replace_ok() {
+            axios.post("http://10.99.212.243:8000/update", this.replaceform)
+                .then(res => {
+                    if (res.data.code == 200) {
+                        this.$message.success('替换成功，生成图像已缓存于图像暂存区，请及时前往筛选')
+                    }
                 })
-            } else if (this.project.callType.includes("多标签")) {
-                let a = this.nowpicdata.findIndex(ele => ele.textInfo.text === item.label)
-                if (a === -1) {
-                    this.nowpicdata.push({
-                        filename: this.showlist[this.nowselect].url.split("/")[this.showlist[this.nowselect].url.split("/").length - 1],
-                        textid: Date.now() + "-0",
-                        textInfo: { 'text': item.label, 'position': { 'x': 0, 'y': 0 }, 'offset': { 'x': 0, 'y': 0 } },
-                        color: item.color
-                    })
-                }
+                .catch(e => {
+                    console.log(e);
+                })
+            this.replace_cancel()
+        },
+        replace_cancel() {
+            this.replacevis = false
+            this.replaceform = {
+                prompt: "",
+                generate: 0,
+                number: 0,
+                id: 0
             }
         },
-        addlabel() {
+        entity_replace(index) {
+            this.replacevis = true
+            this.replaceform.id = this.showlist[this.nowselect].id
+            this.replaceform.number = index
+        },
+        entity_delete(index) {
+            axios.post("http://10.99.212.243:8000/remove", { id: this.showlist[this.nowselect].id, number: index })
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.changepic(this.showlist[this.nowselect])
+                    }
+                })
+        },
+        /*text_to_segment(url) {
+            if (this.textprompt) {
+                this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
+                this.textpromptdisable = true
+            } else {
+                this.$message.error("请填写分割信息")
+            }
+        },
+        changelabel(item, index) {
+            let a = this.seglabels.find(ele => item.text == ele.label)
+            if (a !== undefined) {
+                this.gFirstFeatureLayer.removeFeatureById(item.id)
+                this.addFeature(item.shape, item.type, item.id, a.color, item.rlecode, item.textInfo, true)
+            }
+            this.tagtextLayer.removeTextById(item.textid)
+            const polygontext = new AILabel.Text(item.textid, { text: item.textInfo.text, position: item.textInfo.position, offset: item.textInfo.offset })
+            this.tagtextLayer.addText(polygontext)
+            this.nowpicdata[index].edit = false
+        },*/
+        appearfeature(item, index) {
+            this.addFeature(item.shape, item.type, item.id, item.color, item.rlecode, item.textInfo, true)
+            const polygontext = new AILabel.Text(item.textid, item.textInfo)
+            this.tagtextLayer.addText(polygontext)
+            this.nowpicdata[index].vis = true
+        },
+        hidefeature(item, index) {
+            this.gFirstFeatureLayer.removeFeatureById(item.id)
+            this.tagtextLayer.removeTextById(item.textid)
+            this.nowpicdata[index].vis = false
+        },
+        /*delmask(mask) {
+            this.gFirstFeatureLayer.removeFeatureById(mask.id)
+            this.tagtextLayer.removeTextById(mask.textid)
+            this.nowpicdata = this.nowpicdata.filter(item => {
+                return item.id !== mask.id
+            })
+        },*/
+        /*addlabel() {
             if (this.seglabels.includes(this.newlabel) || this.newlabel === "") {
                 this.$notify.error({
                     title: '添加失败',
@@ -282,32 +249,115 @@ export default {
                 this.seglabels.push({ label: this.newlabel, color: 'rgb(' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ')' })
             }
             this.newlabel = ""
-        },
+        },*/
+        /*pointok() {
+            if (this.pointlist.length === 0) {
+                this.$notify.error({
+                    title: '请添加至少一个点',
+                    message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
+                    duration: 3000
+                });
+                return
+            }
+            if (!this.vis) {
+                const popover = this.$refs.popover;
+                let timer = setTimeout(() => {
+                    const clientX = this.segpop[0]
+                    const clientY = this.segpop[1]
+                    this.segpop.splice(0)
+                    const bodyWidth = document.body.clientWidth;
+                    const { popperElm } = popover;
+                    let disX = clientX + popperElm.offsetWidth < bodyWidth
+                        ? clientX
+                        : bodyWidth - popperElm.offsetWidth;
+                    let disY = clientY - this.height
+                    popover.popperElm.style.left = disX + "px";
+                    popover.popperElm.style.top = disY + "px";
+                    popover.popperElm.style.zIndex = '99';
+                    clearTimeout(timer);
+                }, 5);
+                this.vis = true
+            }
+            this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
+            this.pointlist.splice(0)
+        },*/
+        /*segok() {
+            axios.post('http://localhost:5000/api/segment_manual', { point: this.pointlist, box: this.rect, url: this.gMap.layers[0].imageInfo.src })
+                .then(res => {
+                    let id = Date.now() + ""
+                    if (!this.segvis) {
+                        if (this.pointlist.length > 1) {
+                            this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                        }
+                    }
+                    this.addFeature(res.data.point, "POLYGON", id)
+                    this.storage = { point: res.data.point, id: id, rlecode: res.data.rle }
+                    if (this.rect.length > 0) {
+                        this.gFirstFeatureLayer.removeFeatureById(this.rect[4])
+                    }
+                    this.rect.splice(0)
+                    if (!this.segvis) {
+                        return
+                    }
+                    this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
+                    this.pointlist.splice(0)
+                    if (!this.vis) {
+                        const popover = this.$refs.popover;
+                        let timer = setTimeout(() => {
+                            const clientX = this.segpop[0]
+                            const clientY = this.segpop[1]
+                            this.segpop.splice(0)
+                            const bodyWidth = document.body.clientWidth;
+                            const { popperElm } = popover;
+                            let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                ? clientX
+                                : bodyWidth - popperElm.offsetWidth;
+                            let disY = clientY - this.height
+                            popover.popperElm.style.left = disX + "px";
+                            popover.popperElm.style.top = disY + "px";
+                            popover.popperElm.style.zIndex = '99';
+                            clearTimeout(timer);
+                        }, 5);
+                        this.vis = true
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+        },*/
         /*切图片时把已标注数据标上 */
-        keepdraw(markdata) {
-            markdata.forEach((item, index) => {
-                let a = this.seglabels.findIndex(item2 => item2.label == item.label)
-                if (a !== -1) {
-                    this.nowpicdata[index].color = this.seglabels[a].color
-                } else {
-                    this.seglabels.push({ label: item.label, color: item.color })
+        keepdraw(markdata, url) {
+            let mattinglist = []
+            markdata.forEach((item) => {
+                if (item.vis) {
+                    this.addFeature(item.shape, item.type, item.id, item.color, item.rlecode)
+                    let text = new AILabel.Text(item.textid, item.textInfo)
+                    this.tagtextLayer.addText(text)
                 }
-                let text = new AILabel.Text(item.textid, item.textInfo, { name }, { FontColor: item.color, FontSize: '20px' })
-                this.tagtextLayer.addText(text)
+                if (!Object.prototype.hasOwnProperty.call(item, 'base64str')) {
+                    mattinglist.push({ code: item.rlecode, id: item.id })
+                }
             })
+            if (mattinglist.length > 0) {
+                axios.post("http://localhost:5000/api/matting", { url: url, mattinglist: mattinglist })
+                    .then(res => {
+                        console.log(this.nowpicdata);
+                        res.data.forEach(item => {
+                            this.nowpicdata[this.nowpicdata.findIndex(item2 => item2.id == item.id)].base64str = item.code
+                        })
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+            }
         },
         //汇总框选向后台提交//
         together(num) {
-            let jsondata = JSON.stringify(this.nowpicdata)
+            /*let jsondata = JSON.stringify(this.nowpicdata)
             let file = new FormData()
             const blob = new Blob([jsondata]);
             file.set("file", blob, "data.json")
-            file.set("id", this.showlist[this.nowselect].id)
-            axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
-                console.log(res.data);
-            })
-            let a = (this.colitem.findIndex(item => item === 'results'))
-            this.colitem.splice(a, 1)
+            file.set("id", this.showlist[this.nowselect].id)*/
             if (this.page === 1 && num === -1) {
                 this.$message.warning("已经是第一张了")
                 return
@@ -320,35 +370,110 @@ export default {
                 this.changepic(this.showlist[num])
                 this.nowselect = num
             }
+            /*axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
+                if (res.data.code === 200) {
+                    console.log(res.data.data);
+                    this.showlist[this.nowselect].mark = res.data.data
+                    let a = (this.colitem.findIndex(item => item === 'results'))
+                    this.colitem.splice(a, 1)
+                    
+                } else {
+                    this.$message.error("保存失败")
+                }
+
+            })*/
         },
-        ok() {
+        /*ok() {
             this.power = false
             if (this.Recognizetextcontent === "") {
                 return
             }
             if (this.type === "RECT") {
-                this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-                this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
-                this.nowpicdata.push({
-                    id: this.storage.id,
-                    type: "RECT",
-                    vis: true,
-                    color: this.seglabels[this.Recognizetextcontent].color,
-                    shape: this.storage.data,
-                    textid: this.storage.id + "-0",
-                    edit: false,
-                    textInfo: { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
-                })
-                let textid = this.storage.id + "-0"
-                const recttext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } })
+                let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                const recttext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.x, y: this.data2.y }, offset: { x: 1, y: this.data2.y < 19 ? -this.data2.y - this.data2.height - 25 : 0 } })
                 this.tagtextLayer.addText(recttext)
                 this.Recognizetextcontent = ""
                 //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            } else if (this.type === "POLYGON") {
+                let sum_x = this.data2.reduce((acc, current) => acc + current.x, 0);
+                let sum_y = this.data2.reduce((acc, current) => acc + current.y, 0);
+                sum_x = sum_x / this.data2.length
+                sum_y = sum_y / this.data2.length
+                let id = Date.now() + ""
+                this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
+                axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "POLYGON" })
+                    .then(res => {
+                        this.addFeature(this.data2, "POLYGON", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        let textid = id + "-" + 0
+                        const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        this.tagtextLayer.addText(polygontext)
+                        this.Recognizetextcontent = ""
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+                //this.showlist[this.nowselect].mark.push({ type: "POLYGON", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            } else if (this.type === "POLYLINE") {
+                let maxx = 9999
+                let maxy = 9999
+                let num
+                this.data2.forEach((item, index) => {
+                    if (item.x < maxx || item.x < maxx && item.y < maxy) {
+                        maxx = item.x
+                        maxy = item.y
+                        num = index
+                    }
+                })
+                let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2[num].x, y: this.data2[num].y }, offset: { x: 1, y: 0 } })
+                this.tagtextLayer.addText(polygontext)
+                this.Recognizetextcontent = ""
+                //this.showlist[this.nowselect].mark.push({ type: "POLYLINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            } else if (this.type === "CIRCLE") {
+                let id = Date.now() + ""
+                this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
+                axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "CIRCLE" })
+                    .then(res => {
+                        this.addFeature(this.data2, "CIRCLE", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                        let textid = id + "-" + 0
+                        const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                        this.tagtextLayer.addText(polygontext)
+                        this.Recognizetextcontent = ""
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+
+                //this.showlist[this.nowselect].mark.push({ type: "CIRCLE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            } else if (this.type === "POINT") {
+                this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                let sum_x = this.storage.point.reduce((acc, current) => acc + current.x, 0);
+                let sum_y = this.storage.point.reduce((acc, current) => acc + current.y, 0);
+                sum_x = sum_x / this.storage.point.length
+                sum_y = sum_y / this.storage.point.length
+                this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                this.tagtextLayer.addText(polygontext)
+                if (this.segvis) {
+                    this.segvis = false
+                    this.setMode("RECT")
+                }
+                this.Recognizetextcontent = ""
+                //this.showlist[this.nowselect].mark.push({ type: "POINT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+            } else if (this.type === "LINE") {
+                let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.start.x, y: this.data2.start.y }, offset: { x: 1, y: 0 } })
+                this.tagtextLayer.addText(polygontext)
+                this.Recognizetextcontent = ""
+                //this.showlist[this.nowselect].mark.push({ type: "LINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             }
             this.vis = false
-        },
-        la(e) {
+        },*/
+        /*la(e) {
             if (this.type === "POINT") {
+                this.segpop.push(e.clientX)
+                this.segpop.push(e.clientY)
                 let a = setTimeout(() => {
                     if (this.selected || !this.power) {
                         return
@@ -356,7 +481,7 @@ export default {
                     if (this.type === "LINE") {
                         this.linenumber += 1
                     }
-                    if (this.type === 'RECT' || this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
+                    if (this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
                         if (!this.vis) {
                             const popover = this.$refs.popover;
                             let timer = setTimeout(() => {
@@ -425,18 +550,31 @@ export default {
                 this.vis = true
                 //}
             }
-        },
-        zoomIn() {
+        },*/
+        /*zoomIn() {
             this.gMap.zoomIn();
         },
         zoomOut() {
             this.gMap.zoomOut();
         },
         setMode(mode) {
+            if (!this.segvis) {
+                let features = this.gFirstFeatureLayer.getAllFeatures()
+                features.forEach(item => {
+                    if (!Object.prototype.hasOwnProperty.call(item.props, 'rlecode')) {
+                        this.gFirstFeatureLayer.removeFeatureById(item.id)
+                        this.vis = false
+                    }
+                })
+            }
+            if (this.segvis && mode !== 'POINT') {
+                return
+            }
+            this.pointlist.splice(0)
             this.mode = mode;
             this.linenumber = 0
             this.type = mode
-        },
+        },*/
         // 获取所有features
         getFeatures() {
             this.allFeatures = this.gFirstFeatureLayer.getAllFeatures();
@@ -445,7 +583,7 @@ export default {
             this.allText = this.tagtextLayer.texts;
         },
         // 初始样式
-        setDrawingStyle(mode) {
+        /*setDrawingStyle(mode) {
             let drawingStyle = {};
             switch (mode) {
                 //平移
@@ -537,11 +675,10 @@ export default {
                 default:
                     break;
             }
-        },
+        },*/
 
         // 添加图形
-        addFeature(data, type, id, color = null, textInfo = null, isappear = false) {
-            console.log(isappear);
+        addFeature(data, type, id, color = null, rlecode = null, textInfo = null, isappear = false, base64str = null) {
             let that = this;
             let drawingStyle = this.drawingStyle;
             //线
@@ -573,30 +710,33 @@ export default {
                 const rectFeature = new AILabel.Feature.Rect(
                     id, // id
                     data, // shape
-                    textInfo == null ? { name } : textInfo, // props
-                    {
-                        strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
-                        fill: false, //是否填充
-                        fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
-                        globalAlpha: 0.5,
-                        lineWidth: 3,
-                        stroke: true,
-                    } // style
+                    { name }, // props
+                    drawingStyle // style
                 );
                 that.gFirstFeatureLayer.addFeature(rectFeature);
+                this.segvis = true
+                this.rect.push(data.x)
+                this.rect.push(data.y)
+                this.rect.push(data.x + data.width)
+                this.rect.push(data.y + data.height)
+                this.rect.push(id)
+                this.setMode("POINT")
+                this.segpop.push(window.event.clientX)
+                this.segpop.push(window.event.clientY)
             }
             //多边形
             else if (type === "POLYGON") {
                 const polygonFeature = new AILabel.Feature.Polygon(
                     id, // id
                     { points: data }, // shape
+                    rlecode !== null ? { rlecode } : { name }, // props
                     {
                         strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
                         fill: true, //是否填充
                         fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
                         globalAlpha: 0.5,
                         lineWidth: 3,
-                        stroke: true,
+                        stroke: false,
                     } // style
                 );
                 that.gFirstFeatureLayer.addFeature(polygonFeature);
@@ -610,6 +750,10 @@ export default {
                     { fillStyle: this.rightclick ? "rgb(255,0,0)" : "rgb(0,255,0)", zIndex: 5, lineWidth: 255 } // style
                 );
                 that.gFirstFeatureLayer.addFeature(gFirstFeaturePoint);
+                if (!this.segvis) {
+                    this.segok()
+                }
+                this.rightclick = false
             }
             //注记
             else if (type == "MARKER") {
@@ -636,11 +780,12 @@ export default {
                 const gFirstFeatureCircle = new AILabel.Feature.Circle(
                     id, // id
                     { cx: data.cx, cy: data.cy, r: data.r }, // shape
+                    rlecode !== null ? { rlecode } : { name }, // props
                     {
                         fill: true, //是否填充
                         fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
                         strokeStyle: color === null ? "rgb(145,172,218)" : color,
-                        stroke: true,
+                        stroke: false,
                         globalAlpha: 0.5,
                         lineWidth: 2,
                     } // style
@@ -666,10 +811,29 @@ export default {
                 );
                 that.gFirstMaskLayer.addAction(clearMaskAction);
             }
+            if (rlecode !== null && textInfo !== null && !isappear & base64str == null) {
+                axios.post("http://localhost:5000/api/matting", { url: this.showlist[this.nowselect].url, mattinglist: [{ code: rlecode, id: id }] })
+                    .then(res => {
+                        this.nowpicdata.push({
+                            base64str: res.data[0].code,
+                            color: color,
+                            id: res.data[0].id,
+                            shape: data,
+                            rlecode: rlecode,
+                            type: type,
+                            textid: res.data[0].id + "-0",
+                            textInfo: textInfo,
+                            vis: true,
+                            edit: false
+                        })
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+            }
             this.getFeatures();
-
         },
-        // 增加删除图标
+        /* 增加删除图标
         addDeleteIcon(feature, shape) {
             let gMap = this.gMap;
             let that = this;
@@ -700,7 +864,7 @@ export default {
             const gFirstMarker = new AILabel.Marker(
                 that.deleteIconId, // id
                 {
-                    src: "https://s1.aigei.com/src/img/png/45/45aabfc232a34e5b9bfaf75412973c08.png?|watermark/3/image/aHR0cHM6Ly9zMS5haWdlaS5jb20vd2F0ZXJtYXJrLzUwMC0xLnBuZz9lPTE3MzU0ODgwMDAmdG9rZW49UDdTMlhwemZ6MTF2QWtBU0xUa2ZITjdGdy1vT1pCZWNxZUpheHlwTDpjYWQ1NHVoRlhGUUViSGR3Vm02aXctVTJoWVE9/dissolve/40/gravity/NorthWest/dx/18/dy/21/ws/0.0/wst/0&e=1735488000&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:C11LKqsRLbAqQo2uVPETYDya0QU=",
+                    src: "../../delete.png",
                     position: position, // 矩形右上角 根据图形动态调整
                     offset: {
                         x: -20,
@@ -725,13 +889,13 @@ export default {
                 this.power = false
             });
             gMap.markerLayer.addMarker(gFirstMarker);
-
+ 
             // that.gFirstFeatureLayer
         },
         // 删除 删除按钮
         deIcon() {
             this.gMap.markerLayer.removeAllMarkers();
-        },
+        },*/
         // 增加事件
         addEvent() {
             let that = this;
@@ -744,10 +908,7 @@ export default {
                 } else {
                     if (type === "RECT" && data.width > 10 && data.height > 10 && 500 - data.x - data.width > 0 && data.y + data.height < 375 && data.x > 0 && data.y > 0) {
                         this.power = true
-                        let id = Date.now() + ""
-                        that.addFeature(data, type, id);
-                        this.storage.data = data
-                        this.storage.id = id
+                        that.addFeature(data, type, Date.now() + "");
                     } else if (type === "POLYGON") {
                         let c = true
                         data.forEach(item => {
@@ -766,8 +927,12 @@ export default {
                     }
                     else if (type === "POINT" && data.x > 0 && data.y > 0) {
                         let id = Date.now() + ""
-                        that.addFeature(data, type, id);
                         this.power = true
+                        data.label = this.rightclick ? 0 : 1
+                        data.id = id
+                        this.pointlist.push(data)
+                        if (!this.segvis || (data.x > this.rect[0] && data.x < this.rect[2] && data.y > this.rect[1] && data.y < this.rect[3]))
+                            that.addFeature(data, type, id);
                     } else if (type === "POLYLINE") {
                         let c = true
                         data.forEach(item => {
@@ -890,11 +1055,12 @@ export default {
                 this.getText()
                 // 更新或者移动需要重新设置删除图标
                 that.deIcon();
+
                 feature.updateShape(shape);
                 that.addDeleteIcon(feature, shape);
-                this.nowpicdata[this.nowpicdata.findIndex(item => item.id === id)].shape = shape
-                this.nowpicdata[this.nowpicdata.findIndex(item => item.id === id)].textInfo.position = { x: shape.x, y: shape.y }
+
             });
+
             // 删除
             gMap.events.on("FeatureDeleted", () => {
                 console.log(2222222);
@@ -902,7 +1068,7 @@ export default {
             });
         },
         // 获取坐标 需要自行添加
-        getPoints(feature) {
+        /*getPoints(feature) {
             switch (feature.type) {
                 case "RECT":
                     return feature.getPoints();
@@ -946,13 +1112,14 @@ export default {
             //刷新map
             this.gMap.refresh();
             this.vis = false
-        },
+            this.segvis = false
+        },*/
         changepic(item) {
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
-                mode: "POINT", // 绘制线段
+                mode: "BAN", // 绘制线段
                 //refreshDelayWhenZooming: false, // 缩放时是否允许刷新延时，性能更优
                 zoomWhenDrawing: true,
                 panWhenDrawing: true,
@@ -969,7 +1136,7 @@ export default {
                 "first-layer-image", // id
                 {
                     id: "image",
-                    src: item.url,
+                    src: item.ossPath,
                     width: 500,
                     height: 374,
                     crossOrigin: true, // 如果跨域图片，需要设置为true
@@ -998,22 +1165,27 @@ export default {
             gMap.addLayer(gFirstFeatureLayer);
             gMap.addLayer(tagtextLayer)
             this.nowpicdata = []
-            if (item.mark) {
-                console.log(item.mark);
-                axios.get(item.mark)
+            if (item.calloutPath) {
+                axios.get(item.calloutPath)
                     .then(res => {
+                        res.data.map(ele => {
+                            ele.edit = false
+                        })
                         this.nowpicdata = res.data
-                        this.keepdraw(res.data)
+                        this.keepdraw(res.data, item.ossPath)
                     }).catch(e => {
                         console.log(e);
                     })
             }
             this.rect.splice(0)
-            this.storage = {}
+            this.segvis = false
+            this.rightclick = false
+            this.pointlist.splice(0)
+            this.segpop.splice(0)
+            this.storage = ""
             window.onresize = function () {
                 this.gMap && this.gMap.resize();
             };
-            this.setMode("BAN")
             /*if (item.data) {
                 axios.get(item.data).then(res => {
                     item.mark = res.data
@@ -1022,35 +1194,32 @@ export default {
             }*/
         },
         goBack() {
-            this.$router.push("/MakeMark")
+            this.$router.push("/ProjectList")
         },
         getdata(page, num) {
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+            console.log();
+            axios.post("http://120.26.142.114:10010/dataset/admin/select", { version: this.project.versionId, current: page, pageSize: 5 })
                 .then(res => {
-                    console.log(res.data);
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
                     this.showlist.splice(0)
-                    this.showlist = res.data.data;
+                    this.showlist = res.data.data.records;
                     this.changepic(this.showlist[num == 1 ? 0 : 4])
                     this.nowselect = num == 1 ? 0 : 4
                 })
                 .catch(e => {
                     console.log(e);
                 })
-            axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
-                .then(res => {
-                    this.seglabels = res.data.data
-                })
-                .catch(e => {
-                    console.log(e);
-                })
         }
+    },
+    connect: function (data) {
+        console.log(data)
     },
     mounted() {
         this.project = this.$route.query
+        this.project.verisonId -= 0
         this.getdata(1, 1)
     },
     beforeDestroy() {

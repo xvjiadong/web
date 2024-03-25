@@ -56,6 +56,11 @@ const platformmanagerrouter = [
 ];
 const projectmanagerrouter = [
   {
+    name: "RemainPic",
+    path: "/RemainPic",
+    component: () => import("../components/projectmanager/RemainPic.vue"),
+  },
+  {
     name: "PersonCenter",
     path: "/PersonCenter",
     component: () => import("../views/PersonCenter.vue"),
@@ -69,6 +74,11 @@ const projectmanagerrouter = [
     name: "DataPublish",
     path: "/DataPublish",
     component: () => import("../components/projectmanager/DataPublish.vue"),
+  },
+  {
+    name: "editpic",
+    path: "/EditPic",
+    component: () => import("../components/projectmanager/EditPic.vue"),
   },
   {
     name: "DataReview",
@@ -185,7 +195,7 @@ const projectmanagerrouter = [
     path: "/languageinference",
     name: "languageinference",
     component: () => import("../components/LanguageInference.vue"),
-  },{
+  }, {
     path: "/readview",
     name: "readview",
     component: () => import("../components/ReadView.vue"),
@@ -198,9 +208,14 @@ const projectmanagerrouter = [
 ];
 const datalabelerrouter = [
   {
-    path: "/readview",
-    name: "readview",
-    component: () => import("../components/ReadView.vue"),
+    path: "/pointview",
+    name: "pointview",
+    component: () => import("../components/PointView.vue"),
+  },
+  {
+    path: "/polyline",
+    name: "polyline",
+    component: () => import("../components/PolyLine.vue"),
   },
   {
     path: "/languageinference",

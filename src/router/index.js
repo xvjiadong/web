@@ -19,13 +19,13 @@ VueRouter.prototype.replace = function push(location, onResolve, onReject) {
 };
 const routes = [
   {
-    path: "/55",
-    name: "tryspeed",
+    path: "/",
+    name: "dooropen",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/TrySpeed.vue"),
+      import(/* webpackChunkName: "about" */ "../views/DoorOpen.vue"),
   },
   {
-    path: "/",
+    path: "/login",
     name: "login",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/LoginIn.vue"),
@@ -41,6 +41,11 @@ const routes = [
     name: "MainBox",
     component: () => import("../views/MainBox.vue"),
     children: [],
+  },
+  {
+    path: "/company_enter",
+    name: "company_enter",
+    component: () => import("../views/CompanyEnter.vue"),
   },
   {
     path: "*",
@@ -79,7 +84,7 @@ const add = () => {
   }
 };
 router.beforeEach((to, from, next) => {
-  if (to.fullPath === "/" || to.fullPath === "/logon") {
+  if (to.fullPath === "/" || to.fullPath === "/logon" || to.fullPath === "/login" || to.fullPath === "/company_enter") {
     next();
   } else {
     if (localStorage.getItem("token")) {
