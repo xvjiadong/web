@@ -1205,7 +1205,7 @@ export default {
                         return
                     }
                     this.showlist.splice(0)
-                    this.showlist = res.data.data.records;
+                    this.showlist = res.data.data.datasetCallNewVOS;
                     this.changepic(this.showlist[num == 1 ? 0 : 4])
                     this.nowselect = num == 1 ? 0 : 4
                 })

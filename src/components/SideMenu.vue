@@ -1,8 +1,8 @@
 <template>
     <el-aside width='100%'>
         <el-menu class="el-menu-vertical-demo" :class="{ elMenu: $store.state.islight, elMenu2: !$store.state.islight }"
-            :collapse="$store.state.iscollapse" v-if="$store.state.user.identity === 1" router :collapse-transition="false"
-            :default-active="'/' + $route.fullPath.split('/')[1]">
+            :collapse="$store.state.iscollapse" v-if="$store.state.user.identity === 1" router
+            :collapse-transition="false" :default-active="'/' + $route.fullPath.split('/')[1]">
             <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }"
                 index="project">
                 <template slot="title">
@@ -14,7 +14,8 @@
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/ProjectList"><i class="el-icon-icon-test1"></i>项目列表</el-menu-item>
             </el-submenu>
-            <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }" index="Task">
+            <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }"
+                index="Task">
                 <template slot="title">
                     <i class="el-icon-order-manage"></i>
                     <span slot="title">项目调度</span>
@@ -24,7 +25,8 @@
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/TaskList"><i class="el-icon-list"></i> 任务列表</el-menu-item>
             </el-submenu>
-            <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }" index="Mark">
+            <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }"
+                index="Mark">
                 <template slot="title">
                     <i class="el-icon-edit"></i>
                     <span slot="title">在线标注</span>
@@ -34,11 +36,13 @@
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/MakeMark"><i class="el-icon-icon-test"></i> 任务标注</el-menu-item>
             </el-submenu>
-            <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }" index="/DataReview">
+            <!-- <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
+                index="/DataReview">
                 <i class="el-icon-product-checked"></i>
                 <span slot="title">数据审核</span>
-            </el-menu-item>
-            <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }" index="/DataPublish">
+            </el-menu-item> -->
+            <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
+                index="/DataPublish">
                 <i class="el-icon-training-fill"></i>
                 <span slot="title">数据发布</span>
             </el-menu-item>
@@ -49,7 +53,8 @@
             </el-menu-item>
         </el-menu>
         <el-menu class="el-menu-vertical-demo" :class="{ elMenu: $store.state.islight, elMenu2: !$store.state.islight }"
-            :collapse="$store.state.iscollapse" v-if="$store.state.user.identity === 2" router :collapse-transition="false">
+            :collapse="$store.state.iscollapse" v-if="$store.state.user.identity === 2" router
+            :collapse-transition="false">
             <el-submenu index="project">
                 <template slot="title">
                     <i class="el-icon-money-funds"></i>
@@ -62,10 +67,11 @@
             <el-submenu index="user">
                 <template slot="title">
                     <i class="el-icon-user"></i>
-                    <span slot="title">用户管理</span>
+                    <span slot="title">员工管理</span>
                 </template>
-                <el-menu-item index="/UserList"><i class="el-icon-user-solid"></i>用户列表</el-menu-item>
-                <el-menu-item index="/UserSchedule"><i class="el-icon-bell"></i>用户调度</el-menu-item>
+                <el-menu-item index="/AddUser"><i class="el-icon-folder-add"></i>员工导入</el-menu-item>
+                <el-menu-item index="/UserList"><i class="el-icon-user-solid"></i>员工列表</el-menu-item>
+                <el-menu-item index="/UserSchedule"><i class="el-icon-bell"></i>员工调度</el-menu-item>
             </el-submenu>
             <el-submenu index="Permission">
                 <template slot="title">
@@ -85,10 +91,20 @@
             </el-menu-item>
         </el-menu>
         <el-menu class="el-menu-vertical-demo" :class="{ elMenu: $store.state.islight, elMenu2: !$store.state.islight }"
-            :collapse="$store.state.iscollapse" :collapse-transition="false" v-if="$store.state.user.identity === 0" router
-            :default-active="'/' + $route.fullPath.split('/')[1]">
-            <el-menu-item index="/MakeMark"><i class="el-icon-icon-test"></i><span slot="title">任务标注</span></el-menu-item>
-            <el-menu-item index="/PermissionReuest"><i class="el-icon-printer"></i><span slot="title">权限申请</span></el-menu-item>
+            :collapse="$store.state.iscollapse" :collapse-transition="false" v-if="$store.state.user.identity === 0"
+            router :default-active="'/' + $route.fullPath.split('/')[1]">
+            <el-menu-item index="/MakeMark"><i class="el-icon-icon-test"></i><span
+                    slot="title">任务标注</span></el-menu-item>
+            <el-menu-item index="/PermissionReuest"><i class="el-icon-printer"></i><span
+                    slot="title">权限申请</span></el-menu-item>
+        </el-menu>
+        <el-menu class="el-menu-vertical-demo" :class="{ elMenu: $store.state.islight, elMenu2: !$store.state.islight }"
+            :collapse="$store.state.iscollapse" :collapse-transition="false" v-if="$store.state.user.identity === 3"
+            router :default-active="'/' + $route.fullPath.split('/')[1]">
+            <el-menu-item index="/CheckMaterial"><i class="el-icon-icon-test"></i><span
+                    slot="title">入驻审核</span></el-menu-item>
+            <el-menu-item index="/CompanyManagement"><i class="el-icon-printer"></i><span
+                    slot="title">入驻管理</span></el-menu-item>
         </el-menu>
     </el-aside>
 </template>
@@ -169,4 +185,5 @@ export default {
     cursor: pointer;
     transition: border-color .3s, background-color .3s, color .3s;
     box-sizing: border-box;
-}</style>
+}
+</style>

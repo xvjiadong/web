@@ -153,33 +153,60 @@ export default {
         },
         getdata(page, num = 0) {
             console.log(num);
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 1 })
+            axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 1 })
                 .then(res => {
                     console.log(res.data);
                     this.textdata.splice(0)
-                    res.data.data.forEach((item) => {
-                        if (item.mark) {
-                            axios.get(item.mark)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat(res2.data)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        } else {
-                            axios.get(item.url)
-                                .then(res2 => {
-                                    let a = { id: item.id, result: [] }
-                                    res2.data.forEach((item2) => {
-                                        a.result.push({ content: item2.content, question: item2.question, answer: "" })
+                    if (this.project.identity == 0) {
+                        res.data.data.forEach((item) => {
+                            if (item.mark) {
+                                axios.get(item.mark)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
                                     })
-                                    this.textdata = this.textdata.concat(a)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        }
-                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.url)
+                                    .then(res2 => {
+                                        let a = { id: item.id, result: [] }
+                                        res2.data.forEach((item2) => {
+                                            a.result.push({ content: item2.content, question: item2.question, answer: "" })
+                                        })
+                                        this.textdata = this.textdata.concat(a)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    } else if (this.project.identity == 1) {
+                        res.data.data.datasetCallNewVOS.forEach((item) => {
+                            if (item.calloutPath) {
+                                axios.get(item.calloutPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.ossPath)
+                                    .then(res2 => {
+                                        let a = { id: item.id, result: [] }
+                                        res2.data.forEach((item2) => {
+                                            a.result.push({ content: item2.content, question: item2.question, answer: "" })
+                                        })
+                                        this.textdata = this.textdata.concat(a)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    }
+
                     this.nowselect = 0
                 })
                 .catch(e => {

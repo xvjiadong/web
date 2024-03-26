@@ -317,7 +317,7 @@ export default {
             this.hideintroduction = !this.hideintroduction
         },
         getrowkey(row) {
-            return row.userId || row.taskName
+            return row.versionId
         },
         a(scope) {
             console.log(scope);
@@ -332,15 +332,15 @@ export default {
             console.log(item);
             let router
             if (item.callType === "图像文本标注") {
-                router="/PicView"
+                router = "/PicView"
             } else if (item.callType === "信息抽取标注") {
-                router="/PdfView"
+                router = "/PdfView"
             } else if (item.callType === "图片分类标注") {
-                router="/ImageClassification"
+                router = "/ImageClassification"
             } else if (item.callType === "文本分类标注") {
-                router="/TextClassification"
-            }else if (item.callType === "分割标注") {
-                router="/segment"
+                router = "/TextClassification"
+            } else if (item.callType === "分割标注") {
+                router = "/segment"
             }
             this.$router.push({
                 path: router,
@@ -517,6 +517,7 @@ export default {
 .tableplay:hover {
     color: rgb(82, 142, 255);
 }
+
 .labelblock {
     border: 1px solid rgb(221, 221, 221);
     display: flex;

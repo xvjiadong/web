@@ -1058,14 +1058,20 @@ export default {
         },
         getdata(page, num) {
             this.history = []
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+            axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
                     this.showlist.splice(0)
-                    this.showlist = res.data.data;
+                    if (this.project.identity == 0) {
+                        this.showlist = res.data.data;
+                    } else if (this.project.identity == 1) {
+                        res.data.data.datasetCallNewVOS.forEach(item => {
+                            this.showlist.push({ id: item.id, url: item.ossPath, mark: item.calloutPath })
+                        })
+                    }
                     this.changepic(this.showlist[num == 1 ? 0 : 4], num == 1 ? 0 : 4)
                     this.nowselect = num == 1 ? 0 : 4
                 })
@@ -1083,6 +1089,7 @@ export default {
     },
     mounted() {
         this.project = this.$route.query
+        this.project.versionId -= 0
         this.getdata(1, 1)
     },
     beforeDestroy() {

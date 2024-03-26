@@ -26,15 +26,15 @@
                         <div
                             style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;">
                             <div v-if="textdata.length > 0" style="width: 830px;height: 480px;">
-                                句子1：{{textdata[0].result[nowselect].sentence1}}
+                                句子1：{{ textdata[0].result[nowselect].sentence1 }}
                                 <el-divider></el-divider>
-                                句子2：{{textdata[0].result[nowselect].sentence2}}
+                                句子2：{{ textdata[0].result[nowselect].sentence2 }}
                             </div>
                         </div>
                         <div class="mapresult">
                             <div class="mapresultheader">标注结果</div>
                             <div v-if="textdata.length > 0">
-                                <div>{{textdata[0].result[nowselect].link }}</div>
+                                <div>{{ textdata[0].result[nowselect].link }}</div>
                             </div>
                             <div v-else>
                                 <el-empty description="请在右侧选择标签"></el-empty>
@@ -82,7 +82,7 @@ export default {
             labelsure: "待添加",
             labelvalue: "",
             nowselect: 0,
-            sentenceindex:0,
+            sentenceindex: 0,
             page: 1,
             textdata: [],
         }
@@ -128,33 +128,60 @@ export default {
         },
         getdata(page, num = 0) {
             console.log(num);
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 1 })
+            axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 1 })
                 .then(res => {
                     console.log(res.data);
                     this.textdata.splice(0)
-                    res.data.data.forEach((item) => {
-                        if (item.mark) {
-                            axios.get(item.mark)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat(res2.data)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        } else {
-                            axios.get(item.url)
-                                .then(res2 => {
-                                    let a={id:item.id,result:[]}
-                                    res2.data.forEach((item2) => {
-                                        a.result.push({sentence1:item2.sentence1,sentence2:item2.sentence2,link:""})
+                    if (this.project.identity == 0) {
+                        res.data.data.forEach((item) => {
+                            if (item.mark) {
+                                axios.get(item.mark)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
                                     })
-                                    this.textdata=this.textdata.concat(a)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        }
-                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.url)
+                                    .then(res2 => {
+                                        let a = { id: item.id, result: [] }
+                                        res2.data.forEach((item2) => {
+                                            a.result.push({ sentence1: item2.sentence1, sentence2: item2.sentence2, link: "" })
+                                        })
+                                        this.textdata = this.textdata.concat(a)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    } else if (this.project.identity == 1) {
+                        res.data.data.forEach((item) => {
+                            if (item.calloutPath) {
+                                axios.get(item.calloutPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.ossPath)
+                                    .then(res2 => {
+                                        let a = { id: item.id, result: [] }
+                                        res2.data.forEach((item2) => {
+                                            a.result.push({ sentence1: item2.sentence1, sentence2: item2.sentence2, link: "" })
+                                        })
+                                        this.textdata = this.textdata.concat(a)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    }
+
                     this.nowselect = 0
                 })
                 .catch(e => {
@@ -476,7 +503,8 @@ export default {
     justify-content: space-between;
     align-items: center;
 }
-.notify{
+
+.notify {
     height: 10%;
 }
 </style>

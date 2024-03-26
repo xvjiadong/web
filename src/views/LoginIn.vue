@@ -32,8 +32,6 @@
             <div style="width: 65%; display: flex;justify-content: space-around;color: rgb(215,216,217);">
                 <span style="cursor: pointer;color: rgb(100,100,101);">忘记密码</span>
                 <span style="cursor: pointer;color: rgb(100,100,101);" @click="logon">注册账号</span>
-                <span style="cursor: pointer;color: rgb(100,100,101);"
-                    @click="$router.push('/company_enter')">公司入驻</span>
             </div>
         </div>
     </div>

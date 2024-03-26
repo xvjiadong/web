@@ -668,7 +668,7 @@ export default {
                         console.log(e);
                     })
             } else if (item.callType === '图像文本标注') {
-                axios.post("http://localhost:5000/api/image_ocr", { id: item.id })
+                axios.post("http://localhost:8800/api/image_ocr", { id: item.id })
                     .then(res => {
                         if (res.data === 'ok') {
                             this.getproject()
@@ -810,13 +810,6 @@ export default {
             this.delvisible = false
             this.chooseitem = ""
             this.selectrow = ""
-            this.$nextTick(() => {
-                this.getproject()
-                this.projectlist.forEach(item => {
-                    this[`multipleSelection${item.id}`] = []
-                })
-            })
-
             axios.post('http://120.26.142.114:10010/items/delete', form).then((res) => {
                 console.log(res.data);
                 if (res.data.code === 200) {
@@ -824,11 +817,9 @@ export default {
                     this.chooseitem = ""
                     this.selectrow = ""
                     this.fresh = !this.fresh
-                    this.$nextTick(() => {
-                        this.getproject()
-                        this.projectlist.forEach(item => {
-                            this[`multipleSelection${item.id}`] = []
-                        })
+                    this.getproject()
+                    this.projectlist.forEach(item => {
+                        this[`multipleSelection${item.id}`] = []
                     })
                     this.delvisible = false
                 } else {
@@ -855,6 +846,7 @@ export default {
             axios.get("http://120.26.142.114:10010/items?current=" + page + '&pageSize=' + 5)
                 .then((res) => {
                     if (res.data.code === 200) {
+                        console.log(1);
                         if (res.data.data.length > 0) {
                             this.$message.warning("已经是最后一页了")
                             return

@@ -121,7 +121,7 @@ export default {
     },
     methods: {
         push(row) {
-            console.log(row);
+            row.identity = 0
             if (row.pre === 'ing') {
                 this.$message.error("正在进行一键标注，请不要进入标注界面")
                 return

@@ -81,6 +81,10 @@ const add = () => {
     children.platformmanagerrouter.forEach((item) => {
       router.addRoute("MainBox", item);
     });
+  } else if (store.state.user.identity === 3) {
+    children.adminmanagerrouter.forEach((item) => {
+      router.addRoute("MainBox", item);
+    });
   }
 };
 router.beforeEach((to, from, next) => {

@@ -25,7 +25,8 @@
                     <div style="display: flex;justify-content: space-around;align-items: flex-start;">
                         <el-popover ref="popover" placement="bottom" width="200" trigger="manual" v-model="visible">
                             <el-select size="mini" v-model="selectentity" placeholder="">
-                                <el-option v-for="item in label" :key="item.label" :value="item.label" :label="item.label"></el-option>
+                                <el-option v-for="item in label" :key="item.label" :value="item.label"
+                                    :label="item.label"></el-option>
                             </el-select>
                             <el-button @click="entityok" type="primary">确定</el-button>
                             <el-button @click="entitycancel">取消</el-button>
@@ -117,9 +118,9 @@ export default {
             if (this.textdata[this.nowselect].entity[this.selectentity]) {
                 this.textdata[this.nowselect].entity[this.selectentity].push(this.selectstr)
             } else {
-                this.textdata[this.nowselect].entity[this.selectentity]=[this.selectstr]
+                this.textdata[this.nowselect].entity[this.selectentity] = [this.selectstr]
             }
-            this.entitycancel()  
+            this.entitycancel()
         },
         entitycancel() {
             this.selectentity = ""
@@ -166,30 +167,54 @@ export default {
             this.chooselabel.splice(index, 1)
         },
         getdata(page, num) {
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+            axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 1 })
                 .then(res => {
                     console.log(res.data);
                     this.textdata.splice(0)
-                    res.data.data.forEach(item => {
-                        if (item.mark) {
-                            axios.get(item.mark)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat(res2.data)
-                                    console.log(this.textdata)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        } else {
-                            axios.get(item.url)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat([{ id: item.id, text: res2.data, entity: {} }])
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        }
-                    })
+                    if (this.project.identity == 0) {
+                        res.data.data.forEach(item => {
+                            if (item.mark) {
+                                axios.get(item.mark)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                        console.log(this.textdata)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.url)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat([{ id: item.id, text: res2.data, entity: {} }])
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    } else if (this.project.identity == 1) {
+                        res.data.data.datasetCallNewVOS.forEach(item => {
+                            if (item.calloutPath) {
+                                axios.get(item.calloutPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                        console.log(this.textdata)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.ossPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat([{ id: item.id, text: res2.data, entity: {} }])
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    }
+
                     this.nowselect = num == 1 ? 0 : 4
                 })
                 .catch(e => {
@@ -217,7 +242,7 @@ export default {
             if (!range.toString()) {
                 return
             }
-            this.selectstr=range.toString()
+            this.selectstr = range.toString()
             const popover = this.$refs.popover;
             let timer = setTimeout(() => {
                 popover.popperElm.style.left = e.clientX + "px";

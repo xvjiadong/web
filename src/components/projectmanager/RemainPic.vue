@@ -1,30 +1,37 @@
 <template>
-    <div v-loading="loading" style="height: 480px;padding: 25px;">
-        <div v-for="(item, index) in showlist" :key="item.ossPath" class="card">
-            <img class="pic" :src="item.ossPath">
-            <el-divider direction="vertical"></el-divider>
-            <div style="width: 85%;">
-                <div v-if="item.pic.length > 0" class="generate_block">
-                    <div style="display: flex;justify-content: space-between;padding-left: 15px;padding-right: 15px;">
-                        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
-                            @change="handleCheckAllChange($event, item.pic, index)">全选</el-checkbox>
-                        <span @click="submit(item.id, choice[index])" class="submit">提交</span>
+    <div>
+        <el-page-header @back="goBack">
+        </el-page-header>
+        <div v-loading="loading" style="height: 480px;padding: 25px;">
+            <div v-for="(item, index) in showlist" :key="item.ossPath" class="card">
+                <img class="pic" :src="item.ossPath">
+                <el-divider direction="vertical"></el-divider>
+                <div style="width: 85%;">
+                    <div v-if="item.pic.length > 0" class="generate_block">
+                        <div
+                            style="display: flex;justify-content: space-between;padding-left: 15px;padding-right: 15px;">
+                            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                                @change="handleCheckAllChange($event, item.pic, index)">全选</el-checkbox>
+                            <span @click="submit(item.id, item.choice)" class="submit">提交</span>
+                        </div>
+                        <el-divider></el-divider>
+                        <el-checkbox-group @change="handleCheckedCitiesChange($event, item.pic)" v-model="item.choice"
+                            style="display: flex;overflow-x: auto;">
+                            <el-checkbox :label="image.id" v-for="image in item.pic"
+                                :key="image.ossPath + '-' + image.id">
+                                <img :src="image.ossPath" class="generate_pic">
+                            </el-checkbox>
+                        </el-checkbox-group>
                     </div>
-                    <el-divider></el-divider>
-                    <el-checkbox-group @change="handleCheckedCitiesChange($event, item.pic)" v-model="choice[index]"
-                        style="display: flex;overflow-x: auto;">
-                        <el-checkbox :label="image.id" v-for="image in item.pic" :key="image.ossPath + '-' + image.id">
-                            <img :src="image.ossPath" class="generate_pic">
-                        </el-checkbox>
-                    </el-checkbox-group>
+                    <el-empty v-else description="该图片未作为样本生成过图片"></el-empty>
                 </div>
-                <el-empty v-else description="该图片未作为样本生成过图片"></el-empty>
             </div>
+            <el-pagination v-if="showlist.length !== 0" :hide-on-single-page="true" :current-page="page"
+                :page-sizes="[5]" :page-size="5" background layout="sizes, prev, pager, next, jumper" :total="total"
+                @current-change="handleCurrentChange" />
         </div>
-        <el-pagination v-if="showlist.length !== 0" :hide-on-single-page="true" :current-page="page" :page-sizes="[5]"
-            :page-size="5" background layout="sizes, prev, pager, next, jumper" :total="total"
-            @current-change="handleCurrentChange" />
     </div>
+
 </template>
 <script>
 import axios from 'axios'
@@ -35,21 +42,11 @@ export default {
                 dataId: 0,
                 ids: []
             },
-            choice: [[], [], [], [], []],
             versionId: 0,
             page: 1,
             showlist: [
-                {
-                    ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg",
-                    pic: [
-                        { id: 0, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" },
-                        { id: 1, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" },
-                        { id: 2, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" },
-                        { id: 3, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" },
-                        { id: 4, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" },
-                        { id: 5, ossPath: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816-temp-7995bb4a-e5c9-11ee-98df-00163e16c9a0.jpg" }
-                    ]
-                }],
+
+            ],
             total: 0,
             loading: false,
             loadingnum: 0,
@@ -58,12 +55,14 @@ export default {
         }
     },
     methods: {
+        goBack() {
+            this.$router.push("/projectlist")
+        },
         submit(id, ids) {
             axios.post("http://120.26.142.114:10010/dataset/temp", { "ids": ids, "dataId": id })
                 .then(res => {
                     if (res.data.code === 200) {
                         this.getdata(this.page)
-                        this.choice = [[], [], [], [], []]
                     }
                 })
                 .catch(e => {
@@ -95,7 +94,7 @@ export default {
                         this.showlist[index].pic = res.data.data
                     }
                     this.loadingnum += 1
-                    if (this.loadingnum === this.showlist.length - 1) {
+                    if (this.loadingnum === this.showlist.length) {
                         console.log(this.showlist);
                         this.loading = false
                     }
@@ -109,20 +108,12 @@ export default {
             axios.post("http://120.26.142.114:10010/dataset/admin/select", { current: page, pageSize: 5, version: this.version.versionId })
                 .then(res => {
                     if (res.data.code === 200) {
-                        this.showlist.concat(res.data.data.records)
-                        //this.showlist=res.data.data.records
-                        res.data.data.records.forEach((item) => {
-                            this.showlist.push(item)
-                        })
+                        this.showlist.concat(res.data.data.datasetCallNewVOS)
+                        this.showlist = res.data.data.datasetCallNewVOS
                         this.total = res.data.data.total
                         this.showlist.forEach((item, index) => {
-                            this.showlist[index].choice = []
-                            //item.pic = []
-                            //this.getpic(item.id, index)
-                            if (index != 0) {
-                                this.showlist[index].pic = []
-                                this.getpic(item.id, index)
-                            }
+                            item.pic = []
+                            this.getpic(item.id, index)
                         })
                     }
                 })

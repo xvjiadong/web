@@ -10,11 +10,12 @@
                         <li class="liblock"><a href="#block2" style="color: white;text-decoration: none;">民用数据</a></li>
                         <li class="liblock"><a href="#block3" style="color: white;text-decoration: none;">服务优势</a></li>
                         <li class="liblock"><a href="#block4" style="color: white;text-decoration: none;">服务流程</a></li>
-                        <li class="liblock"><a href="#block5" style="color: white;text-decoration: none;">公司简介</a></li>
+                        <li class="liblock"><a href="#block5" style="color: white;text-decoration: none;">平台简介</a></li>
                     </ul>
                 </div>
-                <div>
+                <div style="display: flex;justify-content: space-between;width: 16.5%;">
                     <button @click="gotologin" class="rightnav">登录</button>
+                    <button @click="$router.push('/company_enter')" class="rightnav2">公司入驻办理</button>
                 </div>
             </div>
         </div>
@@ -304,6 +305,18 @@ export default {
     color: white;
     font-size: 15px;
     width: 80px;
+    height: 35px;
+    padding: 5px;
+    border: 0px;
+}
+
+.rightnav2 {
+    cursor: pointer;
+    background-color: rgb(47, 142, 255);
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+    width: 120px;
     height: 35px;
     padding: 5px;
     border: 0px;

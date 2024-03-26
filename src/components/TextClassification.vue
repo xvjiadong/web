@@ -122,29 +122,52 @@ export default {
             this.chooselabel.splice(index, 1)
         },
         getdata(page, num) {
-            axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: page, number: 5 })
+            axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
                     console.log(res.data);
                     this.textdata.splice(0)
-                    res.data.data.forEach(item => {
-                        if (item.mark) {
-                            axios.get(item.mark)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat(res2.data)
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        } else {
-                            axios.get(item.url)
-                                .then(res2 => {
-                                    this.textdata = this.textdata.concat([{id:item.id,text:res2.data,result:""}])
-                                })
-                                .catch(e2 => {
-                                    console.log(e2);
-                                })
-                        }
-                    })
+                    if (this.project.identity == 0) {
+                        res.data.data.forEach(item => {
+                            if (item.mark) {
+                                axios.get(item.mark)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.url)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat([{ id: item.id, text: res2.data, result: "" }])
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    } else if (this.project.identity == 1) {
+                        res.data.data.datasetCallNewVOS.forEach(item => {
+                            if (item.calloutPath) {
+                                axios.get(item.calloutPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat(res2.data)
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            } else {
+                                axios.get(item.ossPath)
+                                    .then(res2 => {
+                                        this.textdata = this.textdata.concat([{ id: item.id, text: res2.data, result: "" }])
+                                    })
+                                    .catch(e2 => {
+                                        console.log(e2);
+                                    })
+                            }
+                        })
+                    }
+
                     this.nowselect = num == 1 ? 0 : 4
                 })
                 .catch(e => {
@@ -466,7 +489,8 @@ export default {
     justify-content: space-between;
     align-items: center;
 }
-.notify{
+
+.notify {
     height: 10%;
 }
 </style>

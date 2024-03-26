@@ -1,5 +1,10 @@
 const platformmanagerrouter = [
   {
+    name: "Adduser",
+    path: "/adduser",
+    component: () => import("../components/platformmanager/AddUser.vue"),
+  },
+  {
     name: "PersonCenter",
     path: "/PersonCenter",
     component: () => import("../views/PersonCenter.vue"),
@@ -279,8 +284,21 @@ const datalabelerrouter = [
     component: () => import("../components/ImageClassification.vue"),
   },
 ];
+const adminmanagerrouter = [
+  {
+    path: "/CheckMaterial",
+    name: "checkmaterial",
+    component: () => import("../components/adminmanager/CheckMaterial.vue"),
+  },
+  {
+    path: "/CompanyManagement",
+    name: "companymanagement",
+    component: () => import("../components/adminmanager/CompanyManagement.vue"),
+  },
+]
 export default {
   platformmanagerrouter,
   projectmanagerrouter,
   datalabelerrouter,
+  adminmanagerrouter
 };
