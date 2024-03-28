@@ -61,6 +61,16 @@ const platformmanagerrouter = [
 ];
 const projectmanagerrouter = [
   {
+    name: "GenerateArea",
+    path: "/GenerateArea",
+    component: () => import("../components/projectmanager/GenerateArea.vue"),
+  },
+  {
+    name: "TeamPlanning",
+    path: "/TeamPlanning",
+    component: () => import("../components/projectmanager/TeamPlanning.vue"),
+  },
+  {
     name: "RemainPic",
     path: "/RemainPic",
     component: () => import("../components/projectmanager/RemainPic.vue"),

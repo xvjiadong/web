@@ -5,7 +5,7 @@
             </el-page-header>
             <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
         </div>
-        <div class="main">
+        <div class="main" v-loading="loading">
             <el-card class="teachcard">
                 <div slot="header" class="operation">
                     <div class="button-wrap">
@@ -86,6 +86,7 @@
                     </div>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
+                    <el-input v-model="segtext" size="samll" placeholder="请输入标签"></el-input>
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
                         <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
                             <div style="display: flex;justify-content: space-between;align-items: center;">
@@ -185,11 +186,6 @@ import AILabel from "ailabel";
 import axios from "axios";
 import { v4 } from 'uuid'
 import time from '../util/time'
-//import FileSaver from "file-saver";
-//import PicDoc from '../../public/PicDoc.json'
-//import data from '../../public/data (1).json'
-//import example from "../../public/示例.json"
-//import * as cv from 'opencv.js'
 export default {
     data() {
         return {
@@ -232,7 +228,9 @@ export default {
             nowpicdata: [],
             ocrtype: 1,
             now: new Date(),
-            history: []
+            history: [],
+            segtext:"",
+            loading:false
         };
     },
     watch: {
@@ -287,6 +285,7 @@ export default {
                     this.tagtextLayer.addText(text)
                 }
             })
+            this.loading=false
         },
         //汇总框选向后台提交//
         together(num) {
@@ -312,7 +311,7 @@ export default {
                     this.$message.warning("已经是第一张了")
                     return
                 } else if (num === this.showlist.length || num == -1) {
-                    this.gMap.destroy()
+                    //this.gMap.destroy()
                     this.page = num == -1 ? this.page - 1 : this.page + 1
                     this.getdata(this.page, num == -1 ? 0 : 1)
                 } else {
@@ -324,13 +323,13 @@ export default {
         },
         ok() {
             this.power = false
-            if (this.Recognizetextcontent === "") {
+            if (this.Recognizetextcontent === "" && this.segtext=='') {
                 this.$message.warning("请选择标签")
                 return
             }
             this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-            let textInfo = { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.shape[0].x, y: this.storage.shape[0].y }, offset: { x: 0, y: 1 } }
-            this.addFeature(this.storage.shape, 'POLYLINE', this.storage.id, this.seglabels[this.Recognizetextcontent].color, textInfo)
+            let textInfo = { text: this.segtext==''? this.seglabels[this.Recognizetextcontent].label:this.segtext, position: { x: this.storage.shape[0].x, y: this.storage.shape[0].y }, offset: { x: 0, y: 1 } }
+            this.addFeature(this.storage.shape, 'POLYLINE', this.storage.id,this.segtext==''? this.seglabels[this.Recognizetextcontent].color:'rgb(255,0,0)' , textInfo)
             let textid = this.storage.id + "-0"
             const recttext = new AILabel.Text(textid, textInfo)
             this.tagtextLayer.addText(recttext)
@@ -954,6 +953,7 @@ export default {
         },
         changepic(item, num) {
             let that = this
+            this.loading=true
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
@@ -1022,6 +1022,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
+            }else{
+                this.loading=false
             }
             /*if (item.data) {
                 axios.get(item.data).then(res => {
@@ -1040,6 +1042,9 @@ export default {
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
+                    }
+                    if (this.gMap !== null) {
+                        this.gMap.destroy()
                     }
                     this.showlist.splice(0)
                     if (this.project.identity == 0) {

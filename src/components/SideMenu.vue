@@ -24,17 +24,21 @@
                     index="/TaskSchedule"><i class="el-icon-order"></i> 任务调度</el-menu-item>
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/TaskList"><i class="el-icon-list"></i> 任务列表</el-menu-item>
+                <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
+                    index="/TeamPlanning"><i class="el-icon-customer-group"></i> 团队管理</el-menu-item>
             </el-submenu>
             <el-submenu :class="{ elSubmenuTitle: $store.state.islight, elSubmenuTitle2: !$store.state.islight }"
                 index="Mark">
                 <template slot="title">
                     <i class="el-icon-edit"></i>
-                    <span slot="title">在线标注</span>
+                    <span slot="title">数据处理</span>
                 </template>
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/LabelManager"><i class="el-icon-a-business-icon-Bigpromotion"></i> 标签组管理</el-menu-item>
                 <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                     index="/MakeMark"><i class="el-icon-icon-test"></i> 任务标注</el-menu-item>
+                <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
+                    index="/GenerateArea"><i class="el-icon-icon-test"></i> 增强筛选</el-menu-item>
             </el-submenu>
             <!-- <el-menu-item :class="{ elMenuItem: $store.state.islight, elMenuItem2: !$store.state.islight }"
                 index="/DataReview">

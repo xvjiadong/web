@@ -95,7 +95,7 @@ export default {
                     }
                     this.loadingnum += 1
                     if (this.loadingnum === this.showlist.length) {
-                        console.log(this.showlist);
+                        //console.log(this.showlist);
                         this.loading = false
                     }
                 }).catch(e => {
@@ -155,7 +155,6 @@ export default {
 .generate_pic {
     width: 220px;
     height: 220px;
-
 }
 
 .generate_pic:nth-child(n+2) {

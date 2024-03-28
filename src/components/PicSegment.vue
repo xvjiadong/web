@@ -5,7 +5,7 @@
             </el-page-header>
             <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
         </div>
-        <div class="main">
+        <div class="main" v-loading="loading">
             <el-card class="teachcard">
                 <div slot="header" class="operation">
                     <div class="button-wrap">
@@ -89,6 +89,7 @@
                     </div>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
+                    <el-input v-model="segtext" style="width: 100%;" size="mini" placeholder="请输入分割内容"></el-input>
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
                         <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
                             <div style="display: flex;justify-content: space-between;align-items: center;">
@@ -188,13 +189,7 @@
 <script>
 import AILabel from "ailabel";
 import axios from "axios";
-//import time from '../util/time'
 import io from 'socket.io-client'
-//import FileSaver from "file-saver";
-//import PicDoc from '../../public/PicDoc.json'
-//import data from '../../public/data (1).json'
-//import example from "../../public/示例.json"
-//import * as cv from 'opencv.js'
 export default {
     data() {
         return {
@@ -238,6 +233,8 @@ export default {
             textprompt: "",
             textpromptdisable: false,
             socket: null,
+            loading: false,
+            segtext: ""
         };
     },
     watch: {
@@ -252,7 +249,6 @@ export default {
     computed: {
     },
     methods: {
-
         text_to_segment(url) {
             if (this.textprompt) {
                 this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
@@ -402,25 +398,26 @@ export default {
                         res.data.forEach(item => {
                             this.nowpicdata[this.nowpicdata.findIndex(item2 => item2.id == item.id)].base64str = item.code
                         })
+
                     })
                     .catch(e => {
                         console.log(e);
                     })
             }
+            this.loading = false
         },
         //汇总框选向后台提交//
         together(num) {
             if (this.generate_manual)
                 return
+
             let jsondata = JSON.stringify(this.nowpicdata)
             let file = new FormData()
             const blob = new Blob([jsondata]);
             file.set("file", blob, "data.json")
             file.set("id", this.showlist[this.nowselect].id)
             axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
-                console.log(res.data);
                 if (res.data.code === 200) {
-                    console.log(res.data.data);
                     this.showlist[this.nowselect].mark = res.data.data
                     let a = (this.colitem.findIndex(item => item === 'results'))
                     this.colitem.splice(a, 1)
@@ -428,7 +425,7 @@ export default {
                         this.$message.warning("已经是第一张了")
                         return
                     } else if (num === this.showlist.length || num == -1) {
-                        this.gMap.destroy()
+
                         this.page = num == -1 ? this.page - 1 : this.page + 1
                         this.getdata(this.page, num == -1 ? 0 : 1)
                     } else {
@@ -444,7 +441,8 @@ export default {
         },
         ok() {
             this.power = false
-            if (this.Recognizetextcontent === "") {
+            if (this.Recognizetextcontent === "" && this.segtext == '') {
+                this.$message.warning("请输入标签")
                 return
             }
             if (this.type === "RECT") {
@@ -462,7 +460,8 @@ export default {
                 this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
                 axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "POLYGON" })
                     .then(res => {
-                        this.addFeature(this.data2, "POLYGON", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
+                        this.addFeature(this.data2, "POLYGON", id, this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                         let textid = id + "-" + 0
                         const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                         this.tagtextLayer.addText(polygontext)
@@ -484,20 +483,23 @@ export default {
                     }
                 })
                 let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2[num].x, y: this.data2[num].y }, offset: { x: 1, y: 0 } })
+                const polygontext = new AILabel.Text(textid, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2[num].x, y: this.data2[num].y }, offset: { x: 1, y: 0 } })
                 this.tagtextLayer.addText(polygontext)
                 this.Recognizetextcontent = ""
+                this.segtext = ''
                 //this.showlist[this.nowselect].mark.push({ type: "POLYLINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             } else if (this.type === "CIRCLE") {
                 let id = Date.now() + ""
                 this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
                 axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "CIRCLE" })
                     .then(res => {
-                        this.addFeature(this.data2, "CIRCLE", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                        let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
+                        this.addFeature(this.data2, "CIRCLE", id, this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
                         let textid = id + "-" + 0
-                        const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                        const polygontext = new AILabel.Text(textid, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
                         this.tagtextLayer.addText(polygontext)
                         this.Recognizetextcontent = ""
+                        this.segtext = ''
                     })
                     .catch(e => {
                         console.log(e);
@@ -510,15 +512,17 @@ export default {
                 let sum_y = this.storage.point.reduce((acc, current) => acc + current.y, 0);
                 sum_x = sum_x / this.storage.point.length
                 sum_y = sum_y / this.storage.point.length
-                this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
+                this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                 let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                const polygontext = new AILabel.Text(textid, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                 this.tagtextLayer.addText(polygontext)
                 if (this.segvis) {
                     this.segvis = false
                     this.setMode("RECT")
                 }
                 this.Recognizetextcontent = ""
+                this.segtext = ''
                 //this.showlist[this.nowselect].mark.push({ type: "POINT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             } else if (this.type === "LINE") {
                 let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
@@ -1174,6 +1178,7 @@ export default {
             this.segvis = false
         },
         changepic(item) {
+            this.loading = true
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
@@ -1236,6 +1241,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
+            } else {
+                this.loading = false
             }
             this.rect.splice(0)
             this.segvis = false
@@ -1259,9 +1266,12 @@ export default {
         getdata(page, num) {
             axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
-                    if (res.data.data.length === 0) {
+                    if ((this.project.identity == 0 && res.data.data.length === 0) || (this.project.identity == 1 && res.data.data.datasetCallNewVOS.length == 0)) {
                         this.$message.warning("已经是最后一张了")
                         return
+                    }
+                    if (this.gMap !== null) {
+                        this.gMap.destroy()
                     }
                     this.showlist.splice(0)
                     if (this.project.identity == 0) {
@@ -1271,6 +1281,7 @@ export default {
                             this.showlist.push({ id: item.id, url: item.ossPath, mark: item.calloutPath })
                         })
                     }
+                    console.log(this.showlist);
                     this.changepic(this.showlist[num == 1 ? 0 : 4])
                     this.nowselect = num == 1 ? 0 : 4
                 })

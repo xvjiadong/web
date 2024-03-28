@@ -487,6 +487,7 @@ export default {
             axios.get("http://120.26.142.114:10010/items?current=" + 1 + '&pageSize=' + 99)
                 .then((res) => {
                     if (res.data.code === 200) {
+                        console.log(res.data.data);
                         this.projectlist = res.data.data.list;
                     }
                 })
@@ -495,16 +496,22 @@ export default {
                 })
         },
         getmember() {
-            axios.get("http://120.26.142.114:10010/users").then(res => {
-                console.log(res.data);
-                this.members = res.data.data;
-            })
+            axios.get("http://120.26.142.114:10010/users")
+                .then(res => {
+                    this.members = res.data.data;
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         },
         getlabelgroup() {
-            axios.get("http://120.26.142.114:10010/label").then(res => {
-                console.log(res.data);
-                this.labelgroup = res.data.data
-            })
+            axios.get("http://120.26.142.114:10010/label")
+                .then(res => {
+                    this.labelgroup = res.data.data
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         }
     },
     mounted() {

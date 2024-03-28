@@ -5,7 +5,7 @@
             </el-page-header>
             <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
         </div>
-        <div class="main">
+        <div class="main" v-loading="loading">
             <el-card class="teachcard">
                 <div slot="header" class="operation">
                     <div class="button-wrap">
@@ -107,6 +107,7 @@
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
+                        <el-input v-model="segtext" style="width: 100%;" size="mini" placeholder="请输入分割内容"></el-input>
                         <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
                             <div style="display: flex;justify-content: space-between;align-items: center;">
                                 <div :style="'backgroundColor:' + item.color" style="width: 15px;height: 15px;"></div>
@@ -256,7 +257,9 @@ export default {
             clony_mode: false,
             clonyvis: false,
             detect_object: [],
-            label_data: []
+            label_data: [],
+            loading: false,
+            segtext: ""
         };
     },
     watch: {
@@ -345,6 +348,7 @@ export default {
                     let text = new AILabel.Text(item.textid, item.textInfo)
                     this.tagtextLayer.addText(text)
                 }
+                this.loading = false
             })
         },
         //汇总框选向后台提交//
@@ -363,7 +367,7 @@ export default {
                 this.$message.warning("已经是第一张了")
                 return
             } else if (num === this.showlist.length || num == -1) {
-                this.gMap.destroy()
+                //this.gMap.destroy()
                 this.page = num == -1 ? this.page - 1 : this.page + 1
                 this.getdata(this.page, num == -1 ? 0 : 1)
             } else {
@@ -374,26 +378,28 @@ export default {
         },
         ok() {
             this.power = false
-            if (this.Recognizetextcontent === "") {
+            if (this.Recognizetextcontent === "" &&this.segtext==='') {
                 return
             }
             if (this.type === "RECT") {
                 this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
                 this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
+                let textInfo={ text: this.segtext==''? this.seglabels[this.Recognizetextcontent].label:this.segtext, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
                 this.nowpicdata.push({
                     id: this.storage.id,
                     type: "RECT",
                     vis: true,
-                    color: this.seglabels[this.Recognizetextcontent].color,
+                    color: this.segtext==''?this.seglabels[this.Recognizetextcontent].color: `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`,
                     shape: this.storage.data,
                     textid: this.storage.id + "-0",
                     edit: false,
-                    textInfo: { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
+                    textInfo: textInfo
                 })
                 let textid = this.storage.id + "-0"
-                const recttext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } })
+                const recttext = new AILabel.Text(textid, textInfo)
                 this.tagtextLayer.addText(recttext)
                 this.Recognizetextcontent = ""
+                this.segtext=''
                 //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             }
             this.vis = false
@@ -1003,6 +1009,7 @@ export default {
             this.vis = false
         },
         changepic(item) {
+            this.loading=true
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
@@ -1062,6 +1069,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
+            }else{
+                this.loading=false
             }
             this.rect.splice(0)
             this.storage = {}
@@ -1087,6 +1096,9 @@ export default {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
+                    if (this.gMap !== null) {
+                        this.gMap.destroy()
+                    }
                     this.showlist.splice(0)
                     if (this.project.identity == 0) {
                         this.showlist = res.data.data;
@@ -1101,6 +1113,8 @@ export default {
                 .catch(e => {
                     console.log(e);
                 })
+        },
+        getlabel(){
             axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
                 .then(res => {
                     this.seglabels = res.data.data
@@ -1112,8 +1126,9 @@ export default {
     },
     mounted() {
         this.project = this.$route.query
-        this.project.versionId-=0
+        this.project.versionId -= 0
         this.getdata(1, 1)
+        this.getlabel()
         this.label_data = labeldata
         this.socket = io('http://localhost:5000')
         this.socket.on("textprompt_to_detect", (data) => {

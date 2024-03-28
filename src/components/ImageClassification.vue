@@ -5,7 +5,7 @@
             </el-page-header>
             <span>{{ project.projectName }}->{{ project.version }}->{{ project.callType }}</span>
         </div>
-        <div class="main">
+        <div class="main" v-loading='loading'>
             <el-card class="teachcard">
                 <div slot="header" class="operation">
                     <div class="button-wrap">
@@ -223,7 +223,8 @@ export default {
             newlabel: "",
             segpop: [],
             storage: {},
-            nowpicdata: []
+            nowpicdata: [],
+            loading:false
         };
     },
     watch: {
@@ -295,6 +296,7 @@ export default {
                 let text = new AILabel.Text(item.textid, item.textInfo, { name }, { FontColor: item.color, FontSize: '20px' })
                 this.tagtextLayer.addText(text)
             })
+            this.loading=false
         },
         //汇总框选向后台提交//
         together(num) {
@@ -312,7 +314,7 @@ export default {
                 this.$message.warning("已经是第一张了")
                 return
             } else if (num === this.showlist.length || num == -1) {
-                this.gMap.destroy()
+                //this.gMap.destroy()
                 this.page = num == -1 ? this.page - 1 : this.page + 1
                 this.getdata(this.page, num == -1 ? 0 : 1)
             } else {
@@ -949,6 +951,7 @@ export default {
         },
         changepic(item) {
             let that = this
+            this.loading=true
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
@@ -999,7 +1002,6 @@ export default {
             gMap.addLayer(tagtextLayer)
             this.nowpicdata = []
             if (item.mark) {
-                console.log(item.mark);
                 axios.get(item.mark)
                     .then(res => {
                         this.nowpicdata = res.data
@@ -1007,6 +1009,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
+            }else{
+                this.loading=false
             }
             this.rect.splice(0)
             this.storage = {}
@@ -1031,6 +1035,9 @@ export default {
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
+                    }
+                    if (this.gMap !== null) {
+                        this.gMap.destroy()
                     }
                     this.showlist.splice(0)
                     if (this.project.identity == 0) {
