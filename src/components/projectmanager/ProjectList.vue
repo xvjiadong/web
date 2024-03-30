@@ -941,7 +941,6 @@ export default {
 						versionId: item.id,
 					})
 					.then((res) => {
-						console.log(res.data);
 						if (res.data.code === 200) {
 							axios
 								.post("http://localhost:5000/api/text_process", {

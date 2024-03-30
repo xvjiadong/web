@@ -15,7 +15,7 @@
                 <el-button @click="uploaduser" type="primary" size="small"
                     style="font-size: 20px;margin-top: 15px;">导入员工</el-button>
                 <div style="margin-top: 15px;">
-                    <a v-if="!success" :download="url.split('/')[url.split('/').length - 1]" :href="url">
+                    <a v-if="success" :download="url.split('/')[url.split('/').length - 1]" :href="url">
                         下载员工账号数据
                     </a>
                 </div>
@@ -34,6 +34,7 @@
 
 <script>
 import * as xlsx from 'xlsx';
+import axios from 'axios';
 export default {
     data() {
         return {
@@ -47,17 +48,32 @@ export default {
         }
     },
     methods: {
+        getuserlist() {
+            axios.get("http://120.26.142.114:10010/users/company/get/userInfo")
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.url = res.data.data
+
+                    }
+                })
+        },
         uploaduser() {
-            if (this.files.length == 0) {
+            if (this.adduser.files.length == 0) {
                 this.$message.warning("请上传规范员工表格")
             } else {
-                /*axios.post("")
+                let files = new FormData()
+                console.log(this.adduser);
+                this.adduser.files.forEach(item => {
+                    files.append("files", item)
+                })
+                axios.post("http://120.26.142.114:10010/users/company/upload", files)
                     .then(res => {
-                        console.log(res);
+                        if (res.data.code === 200) {
+                            this.$message.success("导入成功")
+                            this.getuserlist()
+                            this.success = true
+                        }
                     })
-                    .catch(e => {
-                        console.log(e);
-                    })*/
             }
         },
         filecheck(file) {

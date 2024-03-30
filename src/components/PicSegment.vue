@@ -251,7 +251,7 @@ export default {
     methods: {
         text_to_segment(url) {
             if (this.textprompt) {
-                this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
+                this.socket.emit("textprompt_to_segment", { url: url, label: this.seglabels, text: this.textprompt })
                 this.textpromptdisable = true
             } else {
                 this.$message.error("请填写分割信息")
@@ -461,7 +461,7 @@ export default {
                 axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "POLYGON" })
                     .then(res => {
                         let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
-                        this.addFeature(this.data2, "POLYGON", id, this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        this.addFeature(this.data2, "POLYGON", id, this.segtext !== '' ? color : this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                         let textid = id + "-" + 0
                         const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                         this.tagtextLayer.addText(polygontext)
@@ -494,7 +494,7 @@ export default {
                 axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "CIRCLE" })
                     .then(res => {
                         let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
-                        this.addFeature(this.data2, "CIRCLE", id, this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                        this.addFeature(this.data2, "CIRCLE", id, this.segtext !== '' ? color : this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
                         let textid = id + "-" + 0
                         const polygontext = new AILabel.Text(textid, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
                         this.tagtextLayer.addText(polygontext)
@@ -513,7 +513,7 @@ export default {
                 sum_x = sum_x / this.storage.point.length
                 sum_y = sum_y / this.storage.point.length
                 let color = `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`
-                this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.segtext!==''?color:this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.segtext !== '' ? color : this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                 let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
                 const polygontext = new AILabel.Text(textid, { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
                 this.tagtextLayer.addText(polygontext)

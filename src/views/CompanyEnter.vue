@@ -12,13 +12,13 @@
             <div v-if="line.left == '0'" class="enterform">
                 <el-form ref="enterform" :model="enterform">
                     <el-form-item label-width="0" prop="companyName">
-                        <el-input size="small" placeholder="请输入企业名称" v-model="enterform.companyNumber">
+                        <el-input size="small" placeholder="请输入企业名称" v-model="enterform.companyName">
                             <template slot="prepend">企业名称<i class="el-icon-office-building"></i></template>
                         </el-input>
                     </el-form-item>
                     <el-form-item label-width="0" prop="enterCompanyNumber">
-                        <el-input size="small" placeholder="请输入企业工商注册号" v-model="enterform.enterCompanyNumber">
-                            <template slot="prepend">企业工商注册号<i class="el-icon-office-building"></i></template>
+                        <el-input size="small" placeholder="请输入企业统一社会信用代码" v-model="enterform.enterCompanyNumber">
+                            <template slot="prepend">企业统一社会信用代码<i class="el-icon-office-building"></i></template>
                         </el-input>
                     </el-form-item>
                     <el-form-item label-width="0" prop="enterPhoneNumber">
@@ -62,8 +62,8 @@
             <div v-if="line.left == '50%'" class="selectform">
                 <el-form ref="selectform" :model="selectform" :rules="selectformrule">
                     <el-form-item label-width="0" prop="companyNumber">
-                        <el-input size="small" placeholder="请输入企业工商注册号" v-model="selectform.companyNumber">
-                            <template slot="prepend">工商注册号<i class="el-icon-office-building"></i></template>
+                        <el-input size="small" placeholder="请输入企业统一社会信用代码" v-model="selectform.companyNumber">
+                            <template slot="prepend">统一社会信用代码<i class="el-icon-office-building"></i></template>
                         </el-input>
                     </el-form-item>
                     <el-form-item label-width="0" prop="phoneNumber">
@@ -76,16 +76,16 @@
                             style="font-size: 20px;width: 40%;">查询</el-button>
                     </el-form-item>
                     <el-form-item v-if="selectvis">
-                        <div v-if="platformmanager.error !== ''"
+                        <div v-if="platformmanager.error === ''"
                             style="display: flex;flex-direction: column;align-items: center;">
                             <span style="font-size: 20px;">账号:{{ platformmanager.number }}</span>
                             <span style="font-size: 20px;">密码:{{ platformmanager.password }}</span>
+                            <span @click="$router.push('/login')"
+                                style="color: rgb(36, 104, 242);text-decoration: underline;cursor: pointer;">去登录-></span>
                         </div>
                         <div v-else>
                             <span style="font-size: 20px;">失败原因:{{ platformmanager.error }}</span>
                         </div>
-                        <span @click="$router.push('/login')"
-                            style="color: rgb(36, 104, 242);text-decoration: underline;cursor: pointer;">去登录-></span>
                     </el-form-item>
                 </el-form>
             </div>
@@ -97,6 +97,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     data() {
         return {
@@ -117,7 +118,7 @@ export default {
                     { required: true, message: "请填写联系人联系方式", trigger: 'blur' }
                 ],
                 enterCompanyNumber: [
-                    { required: true, message: "请输入工商注册号", trigger: 'blur' }
+                    { required: true, message: "请输入统一社会信用代码", trigger: 'blur' }
                 ],
                 position: [
                     { required: true, message: "请输入联系人职位", trigger: 'blur' }
@@ -145,7 +146,7 @@ export default {
                     { required: true, message: "请输入手机号", trigger: 'blur' }
                 ],
                 companyNumber: [
-                    { required: true, message: "请输入工商注册号", trigger: 'blur' }
+                    { required: true, message: "请输入统一社会信用代码", trigger: 'blur' }
                 ]
             },
             line: {
@@ -159,6 +160,29 @@ export default {
             }
         }
     },
+    watch: {
+        'line.left': {
+            handler(oldvalue) {
+                if (oldvalue === '0') {
+                    this.enterform = {
+                        companyName: "",
+                        enterCompanyNumber: "",
+                        enterPhoneNumber: "",
+                        enterReason: "",
+                        position: "",
+                        teamSize: "",
+                        files: []  //公司信用报告、公司盖章、税务登记证、营业执照
+                    }
+                } else {
+                    this.selectform = {
+                        companyNumber: "",
+                        phoneNumber: ""
+                    }
+                }
+            },
+            deep: true
+        }
+    },
     methods: {
         filecheck(file) {
             if (file.size / 1024 / 1024 > 14) {
@@ -167,7 +191,7 @@ export default {
                 //console.log(this.dataset.file);
             } else {
                 //console.log(file.raw);
-                this.enterform.files.push(file)
+                this.enterform.files.push(file.raw)
                 console.log(this.enterform.files);
             }
         },
@@ -188,13 +212,62 @@ export default {
             this.$refs.selectform.validate((valid) => {
                 if (valid) {
                     //写请求
+                    axios.post("http://120.26.142.114:10010/users/company/get/pass/progress", { registrationNumber: this.selectform.companyNumber, phoneNumber: this.selectform.phoneNumber })
+                        .then(res => {
+                            console.log(res.data);
+                            if (res.data.code === 200) {
+
+                                this.platformmanager.number = res.data.data.account
+                                this.platformmanager.password = '123456'
+                                this.selectform = {
+                                    companyNumber: "",
+                                    phoneNumber: ""
+                                }
+                            } else if (res.data.code === 9999) {
+                                this.platformmanager.error = res.data.msg
+                            } else if (res.data.code === 8546) {
+                                this.platformmanager.error = res.data.data
+                            } else if (res.data.code === 8545) {
+                                this.$message.warning(res.data.msg)
+                                return
+                            }
+                            this.selectvis = true
+                        })
+                        .catch(e => {
+                            console.log(e);
+                        })
                 } else {
                     return false;
                 }
             });
         },
         enterform_submit() {
-
+            let files = new FormData()
+            this.enterform.files.forEach(item => {
+                files.append("files", item)
+            })
+            let form = this.enterform
+            axios.post(`http://120.26.142.114:10010/users/company/enroll?companyName=${form.companyName}&registrationNumber=${form.enterCompanyNumber}&phoneNumber=${form.enterPhoneNumber}&reason=${form.enterReason}&position=${form.position}&teamSize=${form.teamSize}`, files)
+                .then(res => {
+                    console.log(res.data);
+                    if (res.data.code === 200) {
+                        this.$message.success(res.data.msg)
+                        this.enterform = {
+                            companyName: "",
+                            enterCompanyNumber: "",
+                            enterPhoneNumber: "",
+                            enterReason: "",
+                            position: "",
+                            teamSize: "",
+                            files: []  //公司信用报告、公司盖章、税务登记证、营业执照
+                        }
+                    } else if (res.data.code === 10203) {
+                        this.$message.error(res.data.msg)
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         },
         change(item) {
             setTimeout(() => {

@@ -69,7 +69,7 @@
                                     @click="setMode('RECT')"></el-button>
                             </div>
                         </el-tooltip>
-                        <el-tooltip content="多边形标注" placement="top-end">
+                        <el-tooltip v-if="ocrtype === 0" content="多边形标注" placement="top-end">
                             <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
                                 <el-button type="text" class="el-icon-house button"
                                     @click="setMode('POLYGON')"></el-button>
@@ -90,7 +90,8 @@
                         </el-tooltip>
                         <el-tooltip content="多选模式，自动为选区添加标注" placement="top-start">
                             <div class="toolblock" :class="{ ocrtype: ocrtype === 1 }">
-                                <el-button type="text" class="el-icon-receiving" @click="ocrtype = 1"></el-button>
+                                <el-button type="text" class="el-icon-receiving"
+                                    @click="ocrtype = 1; mode = 'RECT'"></el-button>
                             </div>
                         </el-tooltip>
                     </div>
@@ -223,7 +224,7 @@ export default {
             ocrtype: 1,
             now: new Date(),
             history: [],
-            loading:false
+            loading: false
         };
     },
     watch: {
@@ -278,7 +279,7 @@ export default {
                     this.tagtextLayer.addText(text)
                 }
             })
-            this.loading=false
+            this.loading = false
         },
         //汇总框选向后台提交//
         together(num) {
@@ -322,6 +323,7 @@ export default {
             if (this.type === "RECT" || this.type == 'POLYGON') {
                 this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
                 this.addFeature(this.storage.data, this.type, this.storage.id)
+                let textInfo = { text: this.Recognizetextcontent, position: { x: this.type == "RECT" ? this.storage.data.x : this.storage.data[0].x, y: this.type == "RECT" ? this.storage.data.y : this.storage.data[0].y }, offset: { x: 0, y: 1 } }
                 axios.post("http://localhost:5000/api/image_indices", { type: this.type, shape: this.storage.data, url: this.showlist[this.nowselect].url })
                     .then(res => {
                         this.nowpicdata.push({
@@ -331,7 +333,7 @@ export default {
                             shape: this.storage.data,
                             textid: this.storage.id + "-0",
                             edit: false,
-                            textInfo: { text: this.Recognizetextcontent, position: { x: this.type == "RECT" ? this.storage.data.x : this.storage.data[0].x, y: this.type == "RECT" ? this.storage.data.y : this.storage.data[0].y }, offset: { x: 0, y: 1 } },
+                            textInfo: textInfo,
                             base64str: res.data
                         })
                     })
@@ -339,7 +341,7 @@ export default {
                         console.log(e);
                     })
                 let textid = this.storage.id + "-0"
-                const recttext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 1 } })
+                const recttext = new AILabel.Text(textid, textInfo)
                 this.tagtextLayer.addText(recttext)
                 this.Recognizetextcontent = ""
                 //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
@@ -747,12 +749,16 @@ export default {
                         that.addFeature(data, type, id);
                         this.storage.data = data
                         this.storage.id = id
-                        axios.post("http://localhost:10010//api/auxiliary_ocr", { url: this.showlist[this.nowselect].url, shape: data, type: this.ocrtype })
+                        axios.post("http://localhost:8800//api/auxiliary_ocr", { url: this.showlist[this.nowselect].url, shape: data, type: this.ocrtype })
                             .then(res => {
                                 if (this.ocrtype === 0) {
                                     this.Recognizetextcontent = res.data
                                 } else {
                                     this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                                    if (res.data.length == 0) {
+                                        this.$message("未检测到文字")
+                                        return
+                                    }
                                     res.data.forEach(item => {
                                         let id = v4()
                                         this.addFeature(item.shape, 'POLYGON', id)
@@ -787,9 +793,17 @@ export default {
                             return
                         }
                         this.power = true
+                        console.log(data);
                         let id = v4()
                         this.storage = { id: id, data: data }
                         that.addFeature(data, type, id);
+                        axios.post("http://localhost:8800//api/auxiliary_ocr", { url: this.showlist[this.nowselect].url, shape: data, type: this.ocrtype, mode: "POLYGON" })
+                            .then(res => {
+                                this.Recognizetextcontent = res.data
+                            })
+                            .catch(e => {
+                                console.log(e);
+                            })
                     } else if (type === "LINE" && data.start.x > 0 && data.start.y > 0 && data.end.x > 0 && data.end.y > 0) {
                         this.power = true
                         that.addFeature(data, type, Date.now() + "");
@@ -979,7 +993,7 @@ export default {
         },
         changepic(item, num) {
             let that = this
-            this.loading=true
+            this.loading = true
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
@@ -1048,8 +1062,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
-            }else{
-                this.loading=false
+            } else {
+                this.loading = false
             }
             /*if (item.data) {
                 axios.get(item.data).then(res => {

@@ -29,6 +29,9 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination v-if="companylist.length !== 0" :hide-on-single-page="true" :current-page="page"
+                :page-sizes="[5]" :page-size="5" background layout="sizes, prev, pager, next, jumper" :total="total"
+                @current-change="handleCurrentChange" />
         </div>
         <div :style="centerbody">
             <i @click="change(-1)" class="el-icon-d-arrow-left"
@@ -38,10 +41,11 @@
             <div v-if="chooseindex != -1">
                 <el-form>
                     <el-form-item label="入驻理由">
-                        {{ detail.reason }}
+                        {{ companylist[chooseindex].reason }}
                     </el-form-item>
                     <el-form-item label="申请材料">
-                        <img :src="item" v-for="(item, index) in detail.piclist" :key="item + '-' + index">
+                        <img style="width:230px;height:230px" :src="item.data" v-for="(item) in detail"
+                            :key="item.data">
                     </el-form-item>
                 </el-form>
             </div>
@@ -52,7 +56,7 @@
     </div>
 </template>
 <script>
-//import axios from 'axios'
+import axios from 'axios'
 export default {
     data() {
         return {
@@ -62,74 +66,12 @@ export default {
             refusevis: false,
             refuseform: {
                 refuseReason: "",
-                companyNumber: ''
+                id: ''
             },
             companylist: [
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "48984",
-                    vis: false
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "ttgdre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-04/5474de4e0e224fedb38fd7bfb8e656b9-新ocr/V1/1.jpg'],
-                    reason: "jgh"
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "jgh"
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "jgh"
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "jgh"
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "jgh"
-                },
-                {
-                    companyName: "dasads",
-                    position: "asdda",
-                    teamSize: "asdasd",
-                    phoneNumber: "re",
-                    companyNumber: "tre",
-                    piclist: ['https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg', 'https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2024-03-03/f28738c4a0514e2a9c6ea45c6b03aee0-GroundingDINO/V2/objects365_v2_00914816.jpg'],
-                    reason: "jgh"
-                },
+
             ],
+            detail: [],
             mainbody: {
                 width: '100%',
                 height: '100%',
@@ -158,22 +100,29 @@ export default {
             }
         }
     },
-    computed: {
-        detail() {
-            if (this.chooseindex == -1) {
-                return ""
-            }
-            return { piclist: this.companylist[this.chooseindex].piclist, reason: this.companylist[this.chooseindex].reason }
-        }
-    },
     methods: {
+        handleCurrentChange(val) {
+            this.get_sample_data(val)
+        },
         refuseok() {
             //发请求
+            axios.get(`http://120.26.142.114:10010/users/company/noPass?id=${this.refuseform.id}&no_passed=${this.refuseform.refuseReason}`)
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.$message.success("审核成功")
+                        this.refusecancel()
+                        this.get_sample_data(this.page)
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
         },
         refusecancel() {
+            this.refusevis = false
             this.refuseform = {
                 refuseReason: "",
-                companyNumber: ''
+                id: ''
             }
         },
         change(appear) {
@@ -182,28 +131,53 @@ export default {
                 this.centerbody.transform = 'rotateY(180deg)'
                 this.leftbody.width = '50%'
                 this.rightbody.width = '50%'
+                this.get_detail(this.companylist[appear].id)
                 return
             }
             this.centerbody.transform = this.centerbody.transform == 'rotateY(0deg)' ? 'rotateY(180deg)' : 'rotateY(0deg)'
             this.leftbody.width = this.centerbody.transform == 'rotateY(0deg)' ? '90%' : '50%'
             this.rightbody.width = this.centerbody.transform == 'rotateY(0deg)' ? '0%' : '50%'
+            setTimeout(() => {
+                if (this.rightbody.width === '0%') {
+                    this.chooseindex = -1
+                    this.detail = []
+                }
+            }, 800)
         },
-        accpet(item) {
-            console.log(item);
+        accept(item) {
+            axios.get("http://120.26.142.114:10010/users/company/pass?id=" + item.id)
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.$message.success("审核成功")
+                        this.get_sample_data(this.page)
+                    }
+                }).catch(e => {
+                    console.log(e);
+                })
         },
         refuse(item) {
-            this.refuseform.companyNumber = item.companyNumber
-            this.refusevis = true
+            this.refuseform.id = item.id
+        },
+        get_sample_data(page) {
+            axios.post("http://120.26.142.114:10010/users/company/get", { current: page, pageSize: 5 })
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.companylist = res.data.data.records
+                        this.total = res.data.data.total
+                    }
+                })
+        },
+        get_detail(id) {
+            axios.get("http://120.26.142.114:10010/users/company/get/data?id=" + id)
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.detail = res.data.data
+                    }
+                })
         },
     },
     mounted() {
-        /*axios.get("")
-            .then(res => {
-                console.log(res);
-            })
-            .catch(e => {
-                console.log(e);
-            })*/
+        this.get_sample_data(this.page)
     }
 }
 </script>

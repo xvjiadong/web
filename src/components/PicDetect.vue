@@ -378,18 +378,20 @@ export default {
         },
         ok() {
             this.power = false
-            if (this.Recognizetextcontent === "" &&this.segtext==='') {
+            if (this.Recognizetextcontent === "" && this.segtext === '') {
                 return
             }
             if (this.type === "RECT") {
+                console.log(this.storage.id, this.storage);
                 this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+
                 this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
-                let textInfo={ text: this.segtext==''? this.seglabels[this.Recognizetextcontent].label:this.segtext, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
+                let textInfo = { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
                 this.nowpicdata.push({
                     id: this.storage.id,
                     type: "RECT",
                     vis: true,
-                    color: this.segtext==''?this.seglabels[this.Recognizetextcontent].color: `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`,
+                    color: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].color : `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`,
                     shape: this.storage.data,
                     textid: this.storage.id + "-0",
                     edit: false,
@@ -399,7 +401,7 @@ export default {
                 const recttext = new AILabel.Text(textid, textInfo)
                 this.tagtextLayer.addText(recttext)
                 this.Recognizetextcontent = ""
-                this.segtext=''
+                this.segtext = ''
                 //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             }
             this.vis = false
@@ -808,7 +810,9 @@ export default {
                         that.addFeature(data, type, id);
                         this.storage.data = data
                         this.storage.id = id
-                        this.clony_detect(this.showlist[this.nowselect].url, data)
+                        if (this.clony_mode) {
+                            this.clony_detect(this.showlist[this.nowselect].url, data)
+                        }
                     } else if (type === "POLYGON") {
                         let c = true
                         data.forEach(item => {
@@ -1009,7 +1013,7 @@ export default {
             this.vis = false
         },
         changepic(item) {
-            this.loading=true
+            this.loading = true
             let that = this
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
@@ -1069,8 +1073,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
-            }else{
-                this.loading=false
+            } else {
+                this.loading = false
             }
             this.rect.splice(0)
             this.storage = {}
@@ -1114,7 +1118,7 @@ export default {
                     console.log(e);
                 })
         },
-        getlabel(){
+        getlabel() {
             axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
                 .then(res => {
                     this.seglabels = res.data.data
