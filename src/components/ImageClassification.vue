@@ -224,7 +224,7 @@ export default {
             segpop: [],
             storage: {},
             nowpicdata: [],
-            loading:false
+            loading: false
         };
     },
     watch: {
@@ -296,7 +296,7 @@ export default {
                 let text = new AILabel.Text(item.textid, item.textInfo, { name }, { FontColor: item.color, FontSize: '20px' })
                 this.tagtextLayer.addText(text)
             })
-            this.loading=false
+            this.loading = false
         },
         //汇总框选向后台提交//
         together(num) {
@@ -951,7 +951,7 @@ export default {
         },
         changepic(item) {
             let that = this
-            this.loading=true
+            this.loading = true
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
@@ -1009,8 +1009,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
-            }else{
-                this.loading=false
+            } else {
+                this.loading = false
             }
             this.rect.splice(0)
             this.storage = {}
@@ -1031,7 +1031,10 @@ export default {
         getdata(page, num) {
             axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
-                    console.log(res.data);
+                    if ((this.project.identity == 0 && res.data.data.length === 0) || (this.project.identity == 1 && res.data.data.datasetCallNewVOS.length == 0)) {
+                        this.$message.warning("已经是最后一张了")
+                        return
+                    }
                     if (res.data.data.length === 0) {
                         this.$message.warning("已经是最后一张了")
                         return
@@ -1047,6 +1050,7 @@ export default {
                             this.showlist.push({ id: item.id, url: item.ossPath, mark: item.calloutPath })
                         })
                     }
+                    this.pages = res.data.data.total
                     this.changepic(this.showlist[num == 1 ? 0 : 4])
                     this.nowselect = num == 1 ? 0 : 4
                 })

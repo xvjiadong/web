@@ -1079,7 +1079,7 @@ export default {
             this.history = []
             axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
-                    if (res.data.data.length === 0) {
+                    if ((this.project.identity == 0 && res.data.data.length === 0) || (this.project.identity == 1 && res.data.data.datasetCallNewVOS.length == 0)) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }

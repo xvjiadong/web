@@ -57,17 +57,18 @@
                                 <el-button type="text" class="el-icon-orange button" @click="setMode('CIRCLE')"></el-button>
                             </div>
                         </el-tooltip>
-                        <el-tooltip content="多边形标注" placement="top-end">
-                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
-                                <el-button type="text" class="el-icon-house button" @click="setMode('POLYGON')"></el-button>
-                            </div>
-                        </el-tooltip>
                         <el-tooltip content="撤销" placement="top-end">
                             <div class="toolblock">
                                 <el-button type="text" class="el-icon-refresh-left button" @click="Revoke()"></el-button>
                             </div>
                         </el-tooltip>
                         -->
+                        <el-tooltip v-if="!clony_mode" content="多边形标注" placement="top-end">
+                            <div class="toolblock" :class="{ modeing: mode === 'POLYGON' }">
+                                <el-button type="text" class="el-icon-house button"
+                                    @click="setMode('POLYGON')"></el-button>
+                            </div>
+                        </el-tooltip>
                         <el-tooltip content="矩形标注" placement="top-start">
                             <div class="toolblock" :class="{ modeing: mode === 'RECT' }">
                                 <el-button type="text" class="el-icon-full-screen button"
@@ -94,8 +95,7 @@
                                 :value="index">
                             </el-option>
                         </el-select>
-                        <el-button @click="clony_mode = !clony_mode"
-                            :disabled="detect_object.length == 0 && !clony_mode">
+                        <el-button @click="clony" :disabled="detect_object.length == 0 && !clony_mode">
                             {{ clony_mode ? '取消' : '启动' }}
                         </el-button>
                         <el-tooltip slot="reference" content="一键模式,划选区域自动检测" placement="top-start">
@@ -106,6 +106,7 @@
                     </el-popover>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
+                    <el-input v-model="segtext" style="width: 100%;" size="mini" placeholder="请输入检测内容"></el-input>
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
                         <el-input v-model="segtext" style="width: 100%;" size="mini" placeholder="请输入分割内容"></el-input>
                         <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
@@ -259,7 +260,8 @@ export default {
             detect_object: [],
             label_data: [],
             loading: false,
-            segtext: ""
+            segtext: "",
+
         };
     },
     watch: {
@@ -274,6 +276,12 @@ export default {
     computed: {
     },
     methods: {
+        clony() {
+            this.clony_mode = !this.clony_mode;
+            if (this.clony_mode) {
+                this.setMode("RECT")
+            }
+        },
         clony_detect(url, data) {
             this.socket.emit('detect_clony', { detect_object: this.detect_object, url: url, label: this.seglabels, x: data.x, y: data.y, width: data.width, height: data.height })
         },
@@ -381,15 +389,13 @@ export default {
             if (this.Recognizetextcontent === "" && this.segtext === '') {
                 return
             }
-            if (this.type === "RECT") {
-                console.log(this.storage.id, this.storage);
+            if (this.type === "RECT" || this.type == 'POLYGON') {
                 this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-
-                this.addFeature(this.storage.data, "RECT", this.storage.id, this.seglabels[this.Recognizetextcontent].color)
-                let textInfo = { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.storage.data.x, y: this.storage.data.y }, offset: { x: 0, y: 0 } }
+                this.addFeature(this.storage.data, this.type, this.storage.id, this.segtext == '' ? this.seglabels[this.Recognizetextcontent].color : `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`)
+                let textInfo = { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.type === 'RECT' ? this.storage.data.x : this.storage.data[0].x, y: this.type === 'RECT' ? this.storage.data.y : this.storage.data[0].y }, offset: { x: 0, y: 0 } }
                 this.nowpicdata.push({
                     id: this.storage.id,
-                    type: "RECT",
+                    type: this.type,
                     vis: true,
                     color: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].color : `rgb(${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0},${Math.floor(Math.random() * (255 - 0 + 1)) + 0})`,
                     shape: this.storage.data,
@@ -402,7 +408,6 @@ export default {
                 this.tagtextLayer.addText(recttext)
                 this.Recognizetextcontent = ""
                 this.segtext = ''
-                //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             }
             this.vis = false
         },
@@ -649,12 +654,14 @@ export default {
             }
             //多边形
             else if (type === "POLYGON") {
+                console.log(color);
                 const polygonFeature = new AILabel.Feature.Polygon(
                     id, // id
                     { points: data }, // shape
+                    textInfo == null ? { name } : textInfo,
                     {
                         strokeStyle: color === null ? "rgb(36,104,242)" : color, //边框颜色
-                        fill: true, //是否填充
+                        fill: false, //是否填充
                         fillStyle: color === null ? "rgb(145,172,218)" : color, //填充色
                         globalAlpha: 0.5,
                         lineWidth: 3,
@@ -824,7 +831,10 @@ export default {
                             return
                         }
                         this.power = true
-                        that.addFeature(data, type, Date.now() + "");
+                        let id = Date.now() + ""
+                        that.addFeature(data, type, id);
+                        this.storage.data = data
+                        this.storage.id = id
                     } else if (type === "LINE" && data.start.x > 0 && data.start.y > 0 && data.end.x > 0 && data.end.y > 0) {
                         this.power = true
                         that.addFeature(data, type, Date.now() + "");
@@ -1094,9 +1104,10 @@ export default {
             this.$router.push("/MakeMark")
         },
         getdata(page, num) {
+            console.log(page);
             axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
-                    if (res.data.data.length === 0) {
+                    if ((this.project.identity == 0 && res.data.data.length === 0) || (this.project.identity == 1 && res.data.data.datasetCallNewVOS.length == 0)) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }
@@ -1121,7 +1132,9 @@ export default {
         getlabel() {
             axios.get("http://120.26.142.114:10010/task/label/" + this.project.versionId)
                 .then(res => {
-                    this.seglabels = res.data.data
+                    if (res.data.code === 200) {
+                        this.seglabels = res.data.data
+                    }
                 })
                 .catch(e => {
                     console.log(e);

@@ -6,11 +6,32 @@
         </div>
         <div class="main">
             <el-card class="teachcard">
-                <div slot="header" style="text-align: right">
+                <div slot="header" style="
+            text-align: right;
+            display: flex;
+            justify-content: space-between;
+          ">
+                    <div>
+                        <span>
+                            <el-popover v-for="(item, index) in four" :key="item.text" placement="top" title="请输入生成数量"
+                                width="200" trigger="manual" v-model="item.vis">
+                                <el-input-number :step-strictly="true" :min="1" size="small"
+                                    v-model="fourturn.generate"></el-input-number>
+                                <el-button type="primary" @click="fourok(item.order, index)">确定</el-button>
+                                <el-tooltip slot="reference" placement="top-start" :content="item.label">
+                                    <i @click="fourvis(index)" :class="item.text" :style="item.style"
+                                        style="font-size: 25px; cursor: pointer"></i>
+                                </el-tooltip>
+                            </el-popover>
+                        </span>
+                    </div>
                     <!-- <span @click="gotogenerate"
                         style="color: rgb(36,104,242);text-decoration: underline;cursor: pointer;">前往生成图片区-></span> -->
-                    <span @click="push"
-                        style="color: rgb(36,104,242);text-decoration: underline;cursor: pointer;">前往标注-></span>
+                    <span @click="push" style="
+              color: rgb(36, 104, 242);
+              text-decoration: underline;
+              cursor: pointer;
+            ">前往标注-></span>
                 </div>
                 <div id="map"></div>
             </el-card>
@@ -220,6 +241,41 @@ export default {
             },
             checkAll: false,
             isIndeterminate: true,
+            fourturn: {
+                id: 0,
+                generate: 1,
+            },
+            four: [
+                {
+                    order: "night",
+                    text: "el-icon-tianqi",
+                    vis: false,
+                    label: "转白天",
+                    style: { color: "rgb(121,183,255)" },
+                },
+                {
+                    order: "day",
+                    text: "el-icon-tianqi-ye",
+                    vis: false,
+                    label: "转夜晚",
+                    style: { color: "rgb(237,169,21)", marginLeft: "15px" },
+                },
+                {
+                    order: "rainy",
+                    text: "el-icon-tianqi-qing",
+                    vis: false,
+                    label: "转晴天",
+                    style: { color: "rgb(255,204,0)", marginLeft: "15px" },
+                },
+                {
+                    order: "clear",
+                    text: "el-icon-tianqi-dabaoyu",
+                    vis: false,
+                    label: "转雨天",
+                    style: { color: "rgb(121,183,255)" },
+                    marginLeft: "15px",
+                },
+            ],
         };
     },
     watch: {
@@ -233,8 +289,32 @@ export default {
     },
     computed: {},
     methods: {
+        fourok(order, index) {
+            this.four[index].vis = false;
+            this.$message.info("正在生成中");
+            axios
+                .post("http://10.99.212.243:10010/update/" + order, this.fourturn)
+                .then((res) => {
+                    if (res.data.code === 200) {
+                        this.$message.success("生成完毕，请前往生成区查看");
+                    } else {
+                        this.$message.error("生成失败");
+                    }
+                })
+                .catch((e) => {
+                    console.log(e);
+                    this.$message.error("生成失败");
+                });
+        },
+        fourvis(index) {
+            for (let i = 0; i < 4; i++) {
+                if (i == index) continue;
+                this.four[i].vis = false;
+            }
+            this.four[index].vis = !this.four[index].vis;
+        },
         push() {
-            let row = this.project
+            let row = this.project;
             row.identity = 1;
             if (row.pre === "ing") {
                 this.$message.error("正在进行一键标注，请不要进入标注界面");
@@ -261,7 +341,7 @@ export default {
         },
         submit() {
             axios
-                .post("http://120.26.142.114:10010/dataset/temp", this.generate_submit)
+                .post("http://10.99.212.243:10010/dataset/temp", this.generate_submit)
                 .then((res) => {
                     console.log(res.data);
                     if (res.data.code === 200) {
@@ -334,24 +414,24 @@ export default {
                 });
         },
         /*text_to_segment(url) {
-                if (this.textprompt) {
-                    this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
-                    this.textpromptdisable = true
-                } else {
-                    this.$message.error("请填写分割信息")
-                }
-            },
-            changelabel(item, index) {
-                let a = this.seglabels.find(ele => item.text == ele.label)
-                if (a !== undefined) {
-                    this.gFirstFeatureLayer.removeFeatureById(item.id)
-                    this.addFeature(item.shape, item.type, item.id, a.color, item.rlecode, item.textInfo, true)
-                }
-                this.tagtextLayer.removeTextById(item.textid)
-                const polygontext = new AILabel.Text(item.textid, { text: item.textInfo.text, position: item.textInfo.position, offset: item.textInfo.offset })
-                this.tagtextLayer.addText(polygontext)
-                this.nowpicdata[index].edit = false
-            },*/
+                    if (this.textprompt) {
+                        this.socket.emit("textprompt_to_segment", { url: url, text: this.textprompt, label: this.seglabels })
+                        this.textpromptdisable = true
+                    } else {
+                        this.$message.error("请填写分割信息")
+                    }
+                },
+                changelabel(item, index) {
+                    let a = this.seglabels.find(ele => item.text == ele.label)
+                    if (a !== undefined) {
+                        this.gFirstFeatureLayer.removeFeatureById(item.id)
+                        this.addFeature(item.shape, item.type, item.id, a.color, item.rlecode, item.textInfo, true)
+                    }
+                    this.tagtextLayer.removeTextById(item.textid)
+                    const polygontext = new AILabel.Text(item.textid, { text: item.textInfo.text, position: item.textInfo.position, offset: item.textInfo.offset })
+                    this.tagtextLayer.addText(polygontext)
+                    this.nowpicdata[index].edit = false
+                },*/
         appearfeature(item, index) {
             this.addFeature(
                 item.shape,
@@ -372,104 +452,104 @@ export default {
             this.nowpicdata[index].vis = false;
         },
         /*delmask(mask) {
-                this.gFirstFeatureLayer.removeFeatureById(mask.id)
-                this.tagtextLayer.removeTextById(mask.textid)
-                this.nowpicdata = this.nowpicdata.filter(item => {
-                    return item.id !== mask.id
-                })
-            },*/
+                    this.gFirstFeatureLayer.removeFeatureById(mask.id)
+                    this.tagtextLayer.removeTextById(mask.textid)
+                    this.nowpicdata = this.nowpicdata.filter(item => {
+                        return item.id !== mask.id
+                    })
+                },*/
         /*addlabel() {
-                if (this.seglabels.includes(this.newlabel) || this.newlabel === "") {
-                    this.$notify.error({
-                        title: '添加失败',
-                        message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
-                        duration: 3000
-                    });
-                } else {
-                    this.$notify.success({
-                        title: '',
-                        message: '添加成功',
-                        duration: 3000
-                    });
-                    this.seglabels.push({ label: this.newlabel, color: 'rgb(' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ')' })
-                }
-                this.newlabel = ""
-            },*/
+                    if (this.seglabels.includes(this.newlabel) || this.newlabel === "") {
+                        this.$notify.error({
+                            title: '添加失败',
+                            message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
+                            duration: 3000
+                        });
+                    } else {
+                        this.$notify.success({
+                            title: '',
+                            message: '添加成功',
+                            duration: 3000
+                        });
+                        this.seglabels.push({ label: this.newlabel, color: 'rgb(' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ',' + Math.floor(Math.random() * (255 - 0)) + ')' })
+                    }
+                    this.newlabel = ""
+                },*/
         /*pointok() {
-                if (this.pointlist.length === 0) {
-                    this.$notify.error({
-                        title: '请添加至少一个点',
-                        message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
-                        duration: 3000
-                    });
-                    return
-                }
-                if (!this.vis) {
-                    const popover = this.$refs.popover;
-                    let timer = setTimeout(() => {
-                        const clientX = this.segpop[0]
-                        const clientY = this.segpop[1]
-                        this.segpop.splice(0)
-                        const bodyWidth = document.body.clientWidth;
-                        const { popperElm } = popover;
-                        let disX = clientX + popperElm.offsetWidth < bodyWidth
-                            ? clientX
-                            : bodyWidth - popperElm.offsetWidth;
-                        let disY = clientY - this.height
-                        popover.popperElm.style.left = disX + "px";
-                        popover.popperElm.style.top = disY + "px";
-                        popover.popperElm.style.zIndex = '99';
-                        clearTimeout(timer);
-                    }, 5);
-                    this.vis = true
-                }
-                this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
-                this.pointlist.splice(0)
-            },*/
+                    if (this.pointlist.length === 0) {
+                        this.$notify.error({
+                            title: '请添加至少一个点',
+                            message: this.seglabels.includes(this.newlabel) ? "标签重复" : "标签为空",
+                            duration: 3000
+                        });
+                        return
+                    }
+                    if (!this.vis) {
+                        const popover = this.$refs.popover;
+                        let timer = setTimeout(() => {
+                            const clientX = this.segpop[0]
+                            const clientY = this.segpop[1]
+                            this.segpop.splice(0)
+                            const bodyWidth = document.body.clientWidth;
+                            const { popperElm } = popover;
+                            let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                ? clientX
+                                : bodyWidth - popperElm.offsetWidth;
+                            let disY = clientY - this.height
+                            popover.popperElm.style.left = disX + "px";
+                            popover.popperElm.style.top = disY + "px";
+                            popover.popperElm.style.zIndex = '99';
+                            clearTimeout(timer);
+                        }, 5);
+                        this.vis = true
+                    }
+                    this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
+                    this.pointlist.splice(0)
+                },*/
         /*segok() {
-                axios.post('http://localhost:5000/api/segment_manual', { point: this.pointlist, box: this.rect, url: this.gMap.layers[0].imageInfo.src })
-                    .then(res => {
-                        let id = Date.now() + ""
-                        if (!this.segvis) {
-                            if (this.pointlist.length > 1) {
-                                this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                    axios.post('http://localhost:5000/api/segment_manual', { point: this.pointlist, box: this.rect, url: this.gMap.layers[0].imageInfo.src })
+                        .then(res => {
+                            let id = Date.now() + ""
+                            if (!this.segvis) {
+                                if (this.pointlist.length > 1) {
+                                    this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                                }
                             }
-                        }
-                        this.addFeature(res.data.point, "POLYGON", id)
-                        this.storage = { point: res.data.point, id: id, rlecode: res.data.rle }
-                        if (this.rect.length > 0) {
-                            this.gFirstFeatureLayer.removeFeatureById(this.rect[4])
-                        }
-                        this.rect.splice(0)
-                        if (!this.segvis) {
-                            return
-                        }
-                        this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
-                        this.pointlist.splice(0)
-                        if (!this.vis) {
-                            const popover = this.$refs.popover;
-                            let timer = setTimeout(() => {
-                                const clientX = this.segpop[0]
-                                const clientY = this.segpop[1]
-                                this.segpop.splice(0)
-                                const bodyWidth = document.body.clientWidth;
-                                const { popperElm } = popover;
-                                let disX = clientX + popperElm.offsetWidth < bodyWidth
-                                    ? clientX
-                                    : bodyWidth - popperElm.offsetWidth;
-                                let disY = clientY - this.height
-                                popover.popperElm.style.left = disX + "px";
-                                popover.popperElm.style.top = disY + "px";
-                                popover.popperElm.style.zIndex = '99';
-                                clearTimeout(timer);
-                            }, 5);
-                            this.vis = true
-                        }
-                    })
-                    .catch(e => {
-                        console.log(e);
-                    })
-            },*/
+                            this.addFeature(res.data.point, "POLYGON", id)
+                            this.storage = { point: res.data.point, id: id, rlecode: res.data.rle }
+                            if (this.rect.length > 0) {
+                                this.gFirstFeatureLayer.removeFeatureById(this.rect[4])
+                            }
+                            this.rect.splice(0)
+                            if (!this.segvis) {
+                                return
+                            }
+                            this.pointlist.forEach(point => { this.gFirstFeatureLayer.removeFeatureById(point.id) })
+                            this.pointlist.splice(0)
+                            if (!this.vis) {
+                                const popover = this.$refs.popover;
+                                let timer = setTimeout(() => {
+                                    const clientX = this.segpop[0]
+                                    const clientY = this.segpop[1]
+                                    this.segpop.splice(0)
+                                    const bodyWidth = document.body.clientWidth;
+                                    const { popperElm } = popover;
+                                    let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                        ? clientX
+                                        : bodyWidth - popperElm.offsetWidth;
+                                    let disY = clientY - this.height
+                                    popover.popperElm.style.left = disX + "px";
+                                    popover.popperElm.style.top = disY + "px";
+                                    popover.popperElm.style.zIndex = '99';
+                                    clearTimeout(timer);
+                                }, 5);
+                                this.vis = true
+                            }
+                        })
+                        .catch(e => {
+                            console.log(e);
+                        })
+                },*/
         /*切图片时把已标注数据标上 */
         keepdraw(markdata, url) {
             let mattinglist = [];
@@ -511,10 +591,10 @@ export default {
         //汇总框选向后台提交//
         together(num) {
             /*let jsondata = JSON.stringify(this.nowpicdata)
-                  let file = new FormData()
-                  const blob = new Blob([jsondata]);
-                  file.set("file", blob, "data.json")
-                  file.set("id", this.showlist[this.nowselect].id)*/
+                        let file = new FormData()
+                        const blob = new Blob([jsondata]);
+                        file.set("file", blob, "data.json")
+                        file.set("id", this.showlist[this.nowselect].id)*/
             if (this.page === 1 && num === -1) {
                 this.$message.warning("已经是第一张了");
                 return;
@@ -531,142 +611,167 @@ export default {
                 this.nowselect = num;
             }
             /*axios.put("http://120.26.142.114:10010/dataset/call", file, { headers: { "Content-Type": "multipart/form-data;charset=utf-8" } }).then((res) => {
-                      if (res.data.code === 200) {
-                          console.log(res.data.data);
-                          this.showlist[this.nowselect].mark = res.data.data
-                          let a = (this.colitem.findIndex(item => item === 'results'))
-                          this.colitem.splice(a, 1)
-                          
-                      } else {
-                          this.$message.error("保存失败")
-                      }
-      
-                  })*/
+                            if (res.data.code === 200) {
+                                console.log(res.data.data);
+                                this.showlist[this.nowselect].mark = res.data.data
+                                let a = (this.colitem.findIndex(item => item === 'results'))
+                                this.colitem.splice(a, 1)
+                                
+                            } else {
+                                this.$message.error("保存失败")
+                            }
+            
+                        })*/
         },
         /*ok() {
-                this.power = false
-                if (this.Recognizetextcontent === "") {
-                    return
-                }
-                if (this.type === "RECT") {
-                    let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                    const recttext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.x, y: this.data2.y }, offset: { x: 1, y: this.data2.y < 19 ? -this.data2.y - this.data2.height - 25 : 0 } })
-                    this.tagtextLayer.addText(recttext)
-                    this.Recognizetextcontent = ""
-                    //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                } else if (this.type === "POLYGON") {
-                    let sum_x = this.data2.reduce((acc, current) => acc + current.x, 0);
-                    let sum_y = this.data2.reduce((acc, current) => acc + current.y, 0);
-                    sum_x = sum_x / this.data2.length
-                    sum_y = sum_y / this.data2.length
-                    let id = Date.now() + ""
-                    this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
-                    axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "POLYGON" })
-                        .then(res => {
-                            this.addFeature(this.data2, "POLYGON", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
-                            let textid = id + "-" + 0
-                            const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
-                            this.tagtextLayer.addText(polygontext)
-                            this.Recognizetextcontent = ""
-                        })
-                        .catch(e => {
-                            console.log(e);
-                        })
-                    //this.showlist[this.nowselect].mark.push({ type: "POLYGON", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                } else if (this.type === "POLYLINE") {
-                    let maxx = 9999
-                    let maxy = 9999
-                    let num
-                    this.data2.forEach((item, index) => {
-                        if (item.x < maxx || item.x < maxx && item.y < maxy) {
-                            maxx = item.x
-                            maxy = item.y
-                            num = index
-                        }
-                    })
-                    let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                    const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2[num].x, y: this.data2[num].y }, offset: { x: 1, y: 0 } })
-                    this.tagtextLayer.addText(polygontext)
-                    this.Recognizetextcontent = ""
-                    //this.showlist[this.nowselect].mark.push({ type: "POLYLINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                } else if (this.type === "CIRCLE") {
-                    let id = Date.now() + ""
-                    this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
-                    axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "CIRCLE" })
-                        .then(res => {
-                            this.addFeature(this.data2, "CIRCLE", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
-                            let textid = id + "-" + 0
-                            const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
-                            this.tagtextLayer.addText(polygontext)
-                            this.Recognizetextcontent = ""
-                        })
-                        .catch(e => {
-                            console.log(e);
-                        })
-    
-                    //this.showlist[this.nowselect].mark.push({ type: "CIRCLE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                } else if (this.type === "POINT") {
-                    this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-                    let sum_x = this.storage.point.reduce((acc, current) => acc + current.x, 0);
-                    let sum_y = this.storage.point.reduce((acc, current) => acc + current.y, 0);
-                    sum_x = sum_x / this.storage.point.length
-                    sum_y = sum_y / this.storage.point.length
-                    this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
-                    let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                    const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
-                    this.tagtextLayer.addText(polygontext)
-                    if (this.segvis) {
-                        this.segvis = false
-                        this.setMode("RECT")
+                    this.power = false
+                    if (this.Recognizetextcontent === "") {
+                        return
                     }
-                    this.Recognizetextcontent = ""
-                    //this.showlist[this.nowselect].mark.push({ type: "POINT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                } else if (this.type === "LINE") {
-                    let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
-                    const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.start.x, y: this.data2.start.y }, offset: { x: 1, y: 0 } })
-                    this.tagtextLayer.addText(polygontext)
-                    this.Recognizetextcontent = ""
-                    //this.showlist[this.nowselect].mark.push({ type: "LINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
-                }
-                this.vis = false
-            },*/
+                    if (this.type === "RECT") {
+                        let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                        const recttext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.x, y: this.data2.y }, offset: { x: 1, y: this.data2.y < 19 ? -this.data2.y - this.data2.height - 25 : 0 } })
+                        this.tagtextLayer.addText(recttext)
+                        this.Recognizetextcontent = ""
+                        //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    } else if (this.type === "POLYGON") {
+                        let sum_x = this.data2.reduce((acc, current) => acc + current.x, 0);
+                        let sum_y = this.data2.reduce((acc, current) => acc + current.y, 0);
+                        sum_x = sum_x / this.data2.length
+                        sum_y = sum_y / this.data2.length
+                        let id = Date.now() + ""
+                        this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
+                        axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "POLYGON" })
+                            .then(res => {
+                                this.addFeature(this.data2, "POLYGON", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                                let textid = id + "-" + 0
+                                const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                                this.tagtextLayer.addText(polygontext)
+                                this.Recognizetextcontent = ""
+                            })
+                            .catch(e => {
+                                console.log(e);
+                            })
+                        //this.showlist[this.nowselect].mark.push({ type: "POLYGON", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    } else if (this.type === "POLYLINE") {
+                        let maxx = 9999
+                        let maxy = 9999
+                        let num
+                        this.data2.forEach((item, index) => {
+                            if (item.x < maxx || item.x < maxx && item.y < maxy) {
+                                maxx = item.x
+                                maxy = item.y
+                                num = index
+                            }
+                        })
+                        let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                        const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2[num].x, y: this.data2[num].y }, offset: { x: 1, y: 0 } })
+                        this.tagtextLayer.addText(polygontext)
+                        this.Recognizetextcontent = ""
+                        //this.showlist[this.nowselect].mark.push({ type: "POLYLINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    } else if (this.type === "CIRCLE") {
+                        let id = Date.now() + ""
+                        this.gFirstFeatureLayer.removeFeatureById(this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id)
+                        axios.post("http://localhost:5000/api/getmask", { point: this.data2, url: this.showlist[this.nowselect].url, type: "CIRCLE" })
+                            .then(res => {
+                                this.addFeature(this.data2, "CIRCLE", id, this.seglabels[this.Recognizetextcontent].color, res.data, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                                let textid = id + "-" + 0
+                                const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: this.data2.cx, y: this.data2.cy }, offset: { x: 0, y: 0 } })
+                                this.tagtextLayer.addText(polygontext)
+                                this.Recognizetextcontent = ""
+                            })
+                            .catch(e => {
+                                console.log(e);
+                            })
+        
+                        //this.showlist[this.nowselect].mark.push({ type: "CIRCLE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    } else if (this.type === "POINT") {
+                        this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
+                        let sum_x = this.storage.point.reduce((acc, current) => acc + current.x, 0);
+                        let sum_y = this.storage.point.reduce((acc, current) => acc + current.y, 0);
+                        sum_x = sum_x / this.storage.point.length
+                        sum_y = sum_y / this.storage.point.length
+                        this.addFeature(this.storage.point, 'POLYGON', Date.now() + "", this.seglabels[this.Recognizetextcontent].color, this.storage.rlecode, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                        const polygontext = new AILabel.Text(textid, { text: this.seglabels[this.Recognizetextcontent].label, position: { x: sum_x, y: sum_y }, offset: { x: 1, y: 0 } })
+                        this.tagtextLayer.addText(polygontext)
+                        if (this.segvis) {
+                            this.segvis = false
+                            this.setMode("RECT")
+                        }
+                        this.Recognizetextcontent = ""
+                        //this.showlist[this.nowselect].mark.push({ type: "POINT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    } else if (this.type === "LINE") {
+                        let textid = this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id + "-" + 0
+                        const polygontext = new AILabel.Text(textid, { text: this.Recognizetextcontent, position: { x: this.data2.start.x, y: this.data2.start.y }, offset: { x: 1, y: 0 } })
+                        this.tagtextLayer.addText(polygontext)
+                        this.Recognizetextcontent = ""
+                        //this.showlist[this.nowselect].mark.push({ type: "LINE", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
+                    }
+                    this.vis = false
+                },*/
         /*la(e) {
-                if (this.type === "POINT") {
-                    this.segpop.push(e.clientX)
-                    this.segpop.push(e.clientY)
-                    let a = setTimeout(() => {
+                    if (this.type === "POINT") {
+                        this.segpop.push(e.clientX)
+                        this.segpop.push(e.clientY)
+                        let a = setTimeout(() => {
+                            if (this.selected || !this.power) {
+                                return
+                            }
+                            if (this.type === "LINE") {
+                                this.linenumber += 1
+                            }
+                            if (this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
+                                if (!this.vis) {
+                                    const popover = this.$refs.popover;
+                                    let timer = setTimeout(() => {
+                                        const { clientX, clientY } = e;
+                                        const bodyWidth = document.body.clientWidth;
+                                        const { popperElm } = popover;
+                                        let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                            ? clientX
+                                            : bodyWidth - popperElm.offsetWidth;
+                                        let disY = clientY - this.height
+                                        popover.popperElm.style.left = disX + "px";
+                                        popover.popperElm.style.top = disY + "px";
+                                        popover.popperElm.style.zIndex = '99';
+                                        clearTimeout(timer);
+                                    }, 5);
+                                    this.vis = true
+                                }
+                            }
+                            clearTimeout(a)
+                        }, 200)
+                    } else {
                         if (this.selected || !this.power) {
                             return
                         }
-                        if (this.type === "LINE") {
-                            this.linenumber += 1
+                        if (this.type === "POINT" || this.type === "RECT" || this.type === "CIRCLE" || (this.type === "LINE")) {
+                            //if (!this.vis) {
+                            const popover = this.$refs.popover;
+                            let timer = setTimeout(() => {
+                                const { clientX, clientY } = e;
+                                const bodyWidth = document.body.clientWidth;
+                                const { popperElm } = popover;
+                                let disX = clientX + popperElm.offsetWidth < bodyWidth
+                                    ? clientX
+                                    : bodyWidth - popperElm.offsetWidth;
+                                let disY = clientY - this.height
+                                popover.popperElm.style.left = disX + "px";
+                                popover.popperElm.style.top = disY + "px";
+                                popover.popperElm.style.zIndex = '99';
+                                clearTimeout(timer);
+                            }, 5);
+                            this.vis = true
+                            //}
                         }
-                        if (this.type === "CIRCLE" || (this.type === "LINE" && this.linenumber % 2 === 0)) {
-                            if (!this.vis) {
-                                const popover = this.$refs.popover;
-                                let timer = setTimeout(() => {
-                                    const { clientX, clientY } = e;
-                                    const bodyWidth = document.body.clientWidth;
-                                    const { popperElm } = popover;
-                                    let disX = clientX + popperElm.offsetWidth < bodyWidth
-                                        ? clientX
-                                        : bodyWidth - popperElm.offsetWidth;
-                                    let disY = clientY - this.height
-                                    popover.popperElm.style.left = disX + "px";
-                                    popover.popperElm.style.top = disY + "px";
-                                    popover.popperElm.style.zIndex = '99';
-                                    clearTimeout(timer);
-                                }, 5);
-                                this.vis = true
-                            }
-                        }
-                        clearTimeout(a)
-                    }, 200)
-                } else {
+                    }
+                },
+                la2(e) {
                     if (this.selected || !this.power) {
                         return
                     }
-                    if (this.type === "POINT" || this.type === "RECT" || this.type === "CIRCLE" || (this.type === "LINE")) {
+                    if ((this.type === "POLYGON" || this.type === "POLYLINE") && this.data2) {
                         //if (!this.vis) {
                         const popover = this.$refs.popover;
                         let timer = setTimeout(() => {
@@ -685,56 +790,31 @@ export default {
                         this.vis = true
                         //}
                     }
-                }
-            },
-            la2(e) {
-                if (this.selected || !this.power) {
-                    return
-                }
-                if ((this.type === "POLYGON" || this.type === "POLYLINE") && this.data2) {
-                    //if (!this.vis) {
-                    const popover = this.$refs.popover;
-                    let timer = setTimeout(() => {
-                        const { clientX, clientY } = e;
-                        const bodyWidth = document.body.clientWidth;
-                        const { popperElm } = popover;
-                        let disX = clientX + popperElm.offsetWidth < bodyWidth
-                            ? clientX
-                            : bodyWidth - popperElm.offsetWidth;
-                        let disY = clientY - this.height
-                        popover.popperElm.style.left = disX + "px";
-                        popover.popperElm.style.top = disY + "px";
-                        popover.popperElm.style.zIndex = '99';
-                        clearTimeout(timer);
-                    }, 5);
-                    this.vis = true
-                    //}
-                }
-            },*/
+                },*/
         /*zoomIn() {
-                this.gMap.zoomIn();
-            },
-            zoomOut() {
-                this.gMap.zoomOut();
-            },
-            setMode(mode) {
-                if (!this.segvis) {
-                    let features = this.gFirstFeatureLayer.getAllFeatures()
-                    features.forEach(item => {
-                        if (!Object.prototype.hasOwnProperty.call(item.props, 'rlecode')) {
-                            this.gFirstFeatureLayer.removeFeatureById(item.id)
-                            this.vis = false
-                        }
-                    })
-                }
-                if (this.segvis && mode !== 'POINT') {
-                    return
-                }
-                this.pointlist.splice(0)
-                this.mode = mode;
-                this.linenumber = 0
-                this.type = mode
-            },*/
+                    this.gMap.zoomIn();
+                },
+                zoomOut() {
+                    this.gMap.zoomOut();
+                },
+                setMode(mode) {
+                    if (!this.segvis) {
+                        let features = this.gFirstFeatureLayer.getAllFeatures()
+                        features.forEach(item => {
+                            if (!Object.prototype.hasOwnProperty.call(item.props, 'rlecode')) {
+                                this.gFirstFeatureLayer.removeFeatureById(item.id)
+                                this.vis = false
+                            }
+                        })
+                    }
+                    if (this.segvis && mode !== 'POINT') {
+                        return
+                    }
+                    this.pointlist.splice(0)
+                    this.mode = mode;
+                    this.linenumber = 0
+                    this.type = mode
+                },*/
         // 获取所有features
         getFeatures() {
             this.allFeatures = this.gFirstFeatureLayer.getAllFeatures();
@@ -744,98 +824,98 @@ export default {
         },
         // 初始样式
         /*setDrawingStyle(mode) {
-                let drawingStyle = {};
-                switch (mode) {
-                    //平移
-                    case "PAN": {
-                        break;
+                    let drawingStyle = {};
+                    switch (mode) {
+                        //平移
+                        case "PAN": {
+                            break;
+                        }
+                        //注记
+                        case "MARKER": {
+                            // 忽略
+                            break;
+                        }
+                        //点
+                        case "POINT": {
+                            this.drawingStyle = { fillStyle: "rgb(255,0,0)" };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //圆
+                        case "CIRCLE": {
+                            this.drawingStyle = {
+                                fillStyle: "#ff0000",
+                                strokeStyle: "#ff0000",
+                                lineWidth: 5,
+                                stroke: true,
+                                fill: true,
+                            };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //线段
+                        case "LINE": {
+                            this.drawingStyle = {
+                                strokeStyle: "rgb(255,0,0)",
+                                lineJoin: "round",
+                                lineCap: "round",
+                                lineWidth: 8,
+                                arrow: false,
+                            };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //多线段
+                        case "POLYLINE": {
+                            this.drawingStyle = {
+                                strokeStyle: "rgb(255,0,0)",
+                                lineJoin: "round",
+                                lineCap: "round",
+                                lineWidth: 8,
+                                stroke: true
+                            };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //矩形
+                        case "RECT": {
+                            this.drawingStyle = { strokeStyle: "rgb(255,0,0)", lineWidth: 2, stroke: true };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //多边形
+                        case "POLYGON": {
+                            this.drawingStyle = {
+                                strokeStyle: "rgb(255,0,0)", //边框颜色
+                                fill: true, //是否填充
+                                //fillStyle: "rgb(145,172,218)", //填充色
+                                globalAlpha: 0.3,
+                                lineWidth: 12,
+                                stroke: true,
+                            };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //涂抹
+                        case "DRAWMASK": {
+                            this.drawingStyle = {
+                                strokeStyle: "rgba(255, 0, 0, .5)",
+                                fillStyle: "#00f",
+                                lineWidth: 50,
+                            };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        //擦除
+                        case "CLEARMASK": {
+                            this.drawingStyle = { fillStyle: "#00f", lineWidth: 30 };
+                            this.gMap.setDrawingStyle(drawingStyle);
+                            break;
+                        }
+                        default:
+                            break;
                     }
-                    //注记
-                    case "MARKER": {
-                        // 忽略
-                        break;
-                    }
-                    //点
-                    case "POINT": {
-                        this.drawingStyle = { fillStyle: "rgb(255,0,0)" };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //圆
-                    case "CIRCLE": {
-                        this.drawingStyle = {
-                            fillStyle: "#ff0000",
-                            strokeStyle: "#ff0000",
-                            lineWidth: 5,
-                            stroke: true,
-                            fill: true,
-                        };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //线段
-                    case "LINE": {
-                        this.drawingStyle = {
-                            strokeStyle: "rgb(255,0,0)",
-                            lineJoin: "round",
-                            lineCap: "round",
-                            lineWidth: 8,
-                            arrow: false,
-                        };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //多线段
-                    case "POLYLINE": {
-                        this.drawingStyle = {
-                            strokeStyle: "rgb(255,0,0)",
-                            lineJoin: "round",
-                            lineCap: "round",
-                            lineWidth: 8,
-                            stroke: true
-                        };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //矩形
-                    case "RECT": {
-                        this.drawingStyle = { strokeStyle: "rgb(255,0,0)", lineWidth: 2, stroke: true };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //多边形
-                    case "POLYGON": {
-                        this.drawingStyle = {
-                            strokeStyle: "rgb(255,0,0)", //边框颜色
-                            fill: true, //是否填充
-                            //fillStyle: "rgb(145,172,218)", //填充色
-                            globalAlpha: 0.3,
-                            lineWidth: 12,
-                            stroke: true,
-                        };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //涂抹
-                    case "DRAWMASK": {
-                        this.drawingStyle = {
-                            strokeStyle: "rgba(255, 0, 0, .5)",
-                            fillStyle: "#00f",
-                            lineWidth: 50,
-                        };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    //擦除
-                    case "CLEARMASK": {
-                        this.drawingStyle = { fillStyle: "#00f", lineWidth: 30 };
-                        this.gMap.setDrawingStyle(drawingStyle);
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            },*/
+                },*/
 
         // 添加图形
         addFeature(
@@ -1015,68 +1095,68 @@ export default {
             this.getFeatures();
         },
         /* 增加删除图标
-            addDeleteIcon(feature, shape) {
-                let gMap = this.gMap;
-                let that = this;
-                // 添加delete-icon
-                // let points = that.getPoints(feature);
-                console.log(shape, "shape");
-                this.vis = false
-                let position = {}
-                if (feature.type === "RECT") {
-                    position.x = shape.x + shape.width
-                    position.y = shape.y - 15
-                } else if (feature.type === "CIRCLE") {
-                    position.x = shape.cx
-                    position.y = shape.cy
-                } else if (feature.type === "POLYGON") {
-                    position.x = shape.points[shape.points.length - 1].x
-                    position.y = shape.points[shape.points.length - 1].y
-                } else if (feature.type === "POINT") {
-                    position.x = shape.x
-                    position.y = shape.y
-                } else if (feature.type === "POLYLINE") {
-                    position.x = shape.points[shape.points.length - 1].x
-                    position.y = shape.points[shape.points.length - 1].y
-                } else if (feature.type === "LINE") {
-                    position.x = shape.end.x
-                    position.y = shape.end.y
-                }
-                const gFirstMarker = new AILabel.Marker(
-                    that.deleteIconId, // id
-                    {
-                        src: "../../delete.png",
-                        position: position, // 矩形右上角 根据图形动态调整
-                        offset: {
-                            x: -20,
-                            y: -4,
-                        },
-                    }, // markerInfo
-                    { name: "delete" } // props
-                );
-                gFirstMarker.events.on("click", (marker) => {
-                    // 首先删除当前marker
-                    gMap.markerLayer.removeMarkerById(marker.id);
-                    // 删除对应text
-                    // gFirstTextLayer.removeTextById(textId);
-                    // 删除对应feature
-                    that.gFirstFeatureLayer.removeFeatureById(feature.id);
-                    this.nowpicdata = this.nowpicdata.filter(item => {
-                        return item.id !== feature.id
-                    })
-                    this.getText(feature.id)
-                    this.tagtextLayer.removeTextById(feature.id + "-0")
-                    this.selected = false
-                    this.power = false
-                });
-                gMap.markerLayer.addMarker(gFirstMarker);
-     
-                // that.gFirstFeatureLayer
-            },
-            // 删除 删除按钮
-            deIcon() {
-                this.gMap.markerLayer.removeAllMarkers();
-            },*/
+                addDeleteIcon(feature, shape) {
+                    let gMap = this.gMap;
+                    let that = this;
+                    // 添加delete-icon
+                    // let points = that.getPoints(feature);
+                    console.log(shape, "shape");
+                    this.vis = false
+                    let position = {}
+                    if (feature.type === "RECT") {
+                        position.x = shape.x + shape.width
+                        position.y = shape.y - 15
+                    } else if (feature.type === "CIRCLE") {
+                        position.x = shape.cx
+                        position.y = shape.cy
+                    } else if (feature.type === "POLYGON") {
+                        position.x = shape.points[shape.points.length - 1].x
+                        position.y = shape.points[shape.points.length - 1].y
+                    } else if (feature.type === "POINT") {
+                        position.x = shape.x
+                        position.y = shape.y
+                    } else if (feature.type === "POLYLINE") {
+                        position.x = shape.points[shape.points.length - 1].x
+                        position.y = shape.points[shape.points.length - 1].y
+                    } else if (feature.type === "LINE") {
+                        position.x = shape.end.x
+                        position.y = shape.end.y
+                    }
+                    const gFirstMarker = new AILabel.Marker(
+                        that.deleteIconId, // id
+                        {
+                            src: "../../delete.png",
+                            position: position, // 矩形右上角 根据图形动态调整
+                            offset: {
+                                x: -20,
+                                y: -4,
+                            },
+                        }, // markerInfo
+                        { name: "delete" } // props
+                    );
+                    gFirstMarker.events.on("click", (marker) => {
+                        // 首先删除当前marker
+                        gMap.markerLayer.removeMarkerById(marker.id);
+                        // 删除对应text
+                        // gFirstTextLayer.removeTextById(textId);
+                        // 删除对应feature
+                        that.gFirstFeatureLayer.removeFeatureById(feature.id);
+                        this.nowpicdata = this.nowpicdata.filter(item => {
+                            return item.id !== feature.id
+                        })
+                        this.getText(feature.id)
+                        this.tagtextLayer.removeTextById(feature.id + "-0")
+                        this.selected = false
+                        this.power = false
+                    });
+                    gMap.markerLayer.addMarker(gFirstMarker);
+         
+                    // that.gFirstFeatureLayer
+                },
+                // 删除 删除按钮
+                deIcon() {
+                    this.gMap.markerLayer.removeAllMarkers();
+                },*/
         // 增加事件
         addEvent() {
             let that = this;
@@ -1280,51 +1360,51 @@ export default {
         },
         // 获取坐标 需要自行添加
         /*getPoints(feature) {
-                switch (feature.type) {
-                    case "RECT":
-                        return feature.getPoints();
-                    case "LINE":
-                        return [feature.shape.start, feature.shape.end];
-                    case "POLYLINE":
-                        return feature.shape.points;
-                    case "POLYGON":
-                        return feature.shape.points;
-                    default:
-                        return [];
-                }
-            },
-            //填充事件
-            Fill() {
-                console.log("填充事件");
-                let fill = this.gFirstFeatureLayer.getFeatureById(this.editId);
-                console.log("--填充对象--", fill);
-                fill.style.fillStyle = "#FFDAB9";
-                fill.style.fill = true;
-                //刷新map
-                this.gMap.refresh();
-            },
-            //撤销
-            Revoke() {
-                if (this.allFeatures.length === 0) {
-                    this.$message("页面无标注")
-                }
-                console.log("撤销");
-                this.getFeatures();
-                this.getText()
-                for (let i = this.allText.length - 1; i >= 0; i--) {
-                    if (this.allText[i].id.split("-")[0] !== this.allFeatures[this.allFeatures.length - 1].id) {
-                        break;
-                    } else {
-                        this.allText.pop()
+                    switch (feature.type) {
+                        case "RECT":
+                            return feature.getPoints();
+                        case "LINE":
+                            return [feature.shape.start, feature.shape.end];
+                        case "POLYLINE":
+                            return feature.shape.points;
+                        case "POLYGON":
+                            return feature.shape.points;
+                        default:
+                            return [];
                     }
-                }
-                this.allFeatures.pop();
-                //this.gMap.removeTextById(this.editId);
-                //刷新map
-                this.gMap.refresh();
-                this.vis = false
-                this.segvis = false
-            },*/
+                },
+                //填充事件
+                Fill() {
+                    console.log("填充事件");
+                    let fill = this.gFirstFeatureLayer.getFeatureById(this.editId);
+                    console.log("--填充对象--", fill);
+                    fill.style.fillStyle = "#FFDAB9";
+                    fill.style.fill = true;
+                    //刷新map
+                    this.gMap.refresh();
+                },
+                //撤销
+                Revoke() {
+                    if (this.allFeatures.length === 0) {
+                        this.$message("页面无标注")
+                    }
+                    console.log("撤销");
+                    this.getFeatures();
+                    this.getText()
+                    for (let i = this.allText.length - 1; i >= 0; i--) {
+                        if (this.allText[i].id.split("-")[0] !== this.allFeatures[this.allFeatures.length - 1].id) {
+                            break;
+                        } else {
+                            this.allText.pop()
+                        }
+                    }
+                    this.allFeatures.pop();
+                    //this.gMap.removeTextById(this.editId);
+                    //刷新map
+                    this.gMap.refresh();
+                    this.vis = false
+                    this.segvis = false
+                },*/
         changepic(item) {
             let that = this;
             const gMap = new AILabel.Map("map", {
@@ -1405,12 +1485,13 @@ export default {
             window.onresize = function () {
                 this.gMap && this.gMap.resize();
             };
+            this.fourturn.id = item.id;
             /*if (item.data) {
-                      axios.get(item.data).then(res => {
-                          item.mark = res.data
-                          this.keepdraw(res.data)
-                      })
-                  }*/
+                            axios.get(item.data).then(res => {
+                                item.mark = res.data
+                                this.keepdraw(res.data)
+                            })
+                        }*/
         },
         goBack() {
             this.$router.push("/ProjectList");

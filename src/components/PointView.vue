@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 <el-popover trigger="manual" v-model="vis" ref="popover" popper-class="pop">
-                    <el-input v-model="segtext" size="samll" placeholder="请输入标签"></el-input>
+                    <el-input v-model="segtext" size="small" placeholder="请输入标签"></el-input>
                     <el-select v-model="Recognizetextcontent" style="width: 100%;" size="mini" placeholder="请选择分割标签">
                         <el-option v-for="(item, index) in seglabels" :key="item.label" :value="index">
                             <div style="display: flex;justify-content: space-between;align-items: center;">
@@ -225,8 +225,8 @@ export default {
             ocrtype: 1,
             now: new Date(),
             history: [],
-            loading:false,
-            segtext:""
+            loading: false,
+            segtext: ""
         };
     },
     watch: {
@@ -281,7 +281,7 @@ export default {
                     this.tagtextLayer.addText(text)
                 }
             })
-            this.loading=false
+            this.loading = false
         },
         //汇总框选向后台提交//
         together(num) {
@@ -319,12 +319,12 @@ export default {
         },
         ok() {
             this.power = false
-            if (this.Recognizetextcontent === "" &&this.segtext=='') {
+            if (this.Recognizetextcontent === "" && this.segtext == '') {
                 return
             }
             this.gFirstFeatureLayer.removeFeatureById(this.storage.id)
-            let textInfo = { text: this.segtext==''? this.seglabels[this.Recognizetextcontent].label:this.segtext, position: { x: this.storage.shape.x, y: this.storage.shape.y }, offset: { x: 0, y: 1 } }
-            this.addFeature(this.storage.shape, 'POINT', this.storage.id,this.segtext==''? this.seglabels[this.Recognizetextcontent].color:'rgb(255,0,0)', textInfo)
+            let textInfo = { text: this.segtext == '' ? this.seglabels[this.Recognizetextcontent].label : this.segtext, position: { x: this.storage.shape.x, y: this.storage.shape.y }, offset: { x: 0, y: 1 } }
+            this.addFeature(this.storage.shape, 'POINT', this.storage.id, this.segtext == '' ? this.seglabels[this.Recognizetextcontent].color : 'rgb(255,0,0)', textInfo)
             let textid = this.storage.id + "-0"
             const recttext = new AILabel.Text(textid, textInfo)
             this.tagtextLayer.addText(recttext)
@@ -338,6 +338,7 @@ export default {
                 type: "POINT"
             })
             this.Recognizetextcontent = ""
+            this.segtext = ""
             //this.showlist[this.nowselect].mark.push({ type: "RECT", id: this.gFirstFeatureLayer.getAllFeatures()[this.gFirstFeatureLayer.getAllFeatures().length - 1].id, shape: this.data2, text: { text: this.Recognizetextcontent, id: textid } })
             this.vis = false
         },
@@ -947,11 +948,11 @@ export default {
         },
         changepic(item, num) {
             let that = this
-            this.loading=true
+            this.loading = true
             const gMap = new AILabel.Map("map", {
                 center: { x: 250, y: 187 },  // 确定中心点
                 zoom: 500,
-                mode: "RECT", // 绘制线段
+                mode: "POINT", // 绘制线段
                 //refreshDelayWhenZooming: false, // 缩放时是否允许刷新延时，性能更优
                 zoomWhenDrawing: true,
                 panWhenDrawing: true,
@@ -1016,8 +1017,8 @@ export default {
                     }).catch(e => {
                         console.log(e);
                     })
-            }else{
-                this.loading=false
+            } else {
+                this.loading = false
             }
             /*if (item.data) {
                 axios.get(item.data).then(res => {
@@ -1033,7 +1034,7 @@ export default {
             this.history = []
             axios.post("http://120.26.142.114:10010" + (this.project.identity == 0 ? '/dataset/task' : '/dataset/admin/select'), { version: this.project.versionId, page: page, number: 5, current: page, pageSize: 5 })
                 .then(res => {
-                    if (res.data.data.length === 0) {
+                    if ((this.project.identity == 0 && res.data.data.length === 0) || (this.project.identity == 1 && res.data.data.datasetCallNewVOS.length == 0)) {
                         this.$message.warning("已经是最后一张了")
                         return
                     }

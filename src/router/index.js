@@ -19,6 +19,12 @@ VueRouter.prototype.replace = function push(location, onResolve, onReject) {
 };
 const routes = [
   {
+    path: "/canvasview",
+    name: "canvasview",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/CanvasView.vue"),
+  },
+  {
     path: "/",
     name: "dooropen",
     component: () =>

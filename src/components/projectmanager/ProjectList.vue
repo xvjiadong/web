@@ -585,6 +585,7 @@ export default {
 				.catch(e => {
 					console.log(e);
 				})
+			this.delete_entity_cancel();
 		},
 		generate_ok() {
 			if (this.generate.prompt == "") {

@@ -3,9 +3,8 @@
     <div class="header">
       <span style="font-size: 16px; color: rgb(21, 27, 38)">任务列表</span>
       <div style="display: flex; justify-content: space-between">
-        <span style="font-size: 10px; color: rgb(21, 27, 38)"
-          >多人协同任务标注功能可通过团队协作方式，提高数据标注效率。任务发起后，系统会向团队成员自动分发标注任务，成员完成标注提交任务后，任务发起人可以进行标注结果验收。</span
-        >
+        <span
+          style="font-size: 10px; color: rgb(21, 27, 38)">多人协同任务标注功能可通过团队协作方式，提高数据标注效率。任务发起后，系统会向团队成员自动分发标注任务，成员完成标注提交任务后，任务发起人可以进行标注结果验收。</span>
         <span class="hide" @click="hide">
           {{ hideintroduction ? "展开" : "隐藏" }}使用介绍
         </span>
@@ -59,87 +58,34 @@
       </div>
     </el-card>
     <el-card class="teachcard">
-      <div
-        slot="header"
-        style="
+      <div slot="header" style="
           display: flex;
           justify-content: space-between;
           align-items: center;
-        "
-      >
+        ">
         <el-menu :default-active="'accpet'" mode="horizontal">
-          <el-menu-item index="accpet" @click="mode = 1"
-            >接受的任务</el-menu-item
-          >
+          <el-menu-item index="accpet" @click="mode = 1">接受的任务</el-menu-item>
         </el-menu>
       </div>
       <div>
         <el-table ref="accept" :data="accepttask">
           <el-table-column type="expand" width="0"></el-table-column>
-          <el-table-column
-            width="150"
-            prop="taskName"
-            label="任务名称"
-          ></el-table-column>
-          <el-table-column
-            width="120"
-            prop="projectName"
-            label="所属项目"
-          ></el-table-column>
-          <el-table-column
-            width="120"
-            prop="version"
-            label="所属版本"
-          ></el-table-column>
-          <el-table-column
-            width="120"
-            prop="adminNane"
-            label="任务创建者"
-          ></el-table-column>
-          <el-table-column
-            width="80"
-            prop="dataNumber"
-            label="数据量"
-          ></el-table-column>
-          <el-table-column
-            width="80"
-            prop="progress"
-            label="标注进度"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="callType"
-            label="标注类型"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="startTime"
-            label="创建时间"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="endTime"
-            label="截止时间"
-          ></el-table-column>
+          <el-table-column width="150" prop="taskName" label="任务名称"></el-table-column>
+          <el-table-column width="120" prop="projectName" label="所属项目"></el-table-column>
+          <el-table-column width="120" prop="version" label="所属版本"></el-table-column>
+          <el-table-column width="120" prop="adminNane" label="任务创建者"></el-table-column>
+          <el-table-column width="80" prop="dataNumber" label="数据量"></el-table-column>
+          <el-table-column width="80" prop="progress" label="标注进度"></el-table-column>
+          <el-table-column width="150" prop="callType" label="标注类型"></el-table-column>
+          <el-table-column width="150" prop="startTime" label="创建时间"></el-table-column>
+          <el-table-column width="150" prop="endTime" label="截止时间"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <span
-                size="mini"
-                class="tableplay"
-                v-if="scope.row.taskprocess !== '100%'"
-                @click="push(scope.row)"
-                >标注</span
-              >
-              <span
-                size="mini"
-                class="tableplay"
-                v-if="scope.row.taskprocess === '100%'"
-                @click="review(scope.row)"
-                >提交审核</span
-              >
-              <span size="mini" class="tableplay" @click="turn(scope.row)"
-                >转让</span
-              >
+              <span size="mini" class="tableplay" v-if="scope.row.taskprocess !== '100%'"
+                @click="push(scope.row)">标注</span>
+              <span size="mini" class="tableplay" v-if="scope.row.taskprocess === '100%'"
+                @click="review(scope.row)">提交审核</span>
+              <span size="mini" class="tableplay" @click="turn(scope.row)">转让</span>
             </template>
           </el-table-column>
         </el-table>
@@ -320,7 +266,7 @@ export default {
   font-size: 16px;
 }
 
-.el-menu--horizontal > .el-menu-item.is-active {
+.el-menu--horizontal>.el-menu-item.is-active {
   border-bottom: 2px solid #409eff;
   color: rgb(36, 104, 242);
 }

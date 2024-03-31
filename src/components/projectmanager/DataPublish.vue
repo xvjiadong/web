@@ -110,7 +110,8 @@ export default {
                     id: item.id,
                     name: item.name,
                     versionId: row.versionId,
-                    verName: row.verName
+                    verName: row.verName,
+                    task: row.callType
                 }
             })
         },

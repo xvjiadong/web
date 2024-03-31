@@ -7,7 +7,7 @@
             </div>
             <el-table :data="versionlist" border>
                 <el-table-column prop="time" label="发布时间"></el-table-column>
-                <el-table-column prop="descript" label="数据集描述"></el-table-column>
+                <el-table-column prop="description" label="数据集描述"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button @click="download(scope.row.url)" size="small" style="font-size: 15px;">下载</el-button>
@@ -40,6 +40,7 @@ export default {
                 id: "",
                 versionId: "",
                 verName: "",
+                task: ""
             },
             versionlist: [],
             publishvis: false,
@@ -49,18 +50,20 @@ export default {
     },
     methods: {
         publishok() {
-            axios.post("http://localhost:5000/api/data_publish", { id: this.version.versionId, format: this.format, descript: this.descript })
+
+            this.$message.info("正在准备发布中，请稍等")
+            axios.post("http://localhost:5000/api/data_publish", { id: this.version.versionId, format: this.format, descript: this.descript, task: this.version.task })
                 .then(res => {
                     if (res.data == 'ok') {
                         this.geturl(this.version.versionId)
                     }
-                    this.publishcancel()
                 }).catch(e => {
                     console.log(e);
                 })
+            this.publishcancel()
         },
         publishcancel() {
-            this.dedscript = ""
+            this.descript = ""
             this.format = []
             this.publishvis = false
         },
@@ -91,6 +94,7 @@ export default {
         this.version.name = query.name
         this.version.versionId = query.versionId - 0
         this.version.verName = query.verName
+        this.version.task = query.task
         this.geturl(this.version.versionId)
     },
 }

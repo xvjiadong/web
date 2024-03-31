@@ -4,7 +4,7 @@ import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 import ElementUI from "element-ui";
-import "./assets/font_4326048_bqm8mhudruq/iconfont.css";
+import "./assets/font_4326048_3rm4eq1vkeq/iconfont.css";
 import "element-ui/lib/theme-chalk/index.css";
 Vue.config.productionTip = false;
 import VueCompositionAPI from "@vue/composition-api";

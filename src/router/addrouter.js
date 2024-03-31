@@ -61,6 +61,16 @@ const platformmanagerrouter = [
 ];
 const projectmanagerrouter = [
   {
+    path: "/pointview",
+    name: "pointview",
+    component: () => import("../components/PointView.vue"),
+  },
+  {
+    path: "/polyline",
+    name: "polyline",
+    component: () => import("../components/PolyLine.vue"),
+  },
+  {
     name: "GenerateArea",
     path: "/GenerateArea",
     component: () => import("../components/projectmanager/GenerateArea.vue"),
@@ -220,8 +230,23 @@ const projectmanagerrouter = [
     name: "publishdetail",
     component: () => import("../components/projectmanager/PublishDetail.vue"),
   },
+  {
+    path: "/PdfView",
+    name: "PdfView",
+    component: () => import("../components/PdfView.vue"),
+  },
 ];
 const datalabelerrouter = [
+  {
+    path: "/languageinference",
+    name: "languageinference",
+    component: () => import("../components/LanguageInference.vue"),
+  },
+  {
+    path: "/readview",
+    name: "readview",
+    component: () => import("../components/ReadView.vue"),
+  },
   {
     path: "/pointview",
     name: "pointview",

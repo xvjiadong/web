@@ -58,11 +58,14 @@
 										:value="item.value">
 									</el-option>
 								</el-select>
-								<el-button v-else class="button-new-tag" size="small" @click="showSelect">+已有标签</el-button>
-								<el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput"
-									size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+								<el-button v-else class="button-new-tag" size="small"
+									@click="showSelect">+已有标签</el-button>
+								<el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue"
+									ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm"
+									@blur="handleInputConfirm">
 								</el-input>
-								<el-button v-else class="button-new-tag" size="small" @click="showInput">+新标签</el-button>
+								<el-button v-else class="button-new-tag" size="small"
+									@click="showInput">+新标签</el-button>
 							</div>
 						</div>
 						<div v-if="popbutton">
@@ -126,7 +129,7 @@
 							<div class="linkright">
 								<div class="righttext">
 									<span @click="jump(`#${item.id}-0`)" class="evidence">{{ item.id + "-" + item.tag
-									}}</span>
+										}}</span>
 								</div>
 								<div class="righttext">
 									{{ mode3tag }}
@@ -226,14 +229,14 @@
 							<span>标注模式:长文本字段标注</span>
 							<span
 								style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">标注内容:{{
-									mark.choosecontent }}</span>
+		mark.choosecontent }}</span>
 						</div>
 						<div class="result" v-if="mark.mode === 2">
 							<span>标注ID:{{ mark.id }}</span>
 							<span>标注模式:标签证据字段标注</span>
 							<span
 								style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">标注内容:{{
-									mark.choosecontent }}</span>
+		mark.choosecontent }}</span>
 							<span>标注类型:{{ mark.istag ? "标签" : "证据" }}</span>
 							<div v-if="mark.istag">
 								<div :key="tag.tag" v-for="tag in mark.markcontent">
@@ -267,7 +270,8 @@
 							<span>标注模式:关联关系字段标注</span>
 							<span>关系实体:<el-tag size="mini" :disable-transitions="false">{{ mark.tag }}</el-tag></span>
 							<div v-if="mark.link.length > 0">
-								<div v-for="link in mark.link" :key="link.id" style="display: flex;align-items: center;">
+								<div v-for="link in mark.link" :key="link.id"
+									style="display: flex;align-items: center;">
 									<span>{{ link.linkname }}</span>
 									<div style="width: 15px;height: 1px;background-color: rgb(100,100,101);"></div>
 									<div
@@ -276,7 +280,7 @@
 									<div class="linkright">
 										<div class="righttext">
 											<span @click="jump(`#${link.id}-0`)" class="evidence">{{ link.tag
-											}}</span>
+												}}</span>
 										</div>
 										<div class="righttext">
 											{{ mark.tag }}
@@ -291,10 +295,12 @@
 							<span>标注模式:智能标注</span>
 							<span>标注类型:{{ mark.mode4kind }}</span>
 							<span v-if="mark.mode4kind === '语义匹配' || mark.mode4kind === '自然语言推理'">
-								<span style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								<span
+									style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 									标注内容1:{{ mark.choosecontent1 }}
 								</span>
-								<span style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								<span
+									style="width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 									标注内容2:{{ mark.choosecontent2 }}
 								</span>
 							</span>
@@ -519,7 +525,7 @@ export default {
 		this.project = this.$route.query;
 		//this.smartmark("抽取式阅读理解任务：阅读文章【谷歌公司首席执行官表示，他们计划在未来五年内全面实现碳中和，并将投资额翻倍用于太阳能和风能等清洁能源项目。同时，亚马逊也发布了雄心勃勃的计划，承诺在2030年前投资100亿美元用于推动可再生能源的创新和发展。】问题【谷歌公司的目标是什么】的答案是什么？")
 		if (this.$store.state.pdflist.length === this.$store.state.index) {
-			this.$store.commit("setpdflist",{url:"https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.pdf",mark:"https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.json"})
+			this.$store.commit("setpdflist", { url: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.pdf", mark: "https://items-storage.oss-cn-beijing.aliyuncs.com/datasets/2023-11-24/ae18f0d1535b48418341c1de5ed09964-信息抽取标注/V1/1.json" })
 			this.getmark(this.$store.state.pdflist[this.$store.state.index].mark)
 			/*axios.post("http://120.26.142.114:10010/dataset/task", { version: this.project.versionId, page: Math.floor(this.$store.state.index / 5) + 1, number: 5 }).then(res => {
 				console.log(res.data);
@@ -692,7 +698,7 @@ export default {
 			this.smarttask = ""
 		},
 		smartmark(item) {
-			axios.post("http://192.168.224.19:3000/predict/", { text: item },{timeout:5000000000000000}).then(res => {
+			axios.post("http://192.168.224.19:3000/predict/", { text: item }, { timeout: 5000000000000000 }).then(res => {
 				console.log(res.data);
 				const regex = /【(.*?)】/g;
 				const matches = [];

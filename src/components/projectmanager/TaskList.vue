@@ -3,9 +3,8 @@
     <div class="header">
       <span style="font-size: 16px; color: rgb(21, 27, 38)">任务列表</span>
       <div style="display: flex; justify-content: space-between">
-        <span style="font-size: 10px; color: rgb(21, 27, 38)"
-          >多人协同任务标注功能可通过团队协作方式，提高数据标注效率。任务发起后，系统会向团队成员自动分发标注任务，成员完成标注提交任务后，任务发起人可以进行标注结果验收。</span
-        >
+        <span
+          style="font-size: 10px; color: rgb(21, 27, 38)">多人协同任务标注功能可通过团队协作方式，提高数据标注效率。任务发起后，系统会向团队成员自动分发标注任务，成员完成标注提交任务后，任务发起人可以进行标注结果验收。</span>
         <span class="hide" @click="hide">
           {{ hideintroduction ? "展开" : "隐藏" }}使用介绍
         </span>
@@ -61,27 +60,16 @@
       </div>
     </el-card>
     <el-card class="teachcard">
-      <div
-        slot="header"
-        style="
+      <div slot="header" style="
           display: flex;
           justify-content: space-between;
           align-items: center;
-        "
-      >
+        ">
         <el-menu :default-active="'create'" mode="horizontal">
-          <el-menu-item index="create" @click="mode = 0"
-            >创建的任务</el-menu-item
-          >
-          <el-menu-item index="accpet" @click="mode = 1"
-            >接受的任务</el-menu-item
-          >
+          <el-menu-item index="create" @click="mode = 0">创建的任务</el-menu-item>
+          <el-menu-item index="accpet" @click="mode = 1">接受的任务</el-menu-item>
         </el-menu>
-        <el-button
-          type="primary"
-          size="mini"
-          style="background-color: rgb(36, 104, 242); margin-right: 20px"
-        >
+        <el-button type="primary" size="mini" style="background-color: rgb(36, 104, 242); margin-right: 20px">
           <i class="el-icon-plus"></i>&emsp;项目团队管理
         </el-button>
       </div>
@@ -91,115 +79,42 @@
             <template slot-scope="scope">
               <div style="text-align: center" v-if="scope.row.taskUser">
                 <el-table :data="scope.row.taskUser" :row-key="getrowkey">
-                  <el-table-column
-                    prop="userId"
-                    width="105"
-                    label="任务承办人"
-                  ></el-table-column>
-                  <el-table-column
-                    prop="dataNumber"
-                    label="标注数量"
-                  ></el-table-column>
-                  <el-table-column
-                    prop="personalProgress"
-                    label="子任务进度"
-                  ></el-table-column>
+                  <el-table-column prop="userId" width="105" label="任务承办人"></el-table-column>
+                  <el-table-column prop="dataNumber" label="标注数量"></el-table-column>
+                  <el-table-column prop="personalProgress" label="子任务进度"></el-table-column>
                   <el-table-column label="操作">
                     <template slot-scope="scope2">
-                      <el-button
-                        size="mini"
-                        @click="handleTaskLook(scope.row, scope2.row)"
-                        >查看</el-button
-                      >
-                      <el-button
-                        size="mini"
-                        @click="handleremove(scope.row, scope2.row)"
-                        >移交</el-button
-                      >
+                      <el-button size="mini" @click="handleTaskLook(scope.row, scope2.row)">查看</el-button>
+                      <el-button size="mini" @click="handleremove(scope.row, scope2.row)">移交</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
               </div>
               <div style="text-align: center" v-else>
-                <el-empty
-                  description="未分配任务"
-                  style="padding: 0px; color: rgb(21, 27, 38)"
-                >
-                  <span
-                    slot
-                    @click="handleSchedule(item, scope.row)"
-                    style="color: rgb(36, 104, 242); cursor: pointer"
-                  >
+                <el-empty description="未分配任务" style="padding: 0px; color: rgb(21, 27, 38)">
+                  <span slot @click="handleSchedule(item, scope.row)" style="color: rgb(36, 104, 242); cursor: pointer">
                     去分配任务
                   </span>
                 </el-empty>
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            width="200"
-            prop="taskName"
-            label="任务名"
-          ></el-table-column>
-          <el-table-column
-            width="80"
-            prop="projectName"
-            label="所属项目"
-          ></el-table-column>
-          <el-table-column
-            width="80"
-            prop="version"
-            label="所属版本"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="callType"
-            label="任务类型"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="progress"
-            label="任务进度"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="startTime"
-            label="创建时间"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="endTime"
-            label="截止时间"
-          ></el-table-column>
+          <el-table-column width="200" prop="taskName" label="任务名"></el-table-column>
+          <el-table-column width="80" prop="projectName" label="所属项目"></el-table-column>
+          <el-table-column width="80" prop="version" label="所属版本"></el-table-column>
+          <el-table-column width="150" prop="callType" label="任务类型"></el-table-column>
+          <el-table-column width="150" prop="progress" label="任务进度"></el-table-column>
+          <el-table-column width="150" prop="startTime" label="创建时间"></el-table-column>
+          <el-table-column width="150" prop="endTime" label="截止时间"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <div v-if="scope.row.taskUser.length > 0">
-                <span
-                  size="mini"
-                  class="tableplay"
-                  @click="handleTaskLook(scope.row)"
-                  >任务详情</span
-                >
-                <span
-                  size="mini"
-                  class="tableplay"
-                  @click="handleTasklabel(scope.row)"
-                  >查看标签</span
-                >
-                <span
-                  size="mini"
-                  class="tableplay"
-                  @click="handleTaskLook(scope.row)"
-                  >任务转让</span
-                >
+                <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务详情</span>
+                <span size="mini" class="tableplay" @click="handleTasklabel(scope.row)">查看标签</span>
+                <span size="mini" class="tableplay" @click="handleTaskLook(scope.row)">任务转让</span>
               </div>
               <div v-else>
-                <span
-                  size="mini"
-                  class="tableplay"
-                  @click="handleSchedule(scope.row)"
-                  >任务调度</span
-                >
+                <span size="mini" class="tableplay" @click="handleSchedule(scope.row)">任务调度</span>
               </div>
             </template>
           </el-table-column>
@@ -208,97 +123,39 @@
       <div v-if="mode === 1">
         <el-table ref="accept" :data="accepttask">
           <el-table-column type="expand" width="0"></el-table-column>
-          <el-table-column
-            width="80"
-            prop="projectid"
-            label="所属项目"
-          ></el-table-column>
-          <el-table-column
-            width="80"
-            prop="projectversion"
-            label="所属版本"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="taskcreator"
-            label="任务创建者"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="tasknumber"
-            label="数据量"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="taskprocess"
-            label="标注进度"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="marktype"
-            label="标注类型"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="createtime"
-            label="创建时间"
-          ></el-table-column>
-          <el-table-column
-            width="150"
-            prop="deadlinetime"
-            label="截止时间"
-          ></el-table-column>
+          <el-table-column width="80" prop="projectid" label="所属项目"></el-table-column>
+          <el-table-column width="80" prop="projectversion" label="所属版本"></el-table-column>
+          <el-table-column width="150" prop="taskcreator" label="任务创建者"></el-table-column>
+          <el-table-column width="150" prop="tasknumber" label="数据量"></el-table-column>
+          <el-table-column width="150" prop="taskprocess" label="标注进度"></el-table-column>
+          <el-table-column width="150" prop="marktype" label="标注类型"></el-table-column>
+          <el-table-column width="150" prop="createtime" label="创建时间"></el-table-column>
+          <el-table-column width="150" prop="deadlinetime" label="截止时间"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <span
-                size="mini"
-                class="tableplay"
-                @click="handlemark(scope.row)"
-                v-if="scope.row.taskprocess !== '100%'"
-                >标注</span
-              >
-              <span
-                size="mini"
-                class="tableplay"
-                @click="handlereview(scope.row)"
-                v-if="scope.row.taskprocess === '100%'"
-                >审核</span
-              >
-              <span
-                size="mini"
-                class="tableplay"
-                @click="handletaskturn(scope.row)"
-                >转让</span
-              >
+              <span size="mini" class="tableplay" @click="handlemark(scope.row)"
+                v-if="scope.row.taskprocess !== '100%'">标注</span>
+              <span size="mini" class="tableplay" @click="handlereview(scope.row)"
+                v-if="scope.row.taskprocess === '100%'">审核</span>
+              <span size="mini" class="tableplay" @click="handletaskturn(scope.row)">转让</span>
             </template>
           </el-table-column>
         </el-table>
       </div>
     </el-card>
-    <el-dialog
-      title="更新标签组"
-      :visible.sync="labelvisible"
-      width="24%"
-      top="15%"
-      :destroy-on-close="true"
-      :show-close="false"
-      :close-on-click-modal="false"
-    >
+    <el-dialog title="更新标签组" :visible.sync="labelvisible" width="24%" top="15%" :destroy-on-close="true"
+      :show-close="false" :close-on-click-modal="false">
       <div style="height: 160px; overflow-y: auto">
         <div style="display: flex; justify-content: left">
           <span>序号</span>
           <span style="margin-left: 15px">标签名</span>
         </div>
-        <div
-          v-for="(item, index) in show.labels"
-          :key="index"
-          style="
+        <div v-for="(item, index) in show.labels" :key="index" style="
             display: flex;
             justify-content: left;
             align-items: center;
             margin-top: 12px;
-          "
-        >
+          ">
           <div style="font-size: 15px; margin-left: 8px">
             {{ index + 1 }}
           </div>
@@ -306,21 +163,10 @@
           <i class="el-icon-close labelicon" @click="deletelabel(item)"></i>
         </div>
       </div>
-      <i
-        v-if="!addnewlabel"
-        class="el-icon-circle-plus-outline labelicon"
-        @click="addnewlabel = true"
-      ></i>
-      <div
-        v-else
-        style="display: flex; flex-direction: column; justify-content: left"
-      >
+      <i v-if="!addnewlabel" class="el-icon-circle-plus-outline labelicon" @click="addnewlabel = true"></i>
+      <div v-else style="display: flex; flex-direction: column; justify-content: left">
         <div style="display: flex; justify-content: left; align-items: center">
-          <input
-            placeholder="请输入新标签;不允许重复和空标签"
-            v-model="newlabel"
-            class="inputlabel"
-          />
+          <input placeholder="请输入新标签;不允许重复和空标签" v-model="newlabel" class="inputlabel" />
           <el-tooltip content="保存编辑" placement="top-start">
             <i class="el-icon-check labelicon" @click="addsure"></i>
           </el-tooltip>
@@ -328,29 +174,15 @@
             <i class="el-icon-close labelicon" @click="addcancel"></i>
           </el-tooltip>
         </div>
-        <span
-          v-if="emptylabel"
-          id="repeattext"
-          class="animate__animated animate__shakeX"
-        >
+        <span v-if="emptylabel" id="repeattext" class="animate__animated animate__shakeX">
           {{ labelerror }}
         </span>
-        <span
-          v-else
-          class="suretext"
-          :class="{ addok: labelsure !== '待添加' }"
-        >
+        <span v-else class="suretext" :class="{ addok: labelsure !== '待添加' }">
           {{ labelsure }}
         </span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button
-          v-if="isupdate"
-          size="mini"
-          type="primary"
-          @click="labelupdate"
-          >更新</el-button
-        >
+        <el-button v-if="isupdate" size="mini" type="primary" @click="labelupdate">更新</el-button>
         <el-button size="mini" @click="labelcancel">关闭</el-button>
       </span>
     </el-dialog>
@@ -639,7 +471,7 @@ export default {
   font-size: 16px;
 }
 
-.el-menu--horizontal > .el-menu-item.is-active {
+.el-menu--horizontal>.el-menu-item.is-active {
   border-bottom: 2px solid #409eff;
   color: rgb(36, 104, 242);
 }

@@ -18,6 +18,9 @@
                     <a v-if="success" :download="url.split('/')[url.split('/').length - 1]" :href="url">
                         下载员工账号数据
                     </a>
+                    <span v-if="error">
+                        {{ error }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -44,16 +47,23 @@ export default {
                 companyNumber: "",
                 files: []
             },
-            excelData: []
+            excelData: [],
+            error: ""
         }
     },
     methods: {
         getuserlist() {
             axios.get("http://120.26.142.114:10010/users/company/get/userInfo")
                 .then(res => {
+                    this.error = ''
+                    this.url = ''
                     if (res.data.code === 200) {
                         this.url = res.data.data
-
+                    } else if (res.data.code === 5000) {
+                        this.$message.error(res.data.msg)
+                        for (let key in res.data.tata) {
+                            this.error += `${res.data.data[key]}行的手机号${key}已被注册`
+                        }
                     }
                 })
         },
